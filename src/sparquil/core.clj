@@ -3,9 +3,34 @@
             [quil.middleware :as m]
             [taoensso.carmine :as car :refer (wcar)]))
 
+;; ---- External environment state ----
+
+(def env (atom {}))
+
+(defn update-env! [key value]
+  (println "Updating env:" key "->" value)
+  (swap! env assoc (keyword key) value))
+
+; TODO: Populate with env values on startup (currently waits for update to get)
+
 ;; ---- Redis ----
+; TODO: Componentize the Redis connection (and also the Quil sketch)
+
 (def redis-conn {:pool {} :spec {:host "127.0.0.1" :port 6379}}) ; See `wcar` docstring for opts
+
 (defmacro wcar* [& body] `(car/wcar redis-conn ~@body))
+
+(defn handle-env-notification [[type _ chan-name _ :as msg]]
+  (println "Redis recieved message: " msg)
+  (when (= type "pmessage")
+    (when-let [key (second (re-find #"^__keyspace@0__:(env(?:\.[\w-]+)*/[\w-]+)$" chan-name))]
+      (println "I think I have an update for a key:" key)
+      (update-env! key (wcar* (car/get key))))))
+
+(def listener
+  (car/with-new-pubsub-listener (:spec redis-conn)
+      {"__keyspace@0__:env*" handle-env-notification}
+    (car/psubscribe  "__keyspace@0__:env*")))
 
 (defn setup []
   ; Set frame rate to 30 frames per second.
@@ -27,7 +52,7 @@
 
 (defn update-state [state]
   ; Update sketch state by changing circle color and position.
-  {:color (or (parse-number (wcar* (car/get "env/color")))
+  {:color (or (parse-number (:env/color @env))
               (mod (+ (:color state) 0.7) 255))
    :angle (+ (:angle state) 0.1)})
 
