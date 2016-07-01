@@ -17,9 +17,17 @@
   {:color 0
    :angle 0})
 
+; From http://stackoverflow.com/a/12285023/1028969
+(defn parse-number
+  "Reads a number from a string. Returns nil if not a number."
+  [s]
+  (when s
+    (if (re-find #"^-?\d+\.?\d*$" s)
+      (read-string s))))
+
 (defn update-state [state]
   ; Update sketch state by changing circle color and position.
-  {:color (or (Integer. (wcar* (car/get "env/color")))
+  {:color (or (parse-number (wcar* (car/get "env/color")))
               (mod (+ (:color state) 0.7) 255))
    :angle (+ (:angle state) 0.1)})
 
