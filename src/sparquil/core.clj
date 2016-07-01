@@ -4,18 +4,25 @@
             [taoensso.carmine :as car :refer (wcar)]))
 
 ; TODO: Spec everything
+; TODO: Add a proper logging library, get rid of printlns
 
 ;; ---- External environment state ----
 
 (def env (atom {}))
 
-(defn update-env! [key value]
-  (println "Updating env:" key "->" value)
-  (swap! env assoc (keyword key) value))
+(defn valid-env-key? [key]
+  "Returns whether the string key is a valid env key."
+  (re-matches #"^env(?:\.[\w-]+)*/[\w-]+$" key))
 
-; TODO: Populate with env values on startup (currently waits for update to get)
+(defn update-env! [key value]
+  "If key is valid, sets that key in env atom to value."
+  (if (valid-env-key? key)
+    (do (println "Updating env:" key "->" value)
+        (swap! env assoc (keyword key) value))
+    (println "Ingoring invalid env key:" key)))
 
 ;; ---- Redis ----
+
 ; TODO: Componentize the Redis connection (and also the Quil sketch)
 ; TODO: set up a "key mirroring" abstraction? Provide a set of key patternss,
 ;       it keeps any updates to keys matching those patterns in sync with redis
@@ -25,22 +32,35 @@
 (defmacro wcar* [& body] `(car/wcar redis-conn ~@body))
 
 (defn handle-env-notification [[type _ chan-name _ :as msg]]
-  (println "Redis recieved message: " msg)
+  (println "Recieved env update notification: " msg)
   (when (= type "pmessage")
-    (when-let [key (second (re-find #"^__keyspace@0__:(env(?:\.[\w-]+)*/[\w-]+)$" chan-name))]
-      (println "I think I have an update for a key:" key)
-      (update-env! key (wcar* (car/get key))))))
+    (let [env-key (second (re-find #"^__keyspace@0__:(env.*)$" chan-name))]
+      (update-env! env-key (wcar* (car/get env-key))))))
 
 (def listener
   (car/with-new-pubsub-listener (:spec redis-conn)
       {"__keyspace@0__:env*" handle-env-notification}
     (car/psubscribe  "__keyspace@0__:env*")))
 
+(defn refresh-env-key!
+  "Gets the latest value of key from Redis, updates the env atom with it."
+  [key]
+  (update-env! key (wcar* (car/get key))))
+
+(defn refresh-env! []
+  "Gets the latest values of all env* keys from Redis, updates the env atom with them."
+  (let [env-keys (wcar* (car/keys "env*"))]
+    (dorun (map #(refresh-env-key! %) env-keys))))
+
+;; ---- Quil ----
+
 (defn setup []
   ; Set frame rate to 30 frames per second.
   (q/frame-rate 30)
   ; Set color mode to HSB (HSV) instead of default RGB.
   (q/color-mode :hsb)
+  ; Get all existing env keys from redis
+  (refresh-env!)
   ; setup function returns initial state. It contains
   ; circle color and position.
   {:color 0
