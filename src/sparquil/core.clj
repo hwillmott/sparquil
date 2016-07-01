@@ -3,6 +3,8 @@
             [quil.middleware :as m]
             [taoensso.carmine :as car :refer (wcar)]))
 
+; TODO: Spec everything
+
 ;; ---- External environment state ----
 
 (def env (atom {}))
@@ -15,6 +17,8 @@
 
 ;; ---- Redis ----
 ; TODO: Componentize the Redis connection (and also the Quil sketch)
+; TODO: set up a "key mirroring" abstraction? Provide a set of key patternss,
+;       it keeps any updates to keys matching those patterns in sync with redis
 
 (def redis-conn {:pool {} :spec {:host "127.0.0.1" :port 6379}}) ; See `wcar` docstring for opts
 
