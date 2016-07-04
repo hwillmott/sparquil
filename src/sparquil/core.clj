@@ -1,5 +1,6 @@
 (ns sparquil.core
-  (:require [quil.core :as q]
+  (:require [clojure.spec :as s]
+            [quil.core :as q]
             [quil.middleware :as m]
             [taoensso.carmine :as car :refer (wcar)]))
 
@@ -9,6 +10,9 @@
 ;; ---- External environment state ----
 
 (def env (atom {}))
+
+(s/fdef valid-env-key?
+  :args (s/cat :key string?))
 
 (defn valid-env-key? [key]
   "Returns whether the string key is a valid env key."
@@ -66,6 +70,9 @@
   {:color 0
    :angle 0})
 
+(s/fdef parse-number
+  :args (s/cat :s (s/nilable string?))
+  :ret (s/nilable number?))
 ; From http://stackoverflow.com/a/12285023/1028969
 (defn parse-number
   "Reads a number from a string. Returns nil if not a number."
