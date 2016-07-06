@@ -73,6 +73,9 @@
   ([env key not-found]
    (get @(:cache env) key not-found)))
 
+(defn current [env]
+  @(:cache env))
+
 (defrecord Env [cache kv-store update-listener]
 ; TODO: Remove update-listener from Env record. Env shouldn't need to deal with
 ; kv-store issues like closing listeners. Do it with channels maybe?
@@ -91,13 +94,43 @@
 
 ;; ---- Quil ----
 
+; sketch-setup, sketch-update, and sketch-draw return valid quil
+; setup, update, and draw functions. State at the sketch level is
+; a vector of the states of the layers)
+
+(defn sketch-setup
+  "Returns a top-level setup function that will realize env and call layer
+  setup functions."
+  [env layer-setup-fns]
+  (fn []
+    (let [current-env (current env)]
+      (mapv #(% current-env) layer-setup-fns)))) ; TODO: try pmap
+
+(defn sketch-update
+  "Returns a top-level update function that will realize env and call layer
+  update functions to update state."
+  [env layer-update-fns]
+  (fn [layer-states]
+    (let [current-env (current env)]
+      (mapv #(%1 current-env %2) layer-update-fns layer-states)))) ;TODO: Try pmap
+
+(defn sketch-draw [layer-draw-fns]
+  "Returns a top-level draw function that will call each layer's draw
+  function with its state."
+  (fn [layer-states]
+    (dorun (map #(%1 %2) layer-draw-fns layer-states))))
+
 (defrecord Sketch [opts applet env]
 
   component/Lifecycle
   (start [sketch]
     ; TODO: Force fun-mode middleware
-    (let [wrapped-opts (update opts :update #(partial % env))]
-      (assoc sketch :applet (mapply q/sketch wrapped-opts))))
+    (let [layers (:layers opts)
+          opts (-> opts
+                   (assoc :setup (sketch-setup env (map :setup layers)))
+                   (assoc :update (sketch-update env (map :update layers)))
+                   (assoc :draw (sketch-draw (map :draw layers))))]
+      (assoc sketch :applet (mapply q/sketch opts))))
 
   (stop [sketch]
     (. applet exit)
@@ -105,18 +138,17 @@
 
 (defn new-sketch
   "Sketch component constructor. Opts will be passed to quil/sketch. See
-   quil/defsketch for documentation of possible options. :setup, :update, and
-   :draw functions as well as fun-mode middleware must be supplied. :update
-   function should take two args: env, a component representing the current
-   environemnt, and state, which is the normal quil fun-mode state."
+   quil/defsketch for documentation of possible options. Do not provide :setup,
+   :update, and :draw functions directly in opts. Provide a :layers key with a
+   vector of {:setup :update :draw} functions. Must also provide fun-mode
+   middleware."
   [opts]
-  (let [safe-opts (spec/conform :sketch/opts opts)]
-    (if (= safe-opts :clojure.spec/invalid)
-      (throw (Exception. (str "Invalid sketch options: "
-                              (spec/explain-str :sketch/opts opts))))
-      (map->Sketch {:opts safe-opts}))))
+  (if (spec/valid? :sketch/opts opts)
+    (map->Sketch {:opts opts})
+    (throw (Exception. (str "Invalid sketch options: "
+                            (spec/explain-str :sketch/opts opts))))))
 
-(defn setup []
+(defn subsketch-setup [env]
   ; Set frame rate to 30 frames per second.
   (q/frame-rate 30)
   ; Set color mode to HSB (HSV) instead of default RGB.
@@ -139,13 +171,13 @@
     (if (re-find #"^-?\d+\.?\d*$" s)
       (read-string s))))
 
-(defn update-state-with-env [env state]
+(defn subsketch-update [env state]
   ; Update sketch state by changing circle color and position.
-  {:color (or (parse-number (env-get env :env/color))
+  {:color (or (parse-number (:env/color env))
               (mod (+ (:color state) 0.7) 255))
    :angle (+ (:angle state) 0.1)})
 
-(defn draw-state [state]
+(defn subsketch-draw [state]
   ; Clear the sketch by filling it with light-grey color.
   (q/background 240)
   ; Set circle color.
@@ -160,15 +192,17 @@
       ; Draw the circle.
       (q/ellipse x y 100 100))))
 
+(def subsketch {:setup subsketch-setup
+                :update subsketch-update
+                :draw subsketch-draw})
+
 (defn sparquil-system []
   (component/system-map
     :sketch (component/using
               (new-sketch
                 {:title "You spin my circle right round"
                  :size [500 500]
-                 :setup setup
-                 :update update-state-with-env
-                 :draw draw-state
+                 :layers [subsketch]
                  :middleware [m/fun-mode]})
               [:env])
     :env (component/using (new-env)
