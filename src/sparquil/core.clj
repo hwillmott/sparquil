@@ -20,7 +20,9 @@
   (get-pattern [kv-store pattern]
     "Return a map containing all keys from kv-store starting with prefix")
   (subscribe-pattern [kv-store pattern callback]
-    "Calls (callback key new-value) to any key matching pattern"))
+    "Upon update to a key matching pattern, calls (callback key new-value).
+    Returns a listener which should be closed by callee when listener should
+    stop listening."))
 
 (defrecord RedisClient [host port conn]
 
@@ -71,16 +73,17 @@
   ([env key not-found]
    (get @(:cache env) key not-found)))
 
-(defrecord Env [cache kv-store]
-
+(defrecord Env [cache kv-store update-listener]
+; TODO: Remove update-listener from Env record. Env shouldn't need to deal with
+; kv-store issues like closing listeners. Do it with channels maybe?
   component/Lifecycle
   (start [env]
     (dorun (map #(apply update-env-cache! cache %) (get-pattern kv-store "env*")))
-    (subscribe-pattern kv-store "env*" #(update-env-cache! cache %1 %2))
-    env)
+    (assoc env :update-listener (subscribe-pattern kv-store "env*" #(update-env-cache! cache %1 %2))))
 
   (stop [env]
-    env))
+    (carm/close-listener update-listener)
+    (assoc env :update-listener nil)))
 
 (defn new-env []
   (map->Env {:cache (atom {})
