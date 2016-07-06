@@ -97,28 +97,38 @@
 ; sketch-setup, sketch-update, and sketch-draw return valid quil
 ; setup, update, and draw functions. State at the sketch level is
 ; a vector of the states of the layers)
+;
+; In a layer, any of setup, update, and draw can be nil. If nil, they
+; will be replaced by:
+; setup: (constantly nil)
+; update: (fn [env state] state) ; indentity for state, ignore env
+; draw: (constantly nil)
 
 (defn sketch-setup
   "Returns a top-level setup function that will realize env and call layer
   setup functions."
   [env layer-setup-fns]
-  (fn []
-    (let [current-env (current env)]
-      (mapv #(% current-env) layer-setup-fns)))) ; TODO: try pmap
+  (let [safe-setup-fns (map #(or % (constantly nil)) layer-setup-fns)]
+    (fn []
+      (let [current-env (current env)]
+        (mapv #(% current-env) safe-setup-fns))))) ; TODO: try pmap
 
 (defn sketch-update
   "Returns a top-level update function that will realize env and call layer
   update functions to update state."
   [env layer-update-fns]
-  (fn [layer-states]
-    (let [current-env (current env)]
-      (mapv #(%1 current-env %2) layer-update-fns layer-states)))) ;TODO: Try pmap
+  (let [safe-update-fns (map #(or % (fn [env state] state))
+                             layer-update-fns)]
+    (fn [layer-states]
+      (let [current-env (current env)]
+        (mapv #(%1 current-env %2) safe-update-fns layer-states))))) ;TODO: Try pmap
 
 (defn sketch-draw [layer-draw-fns]
   "Returns a top-level draw function that will call each layer's draw
   function with its state."
-  (fn [layer-states]
-    (dorun (map #(%1 %2) layer-draw-fns layer-states))))
+  (let [safe-draw-fns (map #(or % (constantly nil)) layer-draw-fns)]
+    (fn [layer-states]
+      (dorun (map #(%1 %2) layer-draw-fns layer-states)))))
 
 (defrecord Sketch [opts applet env]
 
@@ -196,13 +206,18 @@
                 :update subsketch-update
                 :draw subsketch-draw})
 
+(def partially-nil-subsketch {:setup (constantly "Grady wuz here")
+                              :draw (fn [state]
+                                      (q/fill 200 255 255)
+                                      (q/text state 10 10))})
+
 (defn sparquil-system []
   (component/system-map
     :sketch (component/using
               (new-sketch
                 {:title "You spin my circle right round"
                  :size [500 500]
-                 :layers [subsketch]
+                 :layers [subsketch partially-nil-subsketch]
                  :middleware [m/fun-mode]})
               [:env])
     :env (component/using (new-env)

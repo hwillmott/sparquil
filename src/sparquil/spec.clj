@@ -7,7 +7,7 @@
 (s/def :sketch/update (constantly true))
 (s/def :sketch/draw (constantly true))
 
-(s/def :sketch/layer (s/keys :req-un [:sketch/setup :sketch/update :sketch/draw]))
+(s/def :sketch/layer (s/keys :opt-un [:sketch/setup :sketch/update :sketch/draw]))
 (s/def :sketch/layers (s/cat :layers (s/* :sketch/layer)))
 
 (s/def :sketch/opts (s/keys :req-un [:sketch/layers]))
