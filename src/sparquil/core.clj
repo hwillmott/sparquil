@@ -77,6 +77,9 @@
   (start [env]
     (dorun (map #(apply update-env-cache! cache %) (get-pattern kv-store "env*")))
     (subscribe-pattern kv-store "env*" #(update-env-cache! cache %1 %2))
+    env)
+
+  (stop [env]
     env))
 
 (defn new-env []
@@ -91,7 +94,11 @@
   (start [sketch]
     ; TODO: Force fun-mode middleware
     (let [wrapped-opts (update opts :update #(partial % env))]
-      (assoc sketch :applet (mapply q/sketch wrapped-opts)))))
+      (assoc sketch :applet (mapply q/sketch wrapped-opts))))
+
+  (stop [sketch]
+    (. applet exit)
+    env))
 
 (defn new-sketch
   "Sketch component constructor. Opts will be passed to quil/sketch. See
@@ -164,7 +171,3 @@
     :env (component/using (new-env)
                           [:kv-store])
     :kv-store (new-redis-client "127.0.0.1" 6379)))
-
-; TODO: replace this with something like Reloaded Workflow
-(def sys (sparquil-system))
-(component/start-system sys)

@@ -6,4 +6,7 @@
                  [com.stuartsierra/component "0.3.1"]
                  [com.taoensso/carmine "2.13.1"]
                  [quil "2.4.0"]]
-  :repl-options {:init-ns sparquil.core})
+  :profiles {:dev {:source-paths ["dev"]
+                   :dependencies [[org.clojure/tools.namespace "0.2.3"]
+                                  [org.clojure/java.classpath "0.2.0"]
+                                  [org.clojure/test.check "0.9.0"]]}})
