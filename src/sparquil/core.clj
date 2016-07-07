@@ -5,7 +5,8 @@
             [quil.core :as q]
             [quil.middleware :as m]
             [taoensso.carmine :as carm :refer [wcar]]
-            [sparquil.spec]))
+            [sparquil.spec]
+            [sparquil.opc :as opc]))
 
 ; TODO: Spec everything
 ; TODO: Add a proper logging library, get rid of printlns
@@ -92,7 +93,34 @@
   (map->Env {:cache (atom {})
              :kv-store nil}))
 
+;; ---- Display to LEDs ----
+
+(defprotocol Displayer
+  "A protocol for things that are capable of displaying frames"
+  (display [displayer frame] "Display a frame"))
+
+(defrecord FadecandyDisplayer [host port connection]
+  component/Lifecycle
+  (start [displayer]
+    (assoc displayer :connection (opc/open-connection host port)))
+
+  (stop [displayer]
+    (opc/close-connection connection)
+    (dissoc displayer :connection))
+
+  Displayer
+  (display [_ frame]
+    (opc/push-pixels {0 frame} connection)))
+
+(defn new-fadecandy-displayer [host port]
+  (map->FadecandyDisplayer {:host host :port port}))
+
 ;; ---- Quil ----
+
+(defn point->pixel [[height width] [x y]]
+  (if (and (< x width) (< y height))
+    (+ x (* width y))
+    nil))
 
 ; sketch-setup, sketch-update, and sketch-draw return valid quil
 ; setup, update, and draw functions. State at the sketch level is
@@ -123,23 +151,40 @@
       (let [current-env (current env)]
         (mapv #(%1 current-env %2) safe-update-fns layer-states))))) ;TODO: Try pmap
 
-(defn sketch-draw [layer-draw-fns]
+(defn sketch-draw [layer-draw-fns display-fn]
   "Returns a top-level draw function that will call each layer's draw
   function with its state."
   (let [safe-draw-fns (map #(or % (constantly nil)) layer-draw-fns)]
     (fn [layer-states]
-      (dorun (map #(%1 %2) layer-draw-fns layer-states)))))
+      (dorun (map #(%1 %2) layer-draw-fns layer-states)) ; TODO: safe-draw-fns
+      (q/color-mode :rgb 255)
+      (display-fn (q/pixels)))))
 
-(defrecord Sketch [opts applet env]
+(defmulti inflate
+  (fn [size shape] (:leds/type shape)))
+
+(defmethod inflate :leds/strip [size {:keys [:leds/count :leds/offset :leds/spacing]}]
+  (let [[x-offset y-offset] offset]
+    (map (partial point->pixel size)
+         (map vector (range x-offset (+ x-offset (* spacing count)) spacing)
+                     (repeat y-offset)))))
+
+
+(defrecord Sketch [opts applet env displayer]
 
   component/Lifecycle
   (start [sketch]
     ; TODO: Force fun-mode middleware
-    (let [layers (:layers opts)
+    (let [{:keys [size layers led-shapes]} opts
+          led-pixel-indices (mapcat (partial inflate size) led-shapes)
+          display-fn (fn [pixels]
+                       (display displayer (map #(aget pixels %) led-pixel-indices))
+                       pixels)
           opts (-> opts
                    (assoc :setup (sketch-setup env (map :setup layers)))
                    (assoc :update (sketch-update env (map :update layers)))
-                   (assoc :draw (sketch-draw (map :draw layers))))]
+                   (assoc :draw (sketch-draw (map :draw layers) display-fn)))]
+
       (assoc sketch :applet (mapply q/sketch opts))))
 
   (stop [sketch]
@@ -161,8 +206,6 @@
 (defn subsketch-setup [env]
   ; Set frame rate to 30 frames per second.
   (q/frame-rate 30)
-  ; Set color mode to HSB (HSV) instead of default RGB.
-  (q/color-mode :hsb)
   ; Get all existing env keys from redis
   ; setup function returns initial state. It contains
   ; circle color and position.
@@ -189,8 +232,9 @@
 
 (defn subsketch-draw [state]
   ; Clear the sketch by filling it with light-grey color.
-  (q/background 240)
-  ; Set circle color.
+  (q/background 0)
+  ; Set circle color
+  (q/color-mode :hsb)
   (q/fill (:color state) 255 255)
   ; Calculate x and y coordinates of the circle.
   (let [angle (:angle state)
@@ -218,8 +262,13 @@
                 {:title "You spin my circle right round"
                  :size [500 500]
                  :layers [subsketch partially-nil-subsketch]
+                 :led-shapes [{:leds/type :leds/strip
+                               :leds/offset [0 250]
+                               :leds/spacing (/ 500 36)
+                               :leds/count 36}]
                  :middleware [m/fun-mode]})
-              [:env])
+              [:env :displayer])
+    :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
     :env (component/using (new-env)
                           [:kv-store])
     :kv-store (new-redis-client "127.0.0.1" 6379)))
