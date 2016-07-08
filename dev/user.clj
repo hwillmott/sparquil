@@ -3,6 +3,7 @@
             [clojure.stacktrace :refer [print-cause-trace]]
             [com.stuartsierra.component :as component]
             [clojure.tools.namespace.repl :refer [refresh disable-reload!]]
+            [taoensso.carmine :as carm :refer [wcar]]
             [sparquil.core :refer :all]))
 
 (def system nil)

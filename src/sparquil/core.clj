@@ -16,6 +16,14 @@
 ; TODO: set up a "key mirroring" abstraction? Provide a set of key patternss,
 ;       it keeps any updates to keys matching those patterns in sync with redis
 
+(defmacro try-redis
+  ([default & body]
+   `(try ~@body
+     (catch Exception e#
+       (println (str "Redis command failed. Returning default: " ~default ". "
+                     "Exception: " (.getMessage e#)))
+       ~default))))
+
 (defprotocol KVStore
   "A protocol for key-value stores like Redis."
   (get-pattern [kv-store pattern]
@@ -29,25 +37,31 @@
 
   component/Lifecycle
   (start [redis-client]
-    (assoc redis-client :conn {:pool {} :spec {:host host :port port}}))
+    (let [new-conn {:pool {} :spec {:host host :port port}}]
+      (try (wcar new-conn (carm/ping))
+        (catch Exception e
+          (println (str "Ping to Redis (" host ":" port") failed: "
+                        (.getMessage e)))))
+      (assoc redis-client :conn new-conn)))
 
   (stop [redis-client]
     (dissoc redis-client :conn))
 
   KVStore
   (get-pattern [redis-client pattern]
-    (let [keys (wcar conn (carm/keys pattern))]
+    (let [keys (try-redis [] (wcar conn (carm/keys pattern)))]
       (into {} (map (fn [k] {k (wcar conn (carm/get k))})
                     keys))))
 
   (subscribe-pattern [redis-client pattern callback]
     (let [channel (str "__keyspace@0__:" pattern)]
-      (carm/with-new-pubsub-listener (:spec conn)
-        {channel (fn [[type _ chan-name _ :as msg]]
-                  (when (= type "pmessage")
-                    (let [k (second (re-find #"^__keyspace@0__:(.*)$" chan-name))]
-                      (callback k (wcar conn (carm/get k))))))}
-        (carm/psubscribe channel)))))
+      (try-redis nil
+        (carm/with-new-pubsub-listener (:spec conn)
+          {channel (fn [[type _ chan-name _ :as msg]]
+                    (when (= type "pmessage")
+                      (let [k (second (re-find #"^__keyspace@0__:(.*)$" chan-name))]
+                        (callback k (wcar conn (carm/get k))))))}
+          (carm/psubscribe channel))))))
 
 (defn new-redis-client [host port]
   (->RedisClient host port nil))
@@ -86,7 +100,8 @@
     (assoc env :update-listener (subscribe-pattern kv-store "env*" #(update-env-cache! cache %1 %2))))
 
   (stop [env]
-    (carm/close-listener update-listener)
+    (when update-listener
+      (carm/close-listener update-listener))
     (assoc env :update-listener nil)))
 
 (defn new-env []
