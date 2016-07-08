@@ -21,7 +21,8 @@
    `(try ~@body
      (catch Exception e#
        (println (str "Redis command failed. Returning default: " ~default ". "
-                     "Exception: " (.getMessage e#)))
+                     "Exception: " (.getMessage e#) "\n"
+                     "Failed command: " (quote ~@body)))
        ~default))))
 
 (defprotocol KVStore
