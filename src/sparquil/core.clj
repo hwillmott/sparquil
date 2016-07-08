@@ -169,7 +169,6 @@
          (map vector (range x-offset (+ x-offset (* spacing count)) spacing)
                      (repeat y-offset)))))
 
-
 (defrecord Sketch [opts applet env displayer]
 
   component/Lifecycle
@@ -255,6 +254,12 @@
                                       (q/fill 200 255 255)
                                       (q/text state 10 10))})
 
+(defn full-horizontal-strip [y-offset]
+  {:leds/type :leds/strip
+   :leds/offset [0 y-offset]
+   :leds/spacing (/ 500 36)
+   :leds/count 36})
+
 (defn sparquil-system []
   (component/system-map
     :sketch (component/using
@@ -262,10 +267,11 @@
                 {:title "You spin my circle right round"
                  :size [500 500]
                  :layers [subsketch partially-nil-subsketch]
-                 :led-shapes [{:leds/type :leds/strip
-                               :leds/offset [0 250]
-                               :leds/spacing (/ 500 36)
-                               :leds/count 36}]
+                 :led-shapes [(full-horizontal-strip 200)
+                              (full-horizontal-strip 220)
+                              (full-horizontal-strip 240)
+                              (full-horizontal-strip 260)
+                              (full-horizontal-strip 280)]
                  :middleware [m/fun-mode]})
               [:env :displayer])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
