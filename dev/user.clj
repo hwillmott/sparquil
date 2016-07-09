@@ -4,7 +4,8 @@
             [com.stuartsierra.component :as component]
             [clojure.tools.namespace.repl :refer [refresh disable-reload!]]
             [taoensso.carmine :as carm :refer [wcar]]
-            [sparquil.core :refer :all]))
+            [sparquil.core :refer :all]
+            [sparquil.layer :as layer]))
 
 (def system nil)
 
@@ -27,3 +28,7 @@
   (try (do (stop)
            (refresh :after 'user/go))
        (catch Exception e (print-cause-trace e))))
+
+
+(def redis-conn {:pool {} :spec {:host "127.0.0.1" :port 6379}}) ; See `wcar` docstring for opts
+(defmacro wcar* [& body] `(wcar redis-conn ~@body))
