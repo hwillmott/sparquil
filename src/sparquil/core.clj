@@ -6,7 +6,8 @@
             [quil.middleware :as m]
             [taoensso.carmine :as carm :refer [wcar]]
             [sparquil.spec]
-            [sparquil.opc :as opc]))
+            [sparquil.opc :as opc]
+            [sparquil.layer :as l]))
 
 ; TODO: Spec everything
 ; TODO: Add a proper logging library, get rid of printlns
@@ -131,7 +132,7 @@
 (defn new-fadecandy-displayer [host port]
   (map->FadecandyDisplayer {:host host :port port}))
 
-;; ---- Quil ----
+;; ---- Sketch ----
 
 (defn point->pixel [[height width] [x y]]
   (if (and (< x width) (< y height))
@@ -218,57 +219,7 @@
     (throw (Exception. (str "Invalid sketch options: "
                             (spec/explain-str :sketch/opts opts))))))
 
-(defn subsketch-setup [env]
-  ; Set frame rate to 30 frames per second.
-  (q/frame-rate 30)
-  ; Get all existing env keys from redis
-  ; setup function returns initial state. It contains
-  ; circle color and position.
-  {:color 0
-   :angle 0})
-
-(spec/fdef parse-number
-           :args (spec/cat :s (spec/nilable string?))
-           :ret (spec/nilable number?))
-
-; From http://stackoverflow.com/a/12285023/1028969
-(defn parse-number
-  "Reads a number from a string. Returns nil if not a number."
-  [s]
-  (when s
-    (if (re-find #"^-?\d+\.?\d*$" s)
-      (read-string s))))
-
-(defn subsketch-update [env state]
-  ; Update sketch state by changing circle color and position.
-  {:color (or (parse-number (:env/color env))
-              (mod (+ (:color state) 0.7) 255))
-   :angle (+ (:angle state) 0.1)})
-
-(defn subsketch-draw [state]
-  ; Clear the sketch by filling it with light-grey color.
-  (q/background 0)
-  ; Set circle color
-  (q/color-mode :hsb)
-  (q/fill (:color state) 255 255)
-  ; Calculate x and y coordinates of the circle.
-  (let [angle (:angle state)
-        x (* 150 (q/cos angle))
-        y (* 150 (q/sin angle))]
-    ; Move origin point to the center of the sketch.
-    (q/with-translation [(/ (q/width) 2)
-                         (/ (q/height) 2)]
-      ; Draw the circle.
-      (q/ellipse x y 100 100))))
-
-(def subsketch {:setup subsketch-setup
-                :update subsketch-update
-                :draw subsketch-draw})
-
-(def partially-nil-subsketch {:setup (constantly "Grady wuz here")
-                              :draw (fn [state]
-                                      (q/fill 200 255 255)
-                                      (q/text state 10 10))})
+; ---- LED configurations ----
 
 (defn full-horizontal-strip [y-offset]
   {:leds/type :leds/strip
@@ -276,13 +227,16 @@
    :leds/spacing (/ 500 36)
    :leds/count 36})
 
+; ---- System definition ----
+
 (defn sparquil-system []
   (component/system-map
     :sketch (component/using
               (new-sketch
                 {:title "You spin my circle right round"
                  :size [500 500]
-                 :layers [subsketch partially-nil-subsketch]
+                 :layers [l/rainbow-orbit
+                          (l/text "Grady wuz here" :color [255] :offset [10 20])]
                  :led-shapes [(full-horizontal-strip 200)
                               (full-horizontal-strip 220)
                               (full-horizontal-strip 240)
