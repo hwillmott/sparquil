@@ -9,8 +9,8 @@
   (match color
     (brightness :guard number?) (q/color-mode :rgb 255)
     [brightness]                (q/color-mode :rgb 255)
-    [:rgb _ _ _]                (q/color-mode :rgb 255)
-    [:hsb _ _ _]                (q/color-mode :hsb 360 100 100)))
+    [(:or :rgb "rgb") _ _ _]    (q/color-mode :rgb 255)
+    [(:or :hsb "hsb") _ _ _]    (q/color-mode :hsb 360 100 100)))
 
 (defn color-apply
   "Calls f, a Quil function that takes params like fill, with color"
@@ -18,8 +18,8 @@
   (match color
     (brightness :guard number?) (f brightness)
     [brightness]                (f brightness)
-    [:rgb r g b]                (f r g b)
-    [:hsb h s v]                (f h s v)))
+    [(:or :rgb "rgb") r g b]    (f r g b)
+    [(:or :hsb "hsb") h s v]    (f h s v)))
 
 (defn color-wrap [quil-fn]
   "Wraps a Quil function that takes params like fill so that it can
@@ -82,7 +82,7 @@
                            (q/ellipse x y 100 100))))})
 
 
-(defn text [text & {:keys [color offset] :or {color [0] offset [0 0]}}]
+(defn text [text {:keys [color offset] :or {color [0] offset [0 0]}}]
   {:draw (fn [_]
            (fill color)
            (apply q/text text offset))})

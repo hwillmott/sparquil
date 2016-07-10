@@ -1,5 +1,6 @@
 (ns sparquil.core
   (:require [clojure.spec :as spec]
+            [clojure.core.match :refer [match]]
             [org.tobereplaced.mapply :refer [mapply]]
             [com.stuartsierra.component :as component]
             [quil.core :as q]
@@ -7,7 +8,8 @@
             [taoensso.carmine :as carm :refer [wcar]]
             [sparquil.spec]
             [sparquil.opc :as opc]
-            [sparquil.layer :as l]))
+            [sparquil.layer :as l]
+            [clojure.data.json :as json]))
 
 ; TODO: Spec everything
 ; TODO: Add a proper logging library, get rid of printlns
@@ -28,14 +30,18 @@
 
 (defprotocol KVStore
   "A protocol for key-value stores like Redis."
+  (get-key [kv-store key]
+    "Return the value of key in kv-store or nil if it doesn't exist or if the operation fails")
   (get-pattern [kv-store pattern]
     "Return a map containing all keys from kv-store starting with prefix")
-  (subscribe-pattern [kv-store pattern callback]
-    "Upon update to a key matching pattern, calls (callback key new-value).
-    Returns a listener which should be closed by callee when listener should
-    stop listening."))
+  (subscribe-key [kv-store name key-pattern callback]
+    "Upon update to a key that matches pattern, calls (callback key new-value).
+    Assigns name to listener so it can be closed via that name with unsubscribe-key.
+    Returns nil if unable to subscribe listener or the listener otherwise.")
+  (unsubscribe-key [kv-store name]
+    "Unsubscribe the listener named name. Names are set with calls to subscribe-key."))
 
-(defrecord RedisClient [host port conn]
+(defrecord RedisClient [host port conn open-listeners]
 
   component/Lifecycle
   (start [redis-client]
@@ -50,23 +56,37 @@
     (dissoc redis-client :conn))
 
   KVStore
+  (get-key [redis-client key]
+    (try-redis nil (wcar conn (carm/get key))))
+
   (get-pattern [redis-client pattern]
     (let [keys (try-redis [] (wcar conn (carm/keys pattern)))]
       (into {} (map (fn [k] {k (wcar conn (carm/get k))})
                     keys))))
 
-  (subscribe-pattern [redis-client pattern callback]
-    (let [channel (str "__keyspace@0__:" pattern)]
-      (try-redis nil
-        (carm/with-new-pubsub-listener (:spec conn)
-          {channel (fn [[type _ chan-name _ :as msg]]
-                    (when (= type "pmessage")
-                      (let [k (second (re-find #"^__keyspace@0__:(.*)$" chan-name))]
-                        (callback k (wcar conn (carm/get k))))))}
-          (carm/psubscribe channel))))))
+  (subscribe-key [redis-client name key-pattern callback]
+    (let [channel (str "__keyspace@0__:" key-pattern)]
+      (when-let [listener
+                 (try-redis nil
+                   (carm/with-new-pubsub-listener (:spec conn)
+                     {channel (fn [[type _ chan-name _ :as msg]]
+                               (when (= type "pmessage")
+                                 (let [k (second (re-find #"^__keyspace@0__:(.*)$" chan-name))]
+                                   (callback k (wcar conn (carm/get k))))))}
+                     (carm/psubscribe channel)))]
+        (swap! open-listeners assoc name listener))))
+
+  (unsubscribe-key [redis-client name]
+    (swap! open-listeners (fn [listeners]
+                            (if-let [listener (listeners name)]
+                              (do (carm/close-listener listener)
+                                  (dissoc listeners name))
+                              (do (println "Failed to unsubscribe listener with name \"" name "\"."
+                                           "No open listeners with that name.")
+                                  listeners))))))
 
 (defn new-redis-client [host port]
-  (->RedisClient host port nil))
+  (->RedisClient host port nil (atom nil)))
 
 ;; ---- External environment state ----
 
@@ -93,17 +113,15 @@
 (defn current [env]
   @(:cache env))
 
-(defrecord Env [cache kv-store update-listener]
-; TODO: Remove update-listener from Env record. Env shouldn't need to deal with
-; kv-store issues like closing listeners. Do it with channels maybe?
+(defrecord Env [cache kv-store]
   component/Lifecycle
   (start [env]
     (dorun (map #(apply update-env-cache! cache %) (get-pattern kv-store "env*")))
-    (assoc env :update-listener (subscribe-pattern kv-store "env*" #(update-env-cache! cache %1 %2))))
+    (subscribe-key kv-store ::env-updates "env*" #(update-env-cache! cache %1 %2))
+    env)
 
   (stop [env]
-    (when update-listener
-      (carm/close-listener update-listener))
+    (unsubscribe-key kv-store ::env-updates)
     (assoc env :update-listener nil)))
 
 (defn new-env []
@@ -175,6 +193,7 @@
     (fn [layer-states]
       (dorun (map #(%1 %2) layer-draw-fns layer-states)) ; TODO: safe-draw-fns
       (q/color-mode :rgb 255)
+      (l/background 0) ; Make default background black instead of grey
       (display-fn (q/pixels)))))
 
 (defmulti inflate
@@ -186,26 +205,89 @@
          (map vector (range x-offset (+ x-offset (* spacing count)) spacing)
                      (repeat y-offset)))))
 
-(defrecord Sketch [opts applet env displayer]
+(defn resolve-layer-name
+  "Returns the value bound to the symbol named by name in the sparquil.layer ns"
+  [name]
+  (eval (symbol "sparquil.layer" name)))
+
+(defn realize-layer
+  "Takes a layer spec, returns a fully realized layer or nil if realization fails.
+
+  Layer specs are either strings that name a layer defined directly in the
+  sparquil.layer namespace, or a vector. If a vector, the vector is treated almost
+  like a Clojure form, where the first element is a string that names a function in
+  the sparquil.clojure namespace and the tail is interpreted as args to that function.
+
+  Layer specs are unrelated core.spec"
+  [layer-spec]
+  (try
+    (match layer-spec
+      (name :guard string?) (resolve-layer-name name)
+      [name & params]       (apply (resolve-layer-name name) params))
+    (catch Exception e
+      (println "Unable to realize layer spec:" layer-spec)
+      (println "Exception: " (.getMessage e))
+      nil)))
+
+(defn read-layers
+  "Returns a vector of deserialized layer specs or nil if unable to deserialize"
+  [layers-str]
+  (when-let [deserialized
+             (try
+               (json/read-str layers-str :key-fn keyword)
+               (catch Exception e
+                 (println "Value at 'sketch/layers' is not valid json:" layers-str)))]
+    (if (or (vector? deserialized) (string? deserialized))
+      deserialized
+      (println "Value at 'sketch/layers' deserialized to an invalid type:" deserialized))))
+
+
+(defn thaw-layers
+  "Deserializes a string describing a vector of layer specs into a vector of layers"
+  [layers-str]
+  (when-let [layer-specs (read-layers layers-str)]
+    (filter (complement nil?) (mapv realize-layer layer-specs))))
+
+(defn start-applet [env opts layers display-fn]
+  "Creates and returns a new sketch applet"
+  (let [applet-opts (-> opts
+                        (assoc :setup (sketch-setup env (map :setup layers)))
+                        (assoc :update (sketch-update env (map :update layers)))
+                        (assoc :draw (sketch-draw (map :draw layers) display-fn)))]
+    (mapply q/sketch applet-opts)))
+
+(defn get-layers
+  "Returns the thawed layers (not just layer specs) specified by the 'sketch/layer'
+  key in the kv-store"
+  [kv-store]
+  (when-let [layers-str (get-key kv-store :sketch/layers)]
+    (thaw-layers layers-str)))
+
+(defrecord Sketch [opts applet env displayer kv-store]
 
   component/Lifecycle
   (start [sketch]
     ; TODO: Force fun-mode middleware
-    (let [{:keys [size layers led-shapes]} opts
+    (let [{init-layers :layers :keys [size led-shapes]} opts
+          layers (or (get-layers kv-store) init-layers)
           led-pixel-indices (mapcat (partial inflate size) led-shapes)
           display-fn (fn [pixels]
                        (display displayer (map #(aget pixels %) led-pixel-indices))
-                       pixels)
-          opts (-> opts
-                   (assoc :setup (sketch-setup env (map :setup layers)))
-                   (assoc :update (sketch-update env (map :update layers)))
-                   (assoc :draw (sketch-draw (map :draw layers) display-fn)))]
-
-      (assoc sketch :applet (mapply q/sketch opts))))
+                       pixels)]
+      (reset! applet (start-applet env opts layers display-fn))
+      (subscribe-key kv-store ::layer-updates "sketch/layers"
+        (fn [_ new-layer-str]
+          (. @applet exit)
+          (reset! applet (start-applet env opts
+                                       (or (thaw-layers new-layer-str) init-layers)
+                                       display-fn))))
+      sketch))
 
   (stop [sketch]
-    (. applet exit)
-    env))
+    (. @applet exit)
+    (reset! applet nil)
+    (unsubscribe-key kv-store ::layer-updates)
+    sketch))
 
 (defn new-sketch
   "Sketch component constructor. Opts will be passed to quil/sketch. See
@@ -215,7 +297,7 @@
    middleware."
   [opts]
   (if (spec/valid? :sketch/opts opts)
-    (map->Sketch {:opts opts})
+    (map->Sketch {:applet (atom nil) :opts opts})
     (throw (Exception. (str "Invalid sketch options: "
                             (spec/explain-str :sketch/opts opts))))))
 
@@ -236,14 +318,14 @@
                 {:title "You spin my circle right round"
                  :size [500 500]
                  :layers [l/rainbow-orbit
-                          (l/text "Grady wuz here" :color [255] :offset [10 20])]
+                          (l/text "Grady wuz here" {:color [255] :offset [10 20]})]
                  :led-shapes [(full-horizontal-strip 200)
                               (full-horizontal-strip 220)
                               (full-horizontal-strip 240)
                               (full-horizontal-strip 260)
                               (full-horizontal-strip 280)]
                  :middleware [m/fun-mode]})
-              [:env :displayer])
+              [:env :displayer :kv-store])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
     :env (component/using (new-env)
                           [:kv-store])
