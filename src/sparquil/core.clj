@@ -173,6 +173,7 @@
   [env layer-setup-fns]
   (let [safe-setup-fns (map #(or % (constantly nil)) layer-setup-fns)]
     (fn []
+      (l/background 0) ; Make default background black instead of grey
       (let [current-env (current env)]
         (mapv #(% current-env) safe-setup-fns))))) ; TODO: try pmap
 
@@ -193,7 +194,6 @@
     (fn [layer-states]
       (dorun (map #(%1 %2) layer-draw-fns layer-states)) ; TODO: safe-draw-fns
       (q/color-mode :rgb 255)
-      (l/background 0) ; Make default background black instead of grey
       (display-fn (q/pixels)))))
 
 (defmulti inflate
