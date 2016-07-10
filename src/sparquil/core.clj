@@ -111,7 +111,8 @@
    (get @(:cache env) key not-found)))
 
 (defn current [env]
-  @(:cache env))
+  (merge @(:cache env)
+         {:env/time (System/currentTimeMillis)}))
 
 (defrecord Env [cache kv-store]
   component/Lifecycle
