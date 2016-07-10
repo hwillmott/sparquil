@@ -126,31 +126,37 @@
     [:rgb 0 0 204]))
 
 (defn conways
-  "Return a layer that will run Conway's Game of Life on a grid of size [rows cols].
+  "Return a layer that will run Conway's Game of Life on a grid of size [rows cols] stepping
+  once per step-interval milliseconds.
 
   Stretches to fit the size of the sketch as determined by (quil/height) and (quil/width)"
-  [rows cols]
+  [rows cols step-interval]
   {:setup
-   (fn [env]
-     (into [] (repeatedly rows
-                (fn [] (into [] (repeatedly cols #(if (> 0.25 (rand)) true false)))))))
+   (fn [{:keys [:env/time]}]
+     (println time)
+     {:last-step-time time
+      :grid (into [] (repeatedly rows
+                                 (fn [] (into [] (repeatedly cols #(if (> 0.25 (rand)) true false))))))})
 
    :update
-   (fn [env state]
-     (let [neighbors (partial grid-neighbors state)]
-       (reduce (fn [grid coords]
-                 (update-in grid coords conway-cell-transition (neighbors coords)))
-         state
-         (for [i (range rows)
-               j (range cols)]
-           [i j]))))
+   (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+     (if (< time (+ last-step-time step-interval))
+       state
+       {:last-step-time time
+        :grid (let [neighbors (partial grid-neighbors grid)]
+                (reduce (fn [grid coords]
+                          (update-in grid coords conway-cell-transition (neighbors coords)))
+                        grid
+                        (for [i (range rows)
+                              j (range cols)]
+                          [i j])))}))
 
    :draw
-   (fn [state]
+   (fn [{:keys [:grid]}]
      (let [x-interval (/ (q/width) cols)
            y-interval (/ (q/height) rows)]
        (dorun
          (for [i (range rows)
                j (range cols)]
-           (do (fill (conway-cell-color (get-in state [i j])))
+           (do (fill (conway-cell-color (get-in grid [i j])))
                (q/rect (* j x-interval) (* i y-interval) x-interval y-interval))))))})

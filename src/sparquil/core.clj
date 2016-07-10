@@ -344,7 +344,7 @@
               (new-sketch
                 {:title "You spin my circle right round"
                  :size [1200 200]
-                 :layers [(l/conways 6 36)
+                 :layers [(l/conways 6 36 125)
                           l/rainbow-orbit
                           (l/text "Grady wuz here" {:color [255] :offset [10 20]})]
                  :led-shapes [(grid 6 36)]
