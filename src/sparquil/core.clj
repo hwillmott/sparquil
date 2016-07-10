@@ -152,11 +152,6 @@
 
 ;; ---- Sketch ----
 
-(defn point->pixel [[height width] [x y]]
-  (if (and (< x width) (< y height))
-    (+ x (* width y))
-    nil))
-
 ; sketch-setup, sketch-update, and sketch-draw return valid quil
 ; setup, update, and draw functions. State at the sketch level is
 ; a vector of the states of the layers)
@@ -196,14 +191,33 @@
       (q/color-mode :rgb 255)
       (display-fn (q/pixels)))))
 
+(defn point->pixel-index
+  "Given a size and a point, returns the corresponding index in quil/pixel array"
+  [[width height] [x y]]
+  (if (and (< x width) (< y height))
+    (+ (int x) (* width (int y)))
+    nil))
+
 (defmulti inflate
   (fn [size shape] (:leds/type shape)))
 
 (defmethod inflate :leds/strip [size {:keys [:leds/count :leds/offset :leds/spacing]}]
   (let [[x-offset y-offset] offset]
-    (map (partial point->pixel size)
+    (map (partial point->pixel-index size)
          (map vector (range x-offset (+ x-offset (* spacing count)) spacing)
                      (repeat y-offset)))))
+
+; TODO: Different led-pixel mapping modes. Average over region rather than single pixel?
+
+(defmethod inflate :leds/stretch-grid [[width height :as size] {:keys [:leds/dimensions]}]
+  (let [[rows cols] dimensions
+        x-interval (/ width cols)
+        y-interval (/ height rows)]
+    (for [i (range 0 rows) ; i indexes rows (y-dim)
+          j (range 0 cols)] ; j indexes cols  (x-dim)
+      (point->pixel-index size
+        [(+ (/ x-interval 2) (* j x-interval))
+         (+ (/ y-interval 2) (* i y-interval))]))))
 
 (defn resolve-layer-name
   "Returns the value bound to the symbol named by name in the sparquil.layer ns"
@@ -272,7 +286,10 @@
           layers (or (get-layers kv-store) init-layers)
           led-pixel-indices (mapcat (partial inflate size) led-shapes)
           display-fn (fn [pixels]
-                       (display displayer (map #(aget pixels %) led-pixel-indices))
+                       (display displayer (map #(if (nil? %)
+                                                  (q/color 0)
+                                                  (aget pixels %))
+                                               led-pixel-indices))
                        pixels)]
       (reset! applet (start-applet env opts layers display-fn))
       (subscribe-key kv-store ::layer-updates "sketch/layers"
@@ -309,6 +326,10 @@
    :leds/spacing (/ 500 36)
    :leds/count 36})
 
+(defn grid [rows cols]
+  {:leds/type :leds/stretch-grid
+   :leds/dimensions [rows cols]})
+
 ; ---- System definition ----
 
 (defn sparquil-system []
@@ -316,14 +337,10 @@
     :sketch (component/using
               (new-sketch
                 {:title "You spin my circle right round"
-                 :size [500 500]
+                 :size [1200 200]
                  :layers [l/rainbow-orbit
                           (l/text "Grady wuz here" {:color [255] :offset [10 20]})]
-                 :led-shapes [(full-horizontal-strip 200)
-                              (full-horizontal-strip 220)
-                              (full-horizontal-strip 240)
-                              (full-horizontal-strip 260)
-                              (full-horizontal-strip 280)]
+                 :led-shapes [(grid 6 36)]
                  :middleware [m/fun-mode]})
               [:env :displayer :kv-store])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
