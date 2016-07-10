@@ -332,6 +332,11 @@
 
 ; ---- System definition ----
 
+; TODO: Add a :regions opt that maps names to rectangles on the sketch
+;       Uses:
+;       - if :layers is a map, it maps region names to layer vectors
+;       - LED shapes can use regions to specify offsets, sizes, etc.})
+
 (defn sparquil-system []
   (component/system-map
     :sketch (component/using
