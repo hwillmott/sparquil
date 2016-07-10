@@ -5,7 +5,7 @@
             [clojure.tools.namespace.repl :refer [refresh disable-reload!]]
             [taoensso.carmine :as carm :refer [wcar]]
             [sparquil.core :refer :all]
-            [sparquil.layer :as layer]))
+            [sparquil.layer :as l]))
 
 (def system nil)
 

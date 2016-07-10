@@ -69,7 +69,6 @@
 
    :draw
    (fn [state]
-     (background 0)
      (fill [:hsb (:hue state) 100 100])
      ; Calculate x and y coordinates of the circle.
      (let [angle (:angle state)
@@ -86,3 +85,72 @@
   {:draw (fn [_]
            (fill color)
            (apply q/text text offset))})
+
+; Note that the way you specify grid (matrix) positions is different than
+; the way you typically specify pixel positions. Grid coordinates
+; throughout are i (row), j (col), while pixels are x (col), y (row).
+
+(defn dims [grid]
+  "Return the dims of grid as a vector of [rows cols]"
+  [(count grid) (count (first grid))])
+
+(defn grid-neighbor-coords
+  "Return a coll of the coords of the neighbors of the cell with coords (i, j) in a grid
+  of dimensions (rows, cols)."
+  [[rows cols] [i j]]
+  (for [i-offset (range -1 2)
+        j-offset (range -1 2)
+        :when (not= [i-offset j-offset] [0 0])]
+    [(mod (+ i i-offset) rows) (mod (+ j j-offset) cols)]))
+
+(defn grid-neighbors
+  "Return a coll of the values of the neighbors of the cell at coords"
+  [grid coords]
+  (map (partial get-in grid) (grid-neighbor-coords (dims grid) coords)))
+
+(defn conway-cell-transition
+  "Given the value of a cell and a coll of the values of its neighbors,
+   return the next value for the cell."
+  [cell neighbors]
+  (let [live-neighbors (count (filter identity neighbors))]
+    (if cell
+      (cond (< live-neighbors 2) false
+            (<= 2 live-neighbors 3) true
+            (< 3 live-neighbors) false)
+      (if (= 3 live-neighbors) true false))))
+
+(defn conway-cell-color [cell]
+  "Given a conway cell, return the color it should be drawn"
+  (if cell
+    [:rgb 51 204 51]
+    [:rgb 0 0 204]))
+
+(defn conways
+  "Return a layer that will run Conway's Game of Life on a grid of size [rows cols].
+
+  Stretches to fit the size of the sketch as determined by (quil/height) and (quil/width)"
+  [rows cols]
+  {:setup
+   (fn [env]
+     (into [] (repeatedly rows
+                (fn [] (into [] (repeatedly cols #(if (> 0.25 (rand)) true false)))))))
+
+   :update
+   (fn [env state]
+     (let [neighbors (partial grid-neighbors state)]
+       (reduce (fn [grid coords]
+                 (update-in grid coords conway-cell-transition (neighbors coords)))
+         state
+         (for [i (range rows)
+               j (range cols)]
+           [i j]))))
+
+   :draw
+   (fn [state]
+     (let [x-interval (/ (q/width) cols)
+           y-interval (/ (q/height) rows)]
+       (dorun
+         (for [i (range rows)
+               j (range cols)]
+           (do (fill (conway-cell-color (get-in state [i j])))
+               (q/rect (* j x-interval) (* i y-interval) x-interval y-interval))))))})
