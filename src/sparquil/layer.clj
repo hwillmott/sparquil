@@ -57,15 +57,15 @@
   the color wheel."
   {:setup
    (fn [env]
-     (q/frame-rate 30)
+     (q/frame-rate 120)
      {:hue   0
       :angle 0})
 
    :update
    (fn [env state]
      {:hue   (or (parse-number (:env/color env))
-                 (mod (+ (:hue state) 0.7) 360))
-      :angle (+ (:angle state) 0.1)})
+                 (mod (+ (:hue state) 0.1) 360))
+      :angle (+ (:angle state) 0.0125)})
 
    :draw
    (fn [state]
@@ -73,8 +73,8 @@
      (fill [:hsb (:hue state) 100 100])
      ; Calculate x and y coordinates of the circle.
      (let [angle (:angle state)
-           x (* 150 (q/cos angle))
-           y (* 150 (q/sin angle))]
+           x (* (/ (q/width) 2.5) (q/cos angle))
+           y (* (/ (q/height) 2.5) (q/sin angle))]
        ; Move origin point to the center of the sketch.
        (q/with-translation [(/ (q/width) 2)
                             (/ (q/height) 2)]
