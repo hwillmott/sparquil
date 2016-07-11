@@ -40,6 +40,13 @@
   "Like Quil's stroke, but takes Sparquil colors"
   (color-wrap q/stroke))
 
+(defn region-background
+  "Like Quil's background, but sets the background only for region to color"
+  [[_ _ width height] color]
+  (fill color)
+  (stroke color)
+  (q/rect 0 0 width height))
+
 (spec/fdef parse-number
            :args (spec/cat :s (spec/nilable string?))
            :ret (spec/nilable number?))
@@ -52,7 +59,7 @@
     (if (re-find #"^-?\d+\.?\d*$" s)
       (read-string s))))
 
-(def rainbow-orbit
+(defn rainbow-orbit [[_ _ width height :as region]]
   "A disk rotating around the center of the sketch, hue cylcing around
   the color wheel."
   {:setup
@@ -72,19 +79,24 @@
      (fill [:hsb (:hue state) 100 100])
      ; Calculate x and y coordinates of the circle.
      (let [angle (:angle state)
-           x (* (/ (q/width) 2.5) (q/cos angle))
-           y (* (/ (q/height) 2.5) (q/sin angle))]
+           x (* (/ width 2.5) (q/cos angle))
+           y (* (/ height 2.5) (q/sin angle))]
        ; Move origin point to the center of the sketch.
-       (q/with-translation [(/ (q/width) 2)
-                            (/ (q/height) 2)]
+       (q/with-translation [(/ width 2)
+                            (/ height 2)]
                            ; Draw the circle.
                            (q/ellipse x y 100 100))))})
 
 
-(defn text [text {:keys [color offset] :or {color [0] offset [0 0]}}]
+(defn text [_ text {:keys [color offset] :or {color [0] offset [0 0]}}]
+  "A layer that writes text in color at offerset. Defaults to black at [0 0]"
   {:draw (fn [_]
            (fill color)
            (apply q/text text offset))})
+
+(defn fill-layer [region color]
+  "A layer that fills the region with color"
+  {:draw (fn [_] (region-background region color))})
 
 ; Note that the way you specify grid (matrix) positions is different than
 ; the way you typically specify pixel positions. Grid coordinates
@@ -130,10 +142,9 @@
   once per step-interval milliseconds.
 
   Stretches to fit the size of the sketch as determined by (quil/height) and (quil/width)"
-  [rows cols step-interval]
+  [[_ _ width height] rows cols step-interval]
   {:setup
    (fn [{:keys [:env/time]}]
-     (println time)
      {:last-step-time time
       :grid (into [] (repeatedly rows
                                  (fn [] (into [] (repeatedly cols #(if (> 0.25 (rand)) true false))))))})
@@ -153,8 +164,8 @@
 
    :draw
    (fn [{:keys [:grid]}]
-     (let [x-interval (/ (q/width) cols)
-           y-interval (/ (q/height) rows)]
+     (let [x-interval (/ width cols)
+           y-interval (/ height rows)]
        (dorun
          (for [i (range rows)
                j (range cols)]

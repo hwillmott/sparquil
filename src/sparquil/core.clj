@@ -1,6 +1,7 @@
 (ns sparquil.core
   (:require [clojure.spec :as spec]
             [clojure.core.match :refer [match]]
+            [clojure.algo.generic.functor :refer [fmap]]
             [org.tobereplaced.mapply :refer [mapply]]
             [com.stuartsierra.component :as component]
             [quil.core :as q]
@@ -163,32 +164,72 @@
 ; update: (fn [env state] state) ; indentity for state, ignore env
 ; draw: (constantly nil)
 
+(defn region-setup
+  "Calls the setup fn for each layer in region and returns a vector of the
+  resulting states.
+
+  region-setup-fns is a vector of the setup fns for each layer in a region."
+  [current-env region-setup-fns]
+  (mapv #(% current-env) region-setup-fns)) ; TODO try pmap
+
 (defn sketch-setup
   "Returns a top-level setup function that will realize env and call layer
   setup functions."
-  [env layer-setup-fns]
-  (let [safe-setup-fns (map #(or % (constantly nil)) layer-setup-fns)]
+  [env region-setup-map]
+  (let [safe-setup-fn-map (fmap (partial mapv #(or % (constantly nil)))
+                                region-setup-map)]
     (fn []
       (l/background 0) ; Make default background black instead of grey
       (let [current-env (current env)]
-        (mapv #(% current-env) safe-setup-fns))))) ; TODO: try pmap
+        (fmap (partial region-setup current-env) safe-setup-fn-map)))))
+
+(defn region-update [current-env layer-update-fns layer-states]
+  "Update the states of all the layers for a region.
+
+  layer-update-fns and layer-states hold the update fns and states for each
+  layer in a region."
+  (mapv #(%1 current-env %2) layer-update-fns layer-states)) ;TODO: Try pmap
 
 (defn sketch-update
   "Returns a top-level update function that will realize env and call layer
-  update functions to update state."
-  [env layer-update-fns]
-  (let [safe-update-fns (map #(or % (fn [env state] state))
-                             layer-update-fns)]
-    (fn [layer-states]
-      (let [current-env (current env)]
-        (mapv #(%1 current-env %2) safe-update-fns layer-states))))) ;TODO: Try pmap
+  update functions to update state.
 
-(defn sketch-draw [layer-draw-fns display-fn]
+  region-update-map is a map from keyword region names to vectors of layer
+  update fns"
+  [env region-update-map]
+  (let [safe-update-map (fmap (partial map #(or % (fn [env state] state)))
+                              region-update-map)]
+    (fn [region-states]
+      (let [current-env (current env)]
+        (reduce-kv (fn [updated-states region-name layer-update-fns]
+                     (assoc updated-states region-name
+                       (region-update current-env layer-update-fns (region-states region-name))))
+          {} safe-update-map)))))
+
+(defn region-draw
+  "Run a vector of draw fns with their states on region.
+
+  layer-draw-fns holds the draw fns for each layer in region."
+  [[x y _ _ :as region] layer-draw-fns layer-states]
+  (q/with-translation [x y]
+    (dorun (map #(%1 %2) layer-draw-fns layer-states))))
+
+(defn sketch-draw [regions region-draw-map display-fn]
   "Returns a top-level draw function that will call each layer's draw
-  function with its state."
-  (let [safe-draw-fns (map #(or % (constantly nil)) layer-draw-fns)]
-    (fn [layer-states]
-      (dorun (map #(%1 %2) layer-draw-fns layer-states)) ; TODO: safe-draw-fns
+  function with its state.
+
+  regions is a map from keyword region names to region specs ([x y width height])
+
+  region-draw-map is a map from keyword region names to vectors of draw fns
+
+  display-fn will be called with the result of (q/pixels) after all layer draw fns
+  have executed."
+  (let [safe-draw-map (fmap (partial map #(or % (constantly nil)))
+                            region-draw-map)]
+    (fn [region-states]
+      (l/background 0)
+      (doseq [[region-name region] regions]
+        (region-draw region (safe-draw-map region-name) (region-states region-name)))
       (q/color-mode :rgb 255)
       (display-fn (q/pixels)))))
 
@@ -223,7 +264,7 @@
 (defn resolve-layer-name
   "Returns the value bound to the symbol named by name in the sparquil.layer ns"
   [name]
-  (eval (symbol "sparquil.layer" name)))
+  (eval (symbol "sparquil.layer" (str name))))
 
 (defn realize-layer
   "Takes a layer spec, returns a fully realized layer or nil if realization fails.
@@ -234,15 +275,24 @@
   the sparquil.clojure namespace and the tail is interpreted as args to that function.
 
   Layer specs are unrelated core.spec"
-  [layer-spec]
+  [region [layer-name & params :as layer-spec]]
   (try
-    (match layer-spec
-      (name :guard string?) (resolve-layer-name name)
-      [name & params]       (apply (resolve-layer-name name) params))
+    (apply (resolve-layer-name layer-name) region params)
     (catch Exception e
       (println "Unable to realize layer spec:" layer-spec)
       (println "Exception: " (.getMessage e))
       nil)))
+
+(defn realize-layers
+  [regions layers-spec]
+  (match layers-spec
+    (layer-map :guard map?)    (reduce-kv (fn [realized-map region-name layer-vec]
+                                            (assoc realized-map region-name
+                                              (mapv (partial realize-layer (region-name regions))
+                                                    layer-vec)))
+                                 {} layer-map)
+    (layer-vec :guard vector?) {:global (map (partial realize-layer (:global regions))
+                                             layer-vec)}))
 
 (defn read-layers
   "Returns a vector of deserialized layer specs or nil if unable to deserialize"
@@ -263,17 +313,19 @@
   (when-let [layer-specs (read-layers layers-str)]
     (filter (complement nil?) (mapv realize-layer layer-specs))))
 
-(defn start-applet [env opts layers display-fn]
+(defn start-applet [env opts regions layers display-fn]
   "Creates and returns a new sketch applet"
   (let [applet-opts (-> opts
-                        (assoc :setup (sketch-setup env (map :setup layers)))
-                        (assoc :update (sketch-update env (map :update layers)))
-                        (assoc :draw (sketch-draw (map :draw layers) display-fn)))]
+                        (assoc :setup (sketch-setup env (fmap (partial map :setup) layers)))
+                        (assoc :update (sketch-update env (fmap (partial map :update) layers)))
+                        (assoc :draw (sketch-draw regions
+                                                  (fmap (partial map :draw) layers)
+                                                  display-fn)))]
     (mapply q/sketch applet-opts)))
 
 (defn get-layers
   "Returns the thawed layers (not just layer specs) specified by the 'sketch/layer'
-  key in the kv-store"
+  key in the kv-store, or nil if key not present or value invalid."
   [kv-store]
   (when-let [layers-str (get-key kv-store :sketch/layers)]
     (thaw-layers layers-str)))
@@ -283,8 +335,10 @@
   component/Lifecycle
   (start [sketch]
     ; TODO: Force fun-mode middleware
-    (let [{init-layers :layers :keys [size led-shapes]} opts
-          layers (or (get-layers kv-store) init-layers)
+    (let [{[width height :as size] :size :keys [led-shapes]} opts
+          regions (assoc (:regions opts) :global [0 0 width height])
+          layers (realize-layers regions (:layers opts))
+          ;layers (or (get-layers kv-store) init-layers) ; TODO: Renable getting layers from Redis
           led-pixel-indices (mapcat (partial inflate size) led-shapes)
           display-fn (fn [pixels]
                        (display displayer (map #(if (nil? %)
@@ -292,19 +346,21 @@
                                                   (aget pixels %))
                                                led-pixel-indices))
                        pixels)]
-      (reset! applet (start-applet env opts layers display-fn))
-      (subscribe-key kv-store ::layer-updates "sketch/layers"
-        (fn [_ new-layer-str]
-          (. @applet exit)
-          (reset! applet (start-applet env opts
-                                       (or (thaw-layers new-layer-str) init-layers)
-                                       display-fn))))
+      (reset! applet (start-applet env opts regions layers display-fn))
+      ; TODO: Renable getting layers from Redis
+      ;(subscribe-key kv-store ::layer-updates "sketch/layers"
+      ;  (fn [_ new-layer-str]
+      ;    (. @applet exit)
+      ;    (reset! applet (start-applet env opts
+      ;                                 (or (thaw-layers new-layer-str) layers) ; TODO: Change back to init-layers
+      ;                                 display-fn))))
       sketch))
 
   (stop [sketch]
     (. @applet exit)
     (reset! applet nil)
-    (unsubscribe-key kv-store ::layer-updates)
+    ; TODO: Renable getting layers from Redis
+    ;(unsubscribe-key kv-store ::layer-updates)
     sketch))
 
 (defn new-sketch
@@ -333,10 +389,9 @@
 
 ; ---- System definition ----
 
-; TODO: Add a :regions opt that maps names to rectangles on the sketch
-;       Uses:
-;       - if :layers is a map, it maps region names to layer vectors
-;       - LED shapes can use regions to specify offsets, sizes, etc.})
+; TODO: LED shapes can use regions to specify offsets, sizes, etc.
+; TODO: Give an explicit ordering to regions.
+;       Maybe make into a map so it can have more params, like :background-color
 
 (defn sparquil-system []
   (component/system-map
@@ -344,9 +399,11 @@
               (new-sketch
                 {:title "You spin my circle right round"
                  :size [1200 200]
-                 :layers [(l/conways 6 36 125)
-                          l/rainbow-orbit
-                          (l/text "Grady wuz here" {:color [255] :offset [10 20]})]
+                 :regions {:left-square [0 0 600 200]
+                           :rest [600 0 600 200]}
+                 :layers {:left-square '[[conways 6 18 125]]
+                          :global '[[rainbow-orbit]
+                                    [text "Grady wuz here" {:color [255] :offset [10 20]}]]}
                  :led-shapes [(grid 6 36)]
                  :middleware [m/fun-mode]})
               [:env :displayer :kv-store])
