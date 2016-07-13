@@ -401,9 +401,9 @@
                  :size [1200 200]
                  :regions {:left-square [0 0 600 200]
                            :rest [600 0 600 200]}
-                 :layers {:left-square '[[conways 6 18 125]]
-                          :global '[[rainbow-orbit]
-                                    [text "Grady wuz here" {:color [255] :offset [10 20]}]]}
+                 :layers {:left-square '[[brians-brain 60 180 125]]
+                          :rest '[[rainbow-orbit]
+                                  [text "Grady wuz here" {:color [255] :offset [10 20]}]]}
                  :led-shapes [(grid 6 36)]
                  :middleware [m/fun-mode]})
               [:env :displayer :kv-store])

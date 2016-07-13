@@ -1,6 +1,7 @@
 (ns sparquil.layer
   (:require [clojure.spec :as spec]
             [clojure.core.match :refer [match]]
+            [bigml.sampling.simple :as simple]
             [quil.core :as q]))
 
 (defn color-mode
@@ -106,7 +107,7 @@
   "Return the dims of grid as a vector of [rows cols]"
   [(count grid) (count (first grid))])
 
-(defn grid-neighbor-coords
+(defn moore-neighbor-coords
   "Return a coll of the coords of the neighbors of the cell with coords (i, j) in a grid
   of dimensions (rows, cols)."
   [[rows cols] [i j]]
@@ -115,48 +116,46 @@
         :when (not= [i-offset j-offset] [0 0])]
     [(mod (+ i i-offset) rows) (mod (+ j j-offset) cols)]))
 
-(defn grid-neighbors
+(defn moore-neighbors
   "Return a coll of the values of the neighbors of the cell at coords"
   [grid coords]
-  (map (partial get-in grid) (grid-neighbor-coords (dims grid) coords)))
+  (map (partial get-in grid) (moore-neighbor-coords (dims grid) coords)))
 
-(defn conway-cell-transition
-  "Given the value of a cell and a coll of the values of its neighbors,
-   return the next value for the cell."
-  [cell neighbors]
-  (let [live-neighbors (count (filter identity neighbors))]
-    (if cell
-      (cond (< live-neighbors 2) false
-            (<= 2 live-neighbors 3) true
-            (< 3 live-neighbors) false)
-      (if (= 3 live-neighbors) true false))))
+(defn cellwise-grid-init [new-cell rows cols]
+  "Given new-cell, a function of no args that returns a new cell value, return a grid of size
+  [rows cols] filled by repeated calls to the new-cell function"
+  (into [] (repeatedly rows
+                       (fn []
+                         (into []
+                               (repeatedly cols new-cell))))))
 
-(defn conway-cell-color [cell]
-  "Given a conway cell, return the color it should be drawn"
-  (if cell
-    [:rgb 51 204 51]
-    [:rgb 0 0 204]))
+(defn moore-automaton
+  "Return a layer that will run a cellular automaton whose cell transitions are a function
+  of the cell's Moore neighborhood on a grid of size [rows cols] stepping once per
+  step-interval milliseconds.
 
-(defn conways
-  "Return a layer that will run Conway's Game of Life on a grid of size [rows cols] stepping
-  once per step-interval milliseconds.
+  The particular cellular automaton is specified by three functions:
+  - grid-init: returns an initial grid state as a vector of vectors. See also
+               cellwise-grid-init.
+  - cell-transition: given a cell value and that cell's Moore neighborhood (its 8 neighbor
+                     cell values), return the next value for the cell
+  - cell-color: given a cell value, return a color that should fill that cell in the sketch
 
-  Stretches to fit the size of the sketch as determined by (quil/height) and (quil/width)"
-  [[_ _ width height] rows cols step-interval]
+  Stretches to fit the size of the region."
+  [[_ _ width height] rows cols step-interval grid-init cell-transition cell-color]
   {:setup
    (fn [{:keys [:env/time]}]
      {:last-step-time time
-      :grid (into [] (repeatedly rows
-                                 (fn [] (into [] (repeatedly cols #(if (> 0.25 (rand)) true false))))))})
+      :grid (grid-init rows cols)})
 
    :update
    (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
      (if (< time (+ last-step-time step-interval))
        state
        {:last-step-time time
-        :grid (let [neighbors (partial grid-neighbors grid)]
+        :grid (let [neighbors (partial moore-neighbors grid)]
                 (reduce (fn [grid coords]
-                          (update-in grid coords conway-cell-transition (neighbors coords)))
+                          (update-in grid coords cell-transition (neighbors coords)))
                         grid
                         (for [i (range rows)
                               j (range cols)]
@@ -169,5 +168,63 @@
        (dorun
          (for [i (range rows)
                j (range cols)]
-           (do (fill (conway-cell-color (get-in grid [i j])))
+           (do (fill (cell-color (get-in grid [i j])))
                (q/rect (* j x-interval) (* i y-interval) x-interval y-interval))))))})
+
+
+(defn conways-cell []
+  (first (simple/sample #{true false}
+                        :replace true
+                        :weigh {true 0.25 false 0.75})))
+
+(defn conways-cell-transition
+  "Given the value of a cell and a coll of the values of its neighbors,
+   return the next value for the cell."
+  [cell neighbors]
+  (let [live-neighbors (count (filter identity neighbors))]
+    (if cell
+      (cond (< live-neighbors 2) false
+            (<= 2 live-neighbors 3) true
+            (< 3 live-neighbors) false)
+      (if (= 3 live-neighbors) true false))))
+
+(defn conways-cell-color [cell]
+  "Given a conway cell, return the color it should be drawn"
+  (if cell
+    [:rgb 51 204 51]
+    [:rgb 0 0 204]))
+
+
+(defn conways [region rows cols step-interval]
+  (moore-automaton region rows cols step-interval
+                   (partial cellwise-grid-init conways-cell)
+                   conways-cell-transition
+                   conways-cell-color))
+
+(defn brians-brain-cell []
+  (first (simple/sample #{:firing :ready}
+                        :replace true
+                        :weigh {:firing 0.33 :ready 0.67})))
+
+(defn brians-brain-cell-transition
+  "Given the value of a cell and a coll of the values of its neighbors,
+   return the next value for the cell."
+  [cell neighbors]
+  (let [firing-neighbors (count (filter #{:firing} neighbors))]
+    (match cell
+      :firing     :refractory
+      :refractory :ready
+      :ready      (if (= firing-neighbors 2) :firing :ready))))
+
+(defn brians-brain-cell-color [cell]
+  "Given a conway cell, return the color it should be drawn"
+  (match cell
+    :firing     [:rgb 125 249 255]
+    :refractory [:rgb 3 80 150]
+    :ready      [:rgb 0 0 0]))
+
+(defn brians-brain [region rows cols step-interval]
+  (moore-automaton region rows cols step-interval
+                   (partial cellwise-grid-init brians-brain-cell)
+                   brians-brain-cell-transition
+                   brians-brain-cell-color))

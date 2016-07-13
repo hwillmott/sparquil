@@ -7,6 +7,7 @@
                  [org.tobereplaced/mapply "1.0.0"]
                  [com.stuartsierra/component "0.3.1"]
                  [com.taoensso/carmine "2.13.1"]
+                 [bigml/sampling "3.0"]
                  [org.clojure/data.json "0.2.6"]
                  [quil "2.4.0"]]
   :profiles {:dev {:source-paths ["dev"]
