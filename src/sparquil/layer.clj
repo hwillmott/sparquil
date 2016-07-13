@@ -129,6 +129,19 @@
                          (into []
                                (repeatedly cols new-cell))))))
 
+(defn coord-seq [rows cols]
+  (for [i (range rows)
+        j (range cols)]
+    [i j]))
+
+(defn pmapv
+  "An eager version of pmap. Spawns a thread for _every_ element in coll. Use
+   for parallel IO."
+  [f & colls]
+  (->> colls
+       (apply mapv (fn [& args] (future (apply f args))))
+       (mapv deref)))
+
 (defn moore-automaton
   "Return a layer that will run a cellular automaton whose cell transitions are a function
   of the cell's Moore neighborhood on a grid of size [rows cols] stepping once per
@@ -153,23 +166,20 @@
      (if (< time (+ last-step-time step-interval))
        state
        {:last-step-time time
-        :grid (let [neighbors (partial moore-neighbors grid)]
-                (reduce (fn [grid coords]
-                          (update-in grid coords cell-transition (neighbors coords)))
-                        grid
-                        (for [i (range rows)
-                              j (range cols)]
-                          [i j])))}))
+        :grid (let [neighbors (partial moore-neighbors grid)
+                    cells (apply concat grid)]
+                (mapv vec (partition cols
+                                     (pmapv cell-transition
+                                            cells
+                                            (map neighbors (coord-seq rows cols))))))}))
 
    :draw
-   (fn [{:keys [:grid]}]
+   (fn [{:keys [grid]}]
      (let [x-interval (/ width cols)
            y-interval (/ height rows)]
-       (dorun
-         (for [i (range rows)
-               j (range cols)]
-           (do (fill (cell-color (get-in grid [i j])))
-               (q/rect (* j x-interval) (* i y-interval) x-interval y-interval))))))})
+       (doseq [[i j] (coord-seq rows cols)]
+         (fill (cell-color (get-in grid [i j])))
+         (q/rect (* j x-interval) (* i y-interval) x-interval y-interval))))})
 
 
 (defn conways-cell []
@@ -193,7 +203,6 @@
   (if cell
     [:rgb 51 204 51]
     [:rgb 0 0 204]))
-
 
 (defn conways [region rows cols step-interval]
   (moore-automaton region rows cols step-interval
