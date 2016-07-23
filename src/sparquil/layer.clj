@@ -178,8 +178,10 @@
      (let [x-interval (/ width cols)
            y-interval (/ height rows)]
        (doseq [[i j] (coord-seq rows cols)]
-         (fill (cell-color (get-in grid [i j])))
-         (q/rect (* j x-interval) (* i y-interval) x-interval y-interval))))})
+         (let [c (cell-color (get-in grid [i j]))]
+           (fill c)
+           (stroke c)
+           (q/rect (* j x-interval) (* i y-interval) x-interval y-interval)))))})
 
 
 (defn conways-cell []
