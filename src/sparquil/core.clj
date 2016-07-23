@@ -398,12 +398,9 @@
     :sketch (component/using
               (new-sketch
                 {:title "You spin my circle right round"
-                 :size [1200 200]
-                 :regions {:left-square [0 0 600 200]
-                           :rest [600 0 600 200]}
-                 :layers {:left-square '[[brians-brain 60 180 125]]
-                          :rest '[[rainbow-orbit]
-                                  [text "Grady wuz here" {:color [255] :offset [10 20]}]]}
+                 :size [300 300]
+                 :regions {}
+                 :layers {:global '[[brians-brain 30 30 250]]}
                  :led-shapes [(grid 6 36)]
                  :middleware [m/fun-mode]})
               [:env :displayer :kv-store])
