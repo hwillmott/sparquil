@@ -313,16 +313,6 @@
   (when-let [layer-specs (read-layers layers-str)]
     (filter (complement nil?) (mapv realize-layer layer-specs))))
 
-(defn start-applet [env opts regions layers display-fn]
-  "Creates and returns a new sketch applet"
-  (let [applet-opts (-> opts
-                        (assoc :setup (sketch-setup env (fmap (partial map :setup) layers)))
-                        (assoc :update (sketch-update env (fmap (partial map :update) layers)))
-                        (assoc :draw (sketch-draw regions
-                                                  (fmap (partial map :draw) layers)
-                                                  display-fn)))]
-    (mapply q/sketch applet-opts)))
-
 (defn get-layers
   "Returns the thawed layers (not just layer specs) specified by the 'sketch/layer'
   key in the kv-store, or nil if key not present or value invalid."
@@ -330,37 +320,40 @@
   (when-let [layers-str (get-key kv-store :sketch/layers)]
     (thaw-layers layers-str)))
 
+(defn start-applet
+  "Creates and returns a new sketch applet"
+  ([sketch]
+   (start-applet sketch nil nil))
+  ([{:keys [opts env displayer] :as sketch} layers-spec led-shapes]
+   (let [[width height :as size] (:size opts)
+         regions (assoc (:regions opts) :global [0 0 width height])
+         layers (realize-layers regions (or layers-spec (:layers opts)))
+         led-pixel-indices (mapcat (partial inflate size) led-shapes)
+         display-fn (fn [pixels]
+                      (display displayer (map #(if (nil? %)
+                                                (q/color 0)
+                                                (aget pixels %))
+                                              led-pixel-indices))
+                      pixels)
+         applet-opts (-> opts
+                         (assoc :middleware [m/fun-mode])
+                         (assoc :setup (sketch-setup env (fmap (partial map :setup) layers)))
+                         (assoc :update (sketch-update env (fmap (partial map :update) layers)))
+                         (assoc :draw (sketch-draw regions
+                                                   (fmap (partial map :draw) layers)
+                                                   display-fn)))]
+     (mapply q/sketch applet-opts))))
+
 (defrecord Sketch [opts applet env displayer kv-store]
 
   component/Lifecycle
   (start [sketch]
-    ; TODO: Force fun-mode middleware
-    (let [{[width height :as size] :size :keys [led-shapes]} opts
-          regions (assoc (:regions opts) :global [0 0 width height])
-          layers (realize-layers regions (:layers opts))
-          ;layers (or (get-layers kv-store) init-layers) ; TODO: Renable getting layers from Redis
-          led-pixel-indices (mapcat (partial inflate size) led-shapes)
-          display-fn (fn [pixels]
-                       (display displayer (map #(if (nil? %)
-                                                  (q/color 0)
-                                                  (aget pixels %))
-                                               led-pixel-indices))
-                       pixels)]
-      (reset! applet (start-applet env opts regions layers display-fn))
-      ; TODO: Renable getting layers from Redis
-      ;(subscribe-key kv-store ::layer-updates "sketch/layers"
-      ;  (fn [_ new-layer-str]
-      ;    (. @applet exit)
-      ;    (reset! applet (start-applet env opts
-      ;                                 (or (thaw-layers new-layer-str) layers) ; TODO: Change back to init-layers
-      ;                                 display-fn))))
-      sketch))
+    (reset! applet (start-applet sketch))
+    sketch)
 
   (stop [sketch]
     (. @applet exit)
     (reset! applet nil)
-    ; TODO: Renable getting layers from Redis
-    ;(unsubscribe-key kv-store ::layer-updates)
     sketch))
 
 (defn new-sketch
@@ -401,8 +394,7 @@
                  :size [300 300]
                  :regions {}
                  :layers {:global '[[brians-brain 30 30 250]]}
-                 :led-shapes [(grid 6 36)]
-                 :middleware [m/fun-mode]})
+                 :led-shapes [(grid 6 36)]})
               [:env :displayer :kv-store])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
     :env (component/using (new-env)
