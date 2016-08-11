@@ -42,8 +42,9 @@
   (color-wrap q/stroke))
 
 (defn region-background
-  "Like Quil's background, but sets the background only for region to color"
-  [[_ _ width height] color]
+  "Like Quil's background, but sets the background only for the region specified by bounds
+  to color"
+  [[_ _ width height :as bounds] color]
   (fill color)
   (stroke color)
   (q/rect 0 0 width height))
@@ -60,7 +61,7 @@
     (if (re-find #"^-?\d+\.?\d*$" s)
       (read-string s))))
 
-(defn rainbow-orbit [[_ _ width height :as region]]
+(defn rainbow-orbit [[_ _ width height :as bounds]]
   "A disk rotating around the center of the sketch, hue cylcing around
   the color wheel."
   {:setup
@@ -95,9 +96,9 @@
            (fill color)
            (apply q/text text offset))})
 
-(defn fill-layer [region color]
-  "A layer that fills the region with color"
-  {:draw (fn [_] (region-background region color))})
+(defn fill-bounds [bounds color]
+  "A layer that fills the region specified by bounds with color"
+  {:draw (fn [_] (region-background bounds color))})
 
 ; Note that the way you specify grid (matrix) positions is different than
 ; the way you typically specify pixel positions. Grid coordinates
@@ -154,8 +155,8 @@
                      cell values), return the next value for the cell
   - cell-color: given a cell value, return a color that should fill that cell in the sketch
 
-  Stretches to fit the size of the region."
-  [[_ _ width height] rows cols step-interval grid-init cell-transition cell-color]
+  Stretches to fit the size of the region specified by bounds."
+  [[_ _ width height :as bounds] rows cols step-interval grid-init cell-transition cell-color]
   {:setup
    (fn [{:keys [:env/time]}]
      {:last-step-time time
@@ -206,8 +207,8 @@
     [:rgb 51 204 51]
     [:rgb 0 0 204]))
 
-(defn conways [region rows cols step-interval]
-  (moore-automaton region rows cols step-interval
+(defn conways [bounds rows cols step-interval]
+  (moore-automaton bounds rows cols step-interval
                    (partial cellwise-grid-init conways-cell)
                    conways-cell-transition
                    conways-cell-color))
@@ -234,8 +235,8 @@
     :refractory [:rgb 3 80 150]
     :ready      [:rgb 0 0 0]))
 
-(defn brians-brain [region rows cols step-interval]
-  (moore-automaton region rows cols step-interval
+(defn brians-brain [bounds rows cols step-interval]
+  (moore-automaton bounds rows cols step-interval
                    (partial cellwise-grid-init brians-brain-cell)
                    brians-brain-cell-transition
                    brians-brain-cell-color))

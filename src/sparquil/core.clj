@@ -97,7 +97,7 @@
   "Run a vector of draw fns with their states on region.
 
   layer-draw-fns holds the draw fns for each layer in region."
-  [[x y _ _ :as region] layer-draw-fns layer-states]
+  [[x y _ _ :as bounds] layer-draw-fns layer-states]
   (q/with-translation [x y]
     (dorun (map #(%1 %2) layer-draw-fns layer-states))))
 
@@ -115,8 +115,8 @@
                             region-draw-map)]
     (fn [region-states]
       (l/background 0)
-      (doseq [[region-name region] regions]
-        (region-draw region (safe-draw-map region-name) (region-states region-name)))
+      (doseq [{region-name :name bounds :bounds} regions]
+        (region-draw bounds (safe-draw-map region-name) (region-states region-name)))
       (q/color-mode :rgb 255)
       (display-fn (q/pixels)))))
 
@@ -171,14 +171,16 @@
       nil)))
 
 (defn realize-layers
-  [regions layers-spec]
+  [region-map layers-spec]
   (match layers-spec
     (layer-map :guard map?)    (reduce-kv (fn [realized-map region-name layer-vec]
                                             (assoc realized-map region-name
-                                              (mapv (partial realize-layer (region-name regions))
-                                                    layer-vec)))
+                                              (mapv (partial realize-layer
+                                                      (get-in region-map [region-name :bounds]))
+                                                layer-vec)))
                                  {} layer-map)
-    (layer-vec :guard vector?) {:global (map (partial realize-layer (:global regions))
+    (layer-vec :guard vector?) {:global (map (partial realize-layer
+                                               (get-in region-map [:global :bounds]))
                                              layer-vec)}))
 
 (defn read-layers
@@ -213,8 +215,9 @@
    (start-applet sketch nil nil))
   ([{:keys [opts env displayer] :as sketch} layers-spec led-shapes]
    (let [[width height :as size] (:size opts)
-         regions (assoc (:regions opts) :global [0 0 width height])
-         layers (realize-layers regions (or layers-spec (:layers opts)))
+         regions (into [{:name :global :bounds [0 0 width height]}] (:regions opts))
+         region-map (zipmap (map :name regions) regions)
+         layers (realize-layers region-map (or layers-spec (:layers opts)))
          led-pixel-indices (mapcat (partial inflate size) led-shapes)
          display-fn (fn [pixels]
                       (display displayer (map #(if (nil? %)
@@ -278,9 +281,10 @@
     :sketch (component/using
               (new-sketch
                 {:title "You spin my circle right round"
-                 :size [300 300]
-                 :regions {}
-                 :layers {:global '[[brians-brain 30 30 250]]}
+                 :size [300 600]
+                 :regions [{:name :left-arm :bounds [0 150 75 200]}]
+                 :layers {:left-arm '[[fill-bounds 127]
+                                      [text "left-arm" {:color 255 :offset [1 10]}]]}
                  :led-shapes [(grid 6 36)]})
               [:env :displayer :kv-store])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
