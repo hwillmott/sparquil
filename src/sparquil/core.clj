@@ -148,6 +148,7 @@
 
 ; TODO: Different led-pixel mapping modes. Average over region rather than single pixel?
 
+; TODO: rewrite stretch-grid inflate to take an angle. Can make use of strip inflate.
 (defmethod inflate :leds/stretch-grid [[width height :as size] {:keys [:leds/dimensions]}]
   (let [[rows cols] dimensions
         x-interval (/ width cols)
@@ -158,6 +159,14 @@
         [(+ (/ x-interval 2) (* j x-interval))
          (+ (/ y-interval 2) (* i y-interval))]))))
 
+(defmethod inflate :leds/circle [size {:keys [:leds/center :leds/count :leds/radius :leds/angle]}]
+  (let [[x-offset y-offset] center]
+    (->> (range 0 360 (/ 360 count))
+         (map (partial + angle))
+         (map (fn [angle]
+                [(+ x-offset (* radius (Math/cos (degrees->radians angle))))
+                 (+ y-offset (* radius (Math/sin (degrees->radians angle))))]))
+         (map (partial point->pixel-index size)))))
 (defn resolve-layer-name
   "Returns the value bound to the symbol named by name in the sparquil.layer ns"
   [name]
@@ -286,16 +295,21 @@
     :sketch (component/using
               (new-sketch
                 {:title "You spin my circle right round"
-                 :size [300 600]
+                 :size [500 500]
                  :regions [{:name :left-arm :bounds [0 150 75 200]}]
-                 :layers {:global '[[brians-brain 100 50 125]]
+                 :layers {:global '[[brians-brain 100 100 125]]
                           :left-arm '[[fill-bounds 127]
                                       [text "left-arm" {:color 255 :offset [1 10]}]]}
                  :led-shapes [{:leds/type :leds/strip
                                :leds/count 20
                                :leds/length 100
                                :leds/offset [10 10]
-                               :leds/angle 45}]})
+                               :leds/angle 45}
+                              {:leds/type :leds/circle
+                               :leds/center [200 200]
+                               :leds/count 36
+                               :leds/radius 30
+                               :leds/angle 0}]})
 
               [:env :displayer :kv-store])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
