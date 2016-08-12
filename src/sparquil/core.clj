@@ -263,6 +263,10 @@
 
   (stop [sketch]
     (. @applet exit)
+    ; To make sure the applet is totally done exiting before letting other components spin down.
+    ; Without this, when FadecandyDisplayer tries to close the fcserver connection, it throws an
+    ; exception because the applet still tries to send a frame after the exit call above.
+    (Thread/sleep 250)
     (reset! applet nil)
     sketch))
 
