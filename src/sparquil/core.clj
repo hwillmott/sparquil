@@ -118,7 +118,11 @@
       (doseq [{region-name :name bounds :bounds} regions]
         (region-draw bounds (safe-draw-map region-name) (region-states region-name)))
       (q/color-mode :rgb 255)
-      (display-fn (q/pixels)))))
+      (let [pixels (q/pixels)
+            led-pixel-indices (display-fn pixels)]
+        (doseq [i led-pixel-indices]
+          (aset-int pixels i (q/color 255 255 255)))
+        (q/update-pixels)))))
 
 (defn point->pixel-index
   "Given a size and a point, returns the corresponding index in quil/pixel array"
@@ -215,16 +219,17 @@
    (start-applet sketch nil nil))
   ([{:keys [opts env displayer] :as sketch} layers-spec led-shapes]
    (let [[width height :as size] (:size opts)
+         ; TODO: global-top/global-bottom regions?
          regions (into [{:name :global :bounds [0 0 width height]}] (:regions opts))
          region-map (zipmap (map :name regions) regions)
          layers (realize-layers region-map (or layers-spec (:layers opts)))
-         led-pixel-indices (mapcat (partial inflate size) led-shapes)
+         led-pixel-indices (mapcat (partial inflate size) (or led-shapes (:led-shapes opts)))
          display-fn (fn [pixels]
                       (display displayer (map #(if (nil? %)
                                                 (q/color 0)
                                                 (aget pixels %))
                                               led-pixel-indices))
-                      pixels)
+                      led-pixel-indices)
          applet-opts (-> opts
                          (assoc :middleware [m/fun-mode])
                          (assoc :setup (sketch-setup env (fmap (partial map :setup) layers)))
@@ -283,9 +288,10 @@
                 {:title "You spin my circle right round"
                  :size [300 600]
                  :regions [{:name :left-arm :bounds [0 150 75 200]}]
-                 :layers {:left-arm '[[fill-bounds 127]
+                 :layers {:global '[[brians-brain 100 50 125]]
+                          :left-arm '[[fill-bounds 127]
                                       [text "left-arm" {:color 255 :offset [1 10]}]]}
-                 :led-shapes [(grid 6 36)]})
+                 :led-shapes [(grid 100 50)]})
               [:env :displayer :kv-store])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
     :env (component/using (env/new-env)
