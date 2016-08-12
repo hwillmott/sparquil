@@ -121,24 +121,30 @@
       (let [pixels (q/pixels)
             led-pixel-indices (display-fn pixels)]
         (doseq [i led-pixel-indices]
-          (aset-int pixels i (q/color 255 255 255)))
+          (when i
+            (aset-int pixels i (q/color 255 255 255))))
         (q/update-pixels)))))
 
 (defn point->pixel-index
   "Given a size and a point, returns the corresponding index in quil/pixel array"
   [[width height] [x y]]
-  (if (and (< x width) (< y height))
-    (+ (int x) (* width (int y)))
+  (if (and (< 0 x width) (< 0 y height))
+    (+ (Math/round (double x)) (* width (Math/round (double y))))
     nil))
+
+(defn degrees->radians [degrees]
+  (* degrees (/ Math/PI 180)))
 
 (defmulti inflate
   (fn [size shape] (:leds/type shape)))
 
-(defmethod inflate :leds/strip [size {:keys [:leds/count :leds/offset :leds/spacing]}]
+(defmethod inflate :leds/strip [size {:keys [:leds/count :leds/offset :leds/length :leds/angle]}]
   (let [[x-offset y-offset] offset]
-    (map (partial point->pixel-index size)
-         (map vector (range x-offset (+ x-offset (* spacing count)) spacing)
-                     (repeat y-offset)))))
+    (->> (range 0 length (/ length count))
+         (map (fn [radius]
+                [(+ x-offset (* radius (Math/cos (degrees->radians angle))))
+                 (+ y-offset (* radius (Math/sin (degrees->radians angle))))]))
+         (map (partial point->pixel-index size)))))
 
 ; TODO: Different led-pixel mapping modes. Average over region rather than single pixel?
 
@@ -265,12 +271,6 @@
 
 ; ---- LED configurations ----
 
-(defn full-horizontal-strip [y-offset]
-  {:leds/type :leds/strip
-   :leds/offset [0 y-offset]
-   :leds/spacing (/ 500 36)
-   :leds/count 36})
-
 (defn grid [rows cols]
   {:leds/type :leds/stretch-grid
    :leds/dimensions [rows cols]})
@@ -291,7 +291,12 @@
                  :layers {:global '[[brians-brain 100 50 125]]
                           :left-arm '[[fill-bounds 127]
                                       [text "left-arm" {:color 255 :offset [1 10]}]]}
-                 :led-shapes [(grid 100 50)]})
+                 :led-shapes [{:leds/type :leds/strip
+                               :leds/count 20
+                               :leds/length 100
+                               :leds/offset [10 10]
+                               :leds/angle 45}]})
+
               [:env :displayer :kv-store])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
     :env (component/using (env/new-env)
