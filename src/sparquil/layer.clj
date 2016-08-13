@@ -104,34 +104,42 @@
 
 (defn gradient
   "gradient background for testing"
-  [region width height] 
+  [[x y width height]] 
    {:draw 
     (fn [_]  
-     (q/no-stroke)  
      (let [x-interval (/ width 360)]  
-                      (doseq [h (range 360)]  
-                        (fill [:hsb h 50 30])  
-                          (q/rect (* h x-interval) 0 x-interval height))))})
+                      (doseq [h (range 360)]
+                        (fill [:hsb h 50 50])  
+                        (stroke [:hsb h 50 50 ])
+                        (q/rect (* h x-interval) 0 x-interval height))))})
 
 (defn beacon
   "low light beacon visualization"
-  [bounds width height]
-  {:setup
-   (fn [env]
-     {:radius 0})
+  [[x y width height] {:keys [center-x center-y interval offset max-diameter color stroke-width]}]
+  (let [center-x (or center-x (+ (/ width 2) x))
+        center-y (or center-y (+ (/ height 2) y))
+        interval (or interval 200)
+        offset (or offset 0)
+        max-diameter (or max-diameter (max width height))
+        color (or color [:hsb 115 50 50])
+        stroke-width (or stroke-width 20)]
+    {:setup
+       (fn [_]
+         {:diameter 0})
 
-   :update
-   (fn [env state]
-     {:radius (mod (+ (:radius state) 3) 500)})
+     :update
+       (fn [{:keys [:env/time]} state]
+         {:diameter (q/map-range (mod (- time offset) interval) 0 interval 0 max-diameter)})
 
-   :draw
-   (fn [state]
-     (stroke [:hsb 115 50 50])
-     (q/stroke-weight 2)
-     (q/ellipse (/ width 2) (/ height 2) (:radius state) (:radius state)))})
+     :draw
+       (fn [state]
+         (q/no-fill)
+         (stroke color)
+         (q/stroke-weight stroke-width)
+         (q/ellipse center-x center-y (:diameter state) (:diameter state)))}))
 
 (defn twinkle
-  "pulsing? twinkle"
+  "pulsing twinkle"
   [bounds width height cols rows step-interval]
   (let [cell-x (/ width cols)
         cell-y (/ height rows)]
@@ -148,6 +156,7 @@
           :grid (let [cells (apply concat (:grid state))]
                   (mapv vec (partition cols
                               (mapv (partial + 0.5) cells))))}))
+
      :draw
      (fn [state]
        (q/no-stroke)
