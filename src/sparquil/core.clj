@@ -191,17 +191,13 @@
       nil)))
 
 (defn realize-layers
-  [region-map layers-spec]
-  (match layers-spec
-    (layer-map :guard map?)    (reduce-kv (fn [realized-map region-name layer-vec]
-                                            (assoc realized-map region-name
-                                              (mapv (partial realize-layer
-                                                      (get-in region-map [region-name :bounds]))
-                                                layer-vec)))
-                                 {} layer-map)
-    (layer-vec :guard vector?) {:global (map (partial realize-layer
-                                               (get-in region-map [:global :bounds]))
-                                             layer-vec)}))
+  [region-map layer-map]
+  (reduce-kv (fn [realized-map region-name layer-vec]
+               (assoc realized-map region-name
+                 (mapv (partial realize-layer
+                         (get-in region-map [region-name :bounds]))
+                   layer-vec)))
+    {} layer-map))
 
 (defn read-layers
   "Returns a vector of deserialized layer specs or nil if unable to deserialize"
@@ -231,31 +227,33 @@
 
 (defn start-applet
   "Creates and returns a new sketch applet"
-  ([sketch]
-   (start-applet sketch nil nil))
-  ([{:keys [opts env displayer] :as sketch} layers-spec led-shapes]
-   (let [[width height :as size] (:size opts)
+  ([{:keys [config] :as sketch}]
+   (start-applet sketch (get (:scenes config) (:init-scene config))))
+  ([{:keys [config env displayer] :as sketch} scene]
+   (let [led-layout (get (:led-layouts config) (:led-layout scene))
+         layer-map (get (:layer-maps config) (:layer-map scene))
+         [width height :as size] (:size config)
          ; TODO: global-top/global-bottom regions?
-         regions (into [{:name :global :bounds [0 0 width height]}] (:regions opts))
+         regions (into [{:name :global :bounds [0 0 width height]}] (:regions config))
          region-map (zipmap (map :name regions) regions)
-         layers (realize-layers region-map (or layers-spec (:layers opts)))
-         led-pixel-indices (mapcat (partial inflate size) (or led-shapes (:led-shapes opts)))
+         layers (realize-layers region-map layer-map)
+         led-pixel-indices (mapcat (partial inflate size) led-layout)
          display-fn (fn [pixels]
                       (display displayer (map #(if (nil? %)
                                                 (q/color 0)
                                                 (aget pixels %))
                                               led-pixel-indices))
-                      led-pixel-indices)
-         applet-opts (-> opts
-                         (assoc :middleware [m/fun-mode])
-                         (assoc :setup (sketch-setup env (fmap (partial map :setup) layers)))
-                         (assoc :update (sketch-update env (fmap (partial map :update) layers)))
-                         (assoc :draw (sketch-draw regions
-                                                   (fmap (partial map :draw) layers)
-                                                   display-fn)))]
-     (mapply q/sketch applet-opts))))
+                      led-pixel-indices)]
+     (mapply q/sketch {:title (:title config)
+                       :size size
+                       :middleware [m/fun-mode]
+                       :setup (sketch-setup env (fmap (partial map :setup) layers))
+                       :update (sketch-update env (fmap (partial map :update) layers))
+                       :draw (sketch-draw regions
+                                          (fmap (partial map :draw) layers)
+                                          display-fn)}))))
 
-(defrecord Sketch [opts applet env displayer kv-store]
+(defrecord Sketch [config applet env displayer kv-store]
 
   component/Lifecycle
   (start [sketch]
@@ -274,14 +272,14 @@
 (defn new-sketch
   "Sketch component constructor. Opts will be passed to quil/sketch. See
    quil/defsketch for documentation of possible options. Do not provide :setup,
-   :update, and :draw functions directly in opts. Provide a :layers key with a
+   :update, and :draw functions directly in config. Provide a :layers key with a
    vector of {:setup :update :draw} functions. Must also provide fun-mode
    middleware."
-  [opts]
-  (if (spec/valid? :sketch/opts opts)
-    (map->Sketch {:applet (atom nil) :opts opts})
+  [config]
+  (if (spec/valid? :sketch/config config)
+    (map->Sketch {:applet (atom nil) :config config})
     (throw (Exception. (str "Invalid sketch options: "
-                            (spec/explain-str :sketch/opts opts))))))
+                            (spec/explain-str :sketch/config config))))))
 
 ; ---- LED configurations ----
 
@@ -297,25 +295,7 @@
 
 (defn sparquil-system []
   (component/system-map
-    :sketch (component/using
-              (new-sketch
-                {:title "You spin my circle right round"
-                 :size [500 500]
-                 :regions [{:name :left-arm :bounds [0 150 75 200]}]
-                 :layers {:global '[[brians-brain 100 100 125]]
-                          :left-arm '[[fill-bounds 127]
-                                      [text "left-arm" {:color 255 :offset [1 10]}]]}
-                 :led-shapes [{:leds/type :leds/strip
-                               :leds/count 20
-                               :leds/length 100
-                               :leds/offset [10 10]
-                               :leds/angle 45}
-                              {:leds/type :leds/circle
-                               :leds/center [200 200]
-                               :leds/count 36
-                               :leds/radius 30
-                               :leds/angle 0}]})
-
+    :sketch (component/using (new-sketch (read-string (slurp "configs/dev.edn")))
               [:env :displayer :kv-store])
     :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
     :env (component/using (env/new-env)

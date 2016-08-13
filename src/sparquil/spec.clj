@@ -11,8 +11,7 @@
 
 (s/def :sketch/layer-spec (s/cat :layer-name (constantly true) :args (s/* (constantly true))))
 
-(s/def :sketch/layers (s/or :layer-map (s/map-of keyword?
-                                                 (s/coll-of :sketch/layer-spec :kind vector?))
-                            :layer-vec (s/coll-of :sketch/layer-spec :kind vector?)))
+(s/def :sketch/layers (s/map-of keyword?
+                                (s/coll-of :sketch/layer-spec :kind vector?)))
 
-(s/def :sketch/opts (s/keys :req-un [:sketch/layers]))
+(s/def :sketch/config (constantly true))
