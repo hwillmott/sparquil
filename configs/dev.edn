@@ -10,7 +10,11 @@
                                   :leds/center [200 200]
                                   :leds/count 36
                                   :leds/radius 30
-                                  :leds/angle 0}]}
+                                  :leds/angle 0}
+                                 {:leds/type :leds/coordinate-sequence
+                                  :leds/offset [250 250]
+                                  :leds/dims [200 200]
+                                  :leds/coords [[0 0] [1 1] [0 2] [2 0] [2 2]]}]}
           :layer-maps {:brians-brain {:global [[brians-brain 100 100 125]]
                                       :left-arm [[fill-bounds 127]
                                                  [text "left-arm" {:color 255 :offset [1 10]}]]}}

@@ -169,6 +169,17 @@
                  (+ y-offset (* radius (Math/sin (degrees->radians angle))))]))
          (map (partial point->pixel-index size)))))
 
+(defmethod inflate :leds/coordinate-sequence [size {:keys [:leds/offset :leds/dims :leds/coords]}]
+  (let [max-x (apply max (map first coords))
+        max-y (apply max (map second coords))]
+    (->> coords
+         (map (fn [[x y]] [(* x (/ (first dims) max-x))
+                           (* y (/ (second dims) max-y))]))
+         (map (fn [[x y]] [(+ x (first offset))
+                           (+ y (second offset))]))
+         (map (partial point->pixel-index size)))))
+
+
 (defn resolve-layer-name
   "Returns the value bound to the symbol named by name in the sparquil.layer ns"
   [name]
