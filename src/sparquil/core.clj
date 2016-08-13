@@ -1,4 +1,5 @@
 (ns sparquil.core
+  (:gen-class)
   (:require [clojure.spec :as spec]
             [clojure.core.match :refer [match]]
             [clojure.algo.generic.functor :refer [fmap]]
@@ -320,3 +321,6 @@
     :env (component/using (env/new-env)
                           [:kv-store])
     :kv-store (kv/new-redis-client "127.0.0.1" 6379)))
+
+(defn -main [& args]
+  (component/start (sparquil-system)))
