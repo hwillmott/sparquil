@@ -102,7 +102,7 @@
                            ; Draw the circle.
                            (q/ellipse x y 100 100))))})
 
-(defn gradient
+(defn fill-gradient
   "gradient background for testing"
   [[x y width height]] 
    {:draw 
@@ -123,6 +123,7 @@
         max-diameter (or max-diameter (max width height))
         color (or color [:hsb 115 50 50])
         stroke-width (or stroke-width 20)]
+
     {:setup
        (fn [_]
          {:diameter 0})
@@ -140,17 +141,24 @@
 
 (defn twinkle
   "pulsing twinkle"
-  [bounds width height cols rows step-interval]
-  (let [cell-x (/ width cols)
-        cell-y (/ height rows)]
+  [[x y width height] {:keys [cols rows interval hue low-brightness high-brightness]}]
+  (let [cols (or cols 30)
+        rows (or rows 30)
+        cell-x (/ width cols)
+        cell-y (/ height rows)
+        interval (or interval 100)
+        hue (or hue 160)
+        low-brightness (or low-brightness -20)
+        high-brightness (or high-brightness 50)]
+
     {:setup
      (fn [{:keys [:env/time]}]
        {:last-step-time time
-        :grid (cellwise-grid-init #(rand 5) cols rows)})
+        :grid (cellwise-grid-init #(rand 10) cols rows)})
 
      :update
      (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
-       (if (< time (+ last-step-time step-interval))
+       (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
           :grid (let [cells (apply concat (:grid state))]
@@ -161,8 +169,8 @@
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] (coord-seq rows cols)]
-         (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 0 40)]
-           (fill [:hsb 115 40 brightness])
+         (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 low-brightness high-brightness)]
+           (fill [:hsb hue 50 brightness])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn text [_ text {:keys [color offset] :or {color [0] offset [0 0]}}]
@@ -171,7 +179,7 @@
            (fill color)
            (apply q/text text offset))})
 
-(defn fill-bounds [bounds color]
+(defn fill-color [bounds color]
   "A layer that fills the region specified by bounds with color"
   {:draw (fn [_] (region-background bounds color))})
 
