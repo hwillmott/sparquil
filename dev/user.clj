@@ -9,11 +9,11 @@
 
 (def system nil)
 
-(def config (atom (read-string (slurp "configs/dev.edn"))))
+(def config-path (atom "configs/dev.edn"))
 
 (defn init []
   (alter-var-root #'system
-                  (fn [_] (sparquil-system @config))))
+                  (fn [_] (sparquil-system (read-string (slurp @config-path))))))
 
 (defn start []
   (alter-var-root #'system component/start))
@@ -31,8 +31,8 @@
    (try (do (stop)
             (refresh :after 'user/go))
         (catch Exception e (print-cause-trace e))))
-  ([config-path]
-   (reset! config (read-string (slurp config-path)))
+  ([config-path-]
+   (reset! config-path config-path-)
    (reset)))
 
 
