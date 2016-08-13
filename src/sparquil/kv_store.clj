@@ -75,4 +75,4 @@
                                   listeners))))))
 
 (defn new-redis-client [host port]
-  (->RedisClient host port nil (atom nil)))
+  (->RedisClient host port nil (atom {})))
