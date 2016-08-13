@@ -61,6 +61,19 @@
     (if (re-find #"^-?\d+\.?\d*$" s)
       (read-string s))))
 
+(defn cellwise-grid-init [new-cell rows cols]
+  "Given new-cell, a function of no args that returns a new cell value, return a grid of size
+  [rows cols] filled by repeated calls to the new-cell function"
+  (into [] (repeatedly rows
+                       (fn []
+                         (into []
+                               (repeatedly cols new-cell))))))
+
+(defn coord-seq [rows cols]
+  (for [i (range rows)
+        j (range cols)]
+    [i j]))
+
 (defn rainbow-orbit [[_ _ width height :as bounds]]
   "A disk rotating around the center of the sketch, hue cylcing around
   the color wheel."
@@ -89,6 +102,59 @@
                            ; Draw the circle.
                            (q/ellipse x y 100 100))))})
 
+(defn gradient
+  "gradient background for testing"
+  [region width height] 
+   {:draw 
+    (fn [_]  
+     (q/no-stroke)  
+     (let [x-interval (/ width 360)]  
+                      (doseq [h (range 360)]  
+                        (fill [:hsb h 50 30])  
+                          (q/rect (* h x-interval) 0 x-interval height))))})
+
+(defn beacon
+  "low light beacon visualization"
+  [bounds width height]
+  {:setup
+   (fn [env]
+     {:radius 0})
+
+   :update
+   (fn [env state]
+     {:radius (mod (+ (:radius state) 3) 500)})
+
+   :draw
+   (fn [state]
+     (stroke [:hsb 115 50 50])
+     (q/stroke-weight 2)
+     (q/ellipse (/ width 2) (/ height 2) (:radius state) (:radius state)))})
+
+(defn twinkle
+  "pulsing? twinkle"
+  [bounds width height cols rows step-interval]
+  (let [cell-x (/ width cols)
+        cell-y (/ height rows)]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :grid (cellwise-grid-init #(rand 5) cols rows)})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+       (if (< time (+ last-step-time step-interval))
+         state
+         {:last-step-time time
+          :grid (let [cells (apply concat (:grid state))]
+                  (mapv vec (partition cols
+                              (mapv (partial + 0.5) cells))))}))
+     :draw
+     (fn [state]
+       (q/no-stroke)
+       (doseq [[i j] (coord-seq rows cols)]
+         (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 0 40)]
+           (fill [:hsb 115 40 brightness])
+           (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn text [_ text {:keys [color offset] :or {color [0] offset [0 0]}}]
   "A layer that writes text in color at offerset. Defaults to black at [0 0]"
@@ -121,14 +187,6 @@
   "Return a coll of the values of the neighbors of the cell at coords"
   [grid coords]
   (map (partial get-in grid) (moore-neighbor-coords (dims grid) coords)))
-
-(defn cellwise-grid-init [new-cell rows cols]
-  "Given new-cell, a function of no args that returns a new cell value, return a grid of size
-  [rows cols] filled by repeated calls to the new-cell function"
-  (into [] (repeatedly rows
-                       (fn []
-                         (into []
-                               (repeatedly cols new-cell))))))
 
 (defn coord-seq [rows cols]
   (for [i (range rows)
