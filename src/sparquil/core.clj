@@ -168,6 +168,7 @@
                 [(+ x-offset (* radius (Math/cos (degrees->radians angle))))
                  (+ y-offset (* radius (Math/sin (degrees->radians angle))))]))
          (map (partial point->pixel-index size)))))
+
 (defn resolve-layer-name
   "Returns the value bound to the symbol named by name in the sparquil.layer ns"
   [name]
@@ -293,14 +294,15 @@
 ; TODO: Give an explicit ordering to regions.
 ;       Maybe make into a map so it can have more params, like :background-color
 
-(defn sparquil-system []
+(defn sparquil-system [{sketch-config :sketch redis-config :redis fc-config :fadecandy :as config}]
   (component/system-map
-    :sketch (component/using (new-sketch (read-string (slurp "configs/dev.edn")))
+    :sketch (component/using (new-sketch sketch-config)
               [:env :displayer :kv-store])
-    :displayer (new-fadecandy-displayer "127.0.0.1" 7890)
+    :displayer (new-fadecandy-displayer (:host fc-config) (:port fc-config))
     :env (component/using (env/new-env)
                           [:kv-store])
-    :kv-store (kv/new-redis-client "127.0.0.1" 6379)))
+    :kv-store (kv/new-redis-client (:host redis-config) (:port redis-config))))
 
-(defn -main [& args]
-  (component/start (sparquil-system)))
+(defn -main [config-path]
+  (let [config (read-string (slurp config-path))]
+    (component/start (sparquil-system config))))

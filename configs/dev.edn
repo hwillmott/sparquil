@@ -1,19 +1,21 @@
-{:title "dev"
- :size [500 500]
- :regions [{:name :left-arm :bounds [0 150 75 200]}]
- :led-layouts {:normal [{:leds/type :leds/strip
-                         :leds/count 20
-                         :leds/length 100
-                         :leds/offset [10 10]
-                         :leds/angle 45}
-                        {:leds/type :leds/circle
-                         :leds/center [200 200]
-                         :leds/count 36
-                         :leds/radius 30
-                         :leds/angle 0}]}
- :layer-maps {:brians-brain {:global [[brians-brain 100 100 125]]
-                             :left-arm [[fill-bounds 127]
-                                        [text "left-arm" {:color 255 :offset [1 10]}]]}}
- :scenes {:brians-brain {:led-layout :normal
-                         :layer-map :brians-brain}}
- :init-scene :brians-brain}
+{:sketch {:title "dev"
+          :size [500 500]
+          :regions [{:name :left-arm :bounds [0 150 75 200]}]
+          :led-layouts {:normal [{:leds/type :leds/strip
+                                  :leds/count 20
+                                  :leds/length 100
+                                  :leds/offset [10 10]
+                                  :leds/angle 45}
+                                 {:leds/type :leds/circle
+                                  :leds/center [200 200]
+                                  :leds/count 36
+                                  :leds/radius 30
+                                  :leds/angle 0}]}
+          :layer-maps {:brians-brain {:global [[brians-brain 100 100 125]]
+                                      :left-arm [[fill-bounds 127]
+                                                 [text "left-arm" {:color 255 :offset [1 10]}]]}}
+          :scenes {:brians-brain {:led-layout :normal
+                                  :layer-map :brians-brain}}
+          :init-scene :brians-brain}
+ :redis {:host "127.0.0.1" :port 6379}
+ :fadecandy {:host "127.0.0.1" :port 7890}}

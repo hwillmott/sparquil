@@ -9,9 +9,11 @@
 
 (def system nil)
 
+(def config (atom (read-string (slurp "configs/dev.edn"))))
+
 (defn init []
   (alter-var-root #'system
-                  (constantly (sparquil-system))))
+                  (fn [_] (sparquil-system @config))))
 
 (defn start []
   (alter-var-root #'system component/start))
@@ -24,10 +26,14 @@
   (init)
   (start))
 
-(defn reset []
-  (try (do (stop)
-           (refresh :after 'user/go))
-       (catch Exception e (print-cause-trace e))))
+(defn reset
+  ([]
+   (try (do (stop)
+            (refresh :after 'user/go))
+        (catch Exception e (print-cause-trace e))))
+  ([config-path]
+   (reset! config (read-string (slurp config-path)))
+   (reset)))
 
 
 (def redis-conn {:pool {} :spec {:host "127.0.0.1" :port 6379}}) ; See `wcar` docstring for opts
