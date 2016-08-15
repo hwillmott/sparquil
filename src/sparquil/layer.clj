@@ -49,6 +49,14 @@
   (stroke color)
   (q/rect 0 0 width height))
 
+(defn draw-shape
+  "draw a shape"
+  [[shape-type & args]]
+  (match shape-type))
+
+
+
+
 (spec/fdef parse-number
            :args (spec/cat :s (spec/nilable string?))
            :ret (spec/nilable number?))
@@ -73,6 +81,20 @@
   (for [i (range rows)
         j (range cols)]
     [i j]))
+
+(defn draw-star
+  "draws a star"
+  [x y radius1 radius2 points]
+  (let [angle (/ q/TWO-PI points)
+        half-angle (/ angle 2)]
+    (q/begin-shape)
+    (doseq [i (range points)]
+      (let [a (* i angle)]
+        (q/vertex (+ x (* radius2 (q/cos a)))
+                  (+ y (* radius2 (q/sin a))))
+        (q/vertex (+ x (* radius1 (q/cos (+ a half-angle))))
+                  (+ y (* radius1 (q/sin (+ a half-angle)))))))
+    (q/end-shape :close)))
 
 (defn rainbow-orbit [[_ _ width height :as bounds]]
   "A disk rotating around the center of the sketch, hue cylcing around
@@ -104,14 +126,18 @@
 
 (defn fill-gradient
   "gradient background for testing"
-  [[x y width height]] 
+  [[x y width height] {:keys [direction]}] 
+  (let [direction (or direction :horizontal)]
    {:draw 
     (fn [_]  
-     (let [x-interval (/ width 360)]  
-                      (doseq [h (range 360)]
-                        (fill [:hsb h 50 50])  
-                        (stroke [:hsb h 50 50 ])
-                        (q/rect (* h x-interval) 0 x-interval height))))})
+     (let [y-interval (/ height 360)
+           x-interval (/ width 360 )]
+       (doseq [h (range 360)]
+         (fill [:hsb h 50 50])  
+         (stroke [:hsb h 50 50 ])
+         (cond
+           (= direction :horizontal) (q/rect 0 (* h y-interval) width y-interval)
+           (= direction :vertical) (q/rect (* h x-interval) 0 x-interval height)))))}))
 
 (defn beacon
   "low light beacon visualization"
@@ -137,11 +163,40 @@
          (q/no-fill)
          (stroke color)
          (q/stroke-weight stroke-width)
-         (q/ellipse center-x center-y (:diameter state) (:diameter state)))}))
+         (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state))))}))
+
+(defn inverted-beacon
+  "shows a beacon of the layer underneath"
+  [[x y width height] {:keys [center-x center-y interval offset max-diameter stroke-width]}]
+  (let [center-x (or center-x (+ (/ width 2) x))
+        center-y (or center-y (+ (/ height 2) y))
+        interval (or interval 200)
+        offset (or offset 0)
+        max-diameter1 (or max-diameter (max width height))
+        max-diameter2 (+ max-diameter1 stroke-width)]
+    {:setup
+     (fn [_]
+       {:diameter1 0
+        :diameter2 stroke-width})
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       {:diameter1 (q/map-range (mod (- time offset) interval) 0 interval 0 max-diameter1)
+        :diameter2 (+ (+ 400 stroke-width) (q/map-range (mod (- time offset) interval) 0 interval 0 max-diameter1))})
+
+     :draw
+     (fn [state]
+       (q/no-fill)
+       (stroke 0)
+       (q/stroke-weight 400)
+       (q/ellipse center-x center-y (:diameter2 state) (:diameter2 state))
+       (fill 0)
+       (q/no-stroke)
+       (q/ellipse center-x center-y (:diameter1 state) (:diameter1 state)))}))
 
 (defn twinkle
   "pulsing twinkle"
-  [[x y width height] {:keys [cols rows interval hue low-brightness high-brightness]}]
+  [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
   (let [cols (or cols 30)
         rows (or rows 30)
         cell-x (/ width cols)
@@ -149,7 +204,8 @@
         interval (or interval 100)
         hue (or hue 160)
         low-brightness (or low-brightness -20)
-        high-brightness (or high-brightness 50)]
+        high-brightness (or high-brightness 50)
+        gradient (or gradient false)]
 
     {:setup
      (fn [{:keys [:env/time]}]
@@ -163,15 +219,51 @@
          {:last-step-time time
           :grid (let [cells (apply concat (:grid state))]
                   (mapv vec (partition cols
-                              (mapv (partial + 0.5) cells))))}))
+                              (mapv (partial + twinkle-step) cells))))}))
 
      :draw
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] (coord-seq rows cols)]
          (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 low-brightness high-brightness)]
-           (fill [:hsb hue 50 brightness])
+           (if (= gradient false)
+             (fill [:hsb hue 60 brightness])
+             (fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
+
+(defn kaleidoscope
+  "rotating shapes"
+  [[x y width height] {:keys [center-x center-y w h interval offset color stroke-width]}]
+  (let [center-x (or (/ width 2))
+        center-y (or (/ height 2))
+        w (or w (/ width 3))
+        h (or h (/ height 3))
+        interval (or interval 5000)
+        offset (or offset 0)
+        draw-shape (or draw-shape (q/rect 0 0 w h))
+        color (or color [:hsb 200 50 50])
+        stroke-width (or stroke-width 10)]
+
+    {:setup
+     (fn [_]
+       (q/rect-mode :center)
+       {:angle 0})
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       {:angle (q/map-range (mod (- time offset) interval) 0 interval 0 q/TWO-PI)})
+
+     :draw
+     (fn [state]
+         (q/no-fill)
+         (stroke color)
+         (q/stroke-weight stroke-width)
+         (q/push-matrix)
+         (q/translate [center-x center-y])
+         (q/rotate (:angle state))
+         (draw-star 0 0 70 150 5)
+         ;(q/rect 0 0 180 90)
+         (q/pop-matrix))}))
 
 (defn text [_ text {:keys [color offset] :or {color [0] offset [0 0]}}]
   "A layer that writes text in color at offerset. Defaults to black at [0 0]"
@@ -315,3 +407,4 @@
                    (partial cellwise-grid-init brians-brain-cell)
                    brians-brain-cell-transition
                    brians-brain-cell-color))
+
