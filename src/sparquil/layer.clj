@@ -240,7 +240,6 @@
         h (or h (/ height 3))
         interval (or interval 5000)
         offset (or offset 0)
-        draw-shape (or draw-shape (q/rect 0 0 w h))
         color (or color [:hsb 200 50 50])
         stroke-width (or stroke-width 10)]
 
@@ -262,8 +261,28 @@
          (q/translate [center-x center-y])
          (q/rotate (:angle state))
          (draw-star 0 0 70 150 5)
-         ;(q/rect 0 0 180 90)
          (q/pop-matrix))}))
+
+(defn buzzing-bee
+  "Horizontal yellow bars moving downwards"
+  [[x y width height] {:keys [interval stripe-width]}]
+  (let [interval (or interval 500)
+        stripe-width (or stripe-width 20)]
+    {:setup
+      (fn [_]
+        {:offset 0})
+
+      :update
+      (fn [{:keys [:env/time]} state]
+        {:offset (q/map-range (mod time interval) 0 interval 0 (* 2 stripe-width))})
+
+      :draw
+      (fn [state]
+        (stroke [:hsb 60 50 50])
+        (fill [:hsb 60 50 50])
+        (doseq [i (range (/ height stripe-width))]
+          (cond (= (mod i 2) 0) (q/rect 0 (+ (:offset state) (* i stripe-width)) width stripe-width))))}))
+
 
 (defn text [_ text {:keys [color offset] :or {color [0] offset [0 0]}}]
   "A layer that writes text in color at offerset. Defaults to black at [0 0]"
