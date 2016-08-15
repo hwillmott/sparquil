@@ -1,0 +1,286 @@
+{:sketch {:title "harriet-suit"
+          :size [550 480]
+          :regions [{:name :rings :bounds [210 15 130 130]}]
+          :led-layouts {:normal [; left upper arm
+                                 {:leds/type :leds/strip
+                                  :leds/count 3
+                                  :leds/length 60
+                                  :leds/offset [400 40]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [410 90]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 100
+                                  :leds/offset [420 20]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [430 90]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 3
+                                  :leds/length 60
+                                  :leds/offset [440 40]
+                                  :leds/angle 90}
+
+                                 ; left forearm
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [440 140]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 100
+                                  :leds/offset [430 210]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 6
+                                  :leds/length 120
+                                  :leds/offset [420 120]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 100
+                                  :leds/offset [410 210]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [400 140]
+                                  :leds/angle 90}
+
+                                 ; left hand
+                                 {:leds/type :leds/strip
+                                  :leds/count 1
+                                  :leds/length 20
+                                  :leds/offset [400 250]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 40
+                                  :leds/offset [410 250]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 40
+                                  :leds/offset [420 270]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 40
+                                  :leds/offset [430 250]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 40
+                                  :leds/offset [440 270]
+                                  :leds/angle 270}
+
+                                 ; right upper arm
+                                 {:leds/type :leds/strip
+                                  :leds/count 3
+                                  :leds/length 60
+                                  :leds/offset [140 40]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [130 90]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 100
+                                  :leds/offset [120 20]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [110 90]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 3
+                                  :leds/length 60
+                                  :leds/offset [100 40]
+                                  :leds/angle 90}
+
+                                 ; right forearm
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [100 140]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 100
+                                  :leds/offset [110 210]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 6
+                                  :leds/length 120
+                                  :leds/offset [120 120]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 100
+                                  :leds/offset [130 210]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [140 140]
+                                  :leds/angle 90}
+
+                                 ; left hand
+                                 {:leds/type :leds/strip
+                                  :leds/count 1
+                                  :leds/length 20
+                                  :leds/offset [140 250]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 40
+                                  :leds/offset [130 250]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 40
+                                  :leds/offset [120 270]
+                                  :leds/angle 270}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 40
+                                  :leds/offset [110 250]
+                                  :leds/angle 90}
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 40
+                                  :leds/offset [100 270]
+                                  :leds/angle 270}
+
+                                 ; rings
+
+                                 {:leds/type :leds/circle
+                                  :leds/center [275 80]
+                                  :leds/count 32
+                                  :leds/radius 60
+                                  :leds/angle 0}
+                                 {:leds/type :leds/circle
+                                  :leds/center [275 80]
+                                  :leds/count 24
+                                  :leds/radius 50
+                                  :leds/angle 0}
+                                 {:leds/type :leds/circle
+                                  :leds/center [275 80]
+                                  :leds/count 16
+                                  :leds/radius 40
+                                  :leds/angle 0}
+                                 {:leds/type :leds/circle
+                                  :leds/center [275 80]
+                                  :leds/count 12
+                                  :leds/radius 30
+                                  :leds/angle 0}
+                                 {:leds/type :leds/circle
+                                  :leds/center [275 80]
+                                  :leds/count 8
+                                  :leds/radius 20
+                                  :leds/angle 0}
+                                 {:leds/type :leds/circle
+                                  :leds/center [275 80]
+                                  :leds/count 1
+                                  :leds/radius 1
+                                  :leds/angle 0}
+
+                                 ; hips
+
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [375 200]
+                                  :leds/angle 180}
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 100
+                                  :leds/offset [295 220]
+                                  :leds/angle 0}
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 100
+                                  :leds/offset [175 220]
+                                  :leds/angle 0}
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 80
+                                  :leds/offset [235 200]
+                                  :leds/angle 180}]}
+
+          :layer-maps {:buzzing-bee {:global [[fill-color [:rgb 0 0 0]]
+                                              [buzzing-bee {:interval 500 :stripe-width 20}]]}
+                       :gradient-twinkle-inverse-beacon {:global [[twinkle {:interval 50 :low-brightness -10 :high-brightness 60 :twinkle-step 0.1 :gradient true}]
+                                                                  [inverted-beacon {:center-x 275 :center-y 80 :interval 1000 :offset 200 :max-diameter 700 :stroke-width 50}]
+                                                                  [kaleidoscope {:center-x 275 :center-y 80 :interval 10000 :color [:hsb 40 70 20]}]]}
+                       :twinkle-inverse-beacon {:global [[twinkle {:hue 150 :interval 50 :low-brightness -10 :high-brightness 60 :twinkle-step 0.1}]
+                                                         [inverted-beacon {:center-x 275 :center-y 80 :interval 1100 :offset 200 :max-diameter 700 :stroke-width 50}]]}
+                       :twinkle-star {:global [[twinkle {:interval 50 :low-brightness -10 :high-brightness 50 :twinkle-step 0.1}]
+                                               [kaleidoscope {:center-x 275 :center-y 80 :interval 10000 :color [:hsb 40 70 20]}]]}
+                       :gradient-heart-beacon {:global [[fill-gradient {:direction :horizontal}]]
+                                               :rings [[beacon {:interval 1000 :max-diameter 1400 :color [:rgb 60 60 60]}]]}
+                       :pinwheel {:global [[pinwheel {:interval 2000}]]}
+                       :plasma {:global [[plasma {:interval 300}]]}}
+
+          ;[twinkle {:interval 50 :low-brightness -10 :high-brightness 60 :twinkle-step 0.1 :gradient true}]]
+                                      ;[brians-brain 15 15 250]
+                                      ;[fill-gradient {:direction :horizontal}]
+                                      ;[inverted-beacon {:center-x 275 :center-y 80 :interval 1000 :offset 200 :max-diameter 700 :stroke-width 50}]]
+                                      ;[kaleidoscope {:w 200 :h 100 :interval 10000 :color [:hsb 40 70 50]}]]}}
+                                      ;[beacon {:center-x 275 :center-y 80 :interval 1000 :max-diameter 1400 :color [:rgb 60 60 60]}]
+                                      ;[beacon {:center-x 275 :center-y 80 :interval 1000 :offset 200 :max-diameter 1400 :color [:rgb 60 60 60]}]]
+                                      ;:rings []}}
+                                             ;[inverted-beacon {:center-x 60 :center-y 60 :interval 800 :offset 200 :max-diameter 400 :stroke-width 10}]]}}
+                                             ;[beacon {:center-x 60 :center-y 60 :interval 800 :max-diameter 400 :color [:rgb 60 60 60] :stroke-width 10}]]}}
+          :scenes {:buzzing-bee {:led-layout :normal
+                                 :layer-map :buzzing-bee}
+                   :gradient-twinkle-inverse-beacon {:led-layout :normal
+                                                     :layer-map :gradient-twinkle-inverse-beacon}
+                   :twinkle-inverse-beacon {:led-layout :normal
+                                            :layer-map :twinkle-inverse-beacon}
+                   :twinkle-star {:led-layout :normal
+                                  :layer-map :twinkle-star}
+                   :gradient-heart-beacon {:led-layout :normal
+                                           :layer-map :gradient-heart-beacon}
+                   :pinwheel {:led-layout :normal
+                                           :layer-map :pinwheel}
+                   :plasma {:led-layout :normal
+                            :layer-map :plasma}}
+          :init-scene :plasma}
+ :redis {:host "127.0.0.1" :port 6379}
+ :fadecandy {:host "127.0.0.1" :port 7890}}

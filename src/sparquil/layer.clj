@@ -142,8 +142,8 @@
 (defn beacon
   "low light beacon visualization"
   [[x y width height] {:keys [center-x center-y interval offset max-diameter color stroke-width]}]
-  (let [center-x (or center-x (+ (/ width 2) x))
-        center-y (or center-y (+ (/ height 2) y))
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
         interval (or interval 200)
         offset (or offset 0)
         max-diameter (or max-diameter (max width height))
@@ -233,12 +233,10 @@
 
 (defn kaleidoscope
   "rotating shapes"
-  [[x y width height] {:keys [center-x center-y w h interval offset color stroke-width]}]
-  (let [center-x (or (/ width 2))
-        center-y (or (/ height 2))
-        w (or w (/ width 3))
-        h (or h (/ height 3))
-        interval (or interval 5000)
+  [[x y width height] {:keys [center-x center-y interval offset color stroke-width]}]
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
+        interval (or interval 1000)
         offset (or offset 0)
         color (or color [:hsb 200 50 50])
         stroke-width (or stroke-width 10)]
@@ -258,10 +256,71 @@
          (stroke color)
          (q/stroke-weight stroke-width)
          (q/push-matrix)
-         (q/translate [center-x center-y])
+         (q/translate center-x center-y)
          (q/rotate (:angle state))
-         (draw-star 0 0 70 150 5)
+         (draw-star 0 0 30 50 5)
          (q/pop-matrix))}))
+
+(defn pinwheel
+  "Rotating color wheel"
+  [[x y width height] {:keys [center-x center-y interval offset radius]}]
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
+        interval (or interval 2000)
+        offset (or offset 0)
+        radius (or radius (/ width 2))]
+
+    {:setup
+     (fn [_]
+       {:angle-offset 0})
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       {:angle-offset (q/map-range (mod (- time offset) interval) 0 interval 0 q/TWO-PI)})
+
+     :draw
+     (fn [state]
+       (q/begin-shape :triangle-fan)
+       (q/vertex center-x center-y)
+       (doseq [i (range 361)]
+         (fill [:hsb i 50 50])
+         (stroke [:hsb i 50 50])
+         (q/vertex (+ center-x (* radius (q/cos (+ (:angle-offset state) (q/radians i)))))
+                   (+ center-y (* radius (q/sin (+ (:angle-offset state) (q/radians i)))))))
+       (q/end-shape :close))}))
+
+(defn plasma
+  "Plasma hue effect"
+  [[x y width height] {:keys [cols rows interval perlin-step hue low-brightness high-brightness gradient]}]
+  (let [cols (or cols 50)
+        rows (or rows 50)
+        cell-x (/ width cols)
+        cell-y (/ height rows)
+        interval (or interval 50)
+        perlin-step (or perlin-step 0.1)
+        hue (or hue 160)
+        low-brightness (or low-brightness -20)
+        high-brightness (or high-brightness 50)
+        gradient (or gradient false)]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :perlin-offset 0})
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time perlin-offset] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :perlin-offset (+ perlin-offset perlin-step)}))
+     :draw
+     (fn [state]
+       (q/no-stroke)
+       (doseq [[i j] (coord-seq rows cols)]
+         (let [brightness (q/map-range (q/noise (+ i (:perlin-offset state)) (+ j (:perlin-offset state))) 0 1 low-brightness high-brightness)]
+           (if (= gradient false)
+             (fill [:hsb hue 60 brightness])
+             (fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
+           (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn buzzing-bee
   "Horizontal yellow bars moving downwards"
@@ -278,8 +337,8 @@
 
       :draw
       (fn [state]
-        (stroke [:hsb 60 50 50])
-        (fill [:hsb 60 50 50])
+        (stroke [:hsb 50 70 50])
+        (fill [:hsb 50 70 50])
         (doseq [i (range (/ height stripe-width))]
           (cond (= (mod i 2) 0) (q/rect 0 (+ (:offset state) (* i stripe-width)) width stripe-width))))}))
 
