@@ -292,12 +292,12 @@
 (defn plasma
   "Plasma hue effect"
   [[x y width height] {:keys [cols rows interval perlin-step hue low-brightness high-brightness gradient]}]
-  (let [cols (or cols 50)
-        rows (or rows 50)
+  (let [cols (or cols 30)
+        rows (or rows 30)
         cell-x (/ width cols)
         cell-y (/ height rows)
         interval (or interval 50)
-        perlin-step (or perlin-step 0.1)
+        perlin-step (or perlin-step 0.2)
         hue (or hue 160)
         low-brightness (or low-brightness -20)
         high-brightness (or high-brightness 50)
@@ -316,10 +316,10 @@
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] (coord-seq rows cols)]
-         (let [brightness (q/map-range (q/noise (+ i (:perlin-offset state)) (+ j (:perlin-offset state))) 0 1 low-brightness high-brightness)]
+         (let [noise (q/sin (* 4 (q/noise (+ (* i 0.1) (:perlin-offset state)) (+ (* j 0.1) (:perlin-offset state)))))]
            (if (= gradient false)
-             (fill [:hsb hue 60 brightness])
-             (fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
+             (fill [:hsb hue 60 (q/map-range noise 0 1 low-brightness high-brightness)])
+             (fill [:hsb (q/map-range noise 0 1 150 360) 60 50]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn buzzing-bee
