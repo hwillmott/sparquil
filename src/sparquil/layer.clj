@@ -75,17 +75,17 @@
     [i j]))
 
 (defn draw-star
-  "Draws a star centered around x and y with inner radius as radius1 and outer radius as radius2 and points as the number of points on the star"
-  [x y radius1 radius2 points]
+  "Draws a star centered around x and y"
+  [x y inner-radius outer-radius points]
   (let [angle (/ q/TWO-PI points)
         half-angle (/ angle 2)]
     (q/begin-shape)
     (doseq [i (range points)]
       (let [a (* i angle)]
-        (q/vertex (+ x (* radius2 (q/cos a)))
-                  (+ y (* radius2 (q/sin a))))
-        (q/vertex (+ x (* radius1 (q/cos (+ a half-angle))))
-                  (+ y (* radius1 (q/sin (+ a half-angle)))))))
+        (q/vertex (+ x (* outer-radius (q/cos a)))
+                  (+ y (* outer-radius (q/sin a))))
+        (q/vertex (+ x (* inner-radius (q/cos (+ a half-angle))))
+                  (+ y (* inner-radius (q/sin (+ a half-angle)))))))
     (q/end-shape :close)))
 
 (defn rainbow-orbit [[_ _ width height :as bounds]]
@@ -160,30 +160,30 @@
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."
   [[x y width height] {:keys [center-x center-y interval offset max-diameter stroke-width]}]
-  (let [center-x (or center-x (+ (/ width 2) x))
-        center-y (or center-y (+ (/ height 2) y))
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
         interval (or interval 200)
         offset (or offset 0)
-        max-diameter1 (or max-diameter (max width height))]
+        max-diameter (or max-diameter (max width height))]
     {:setup
      (fn [_]
-       {:diameter1 0
-        :diameter2 stroke-width})
+       {:inner-diameter 0
+        :outer-diameter stroke-width})
 
      :update
      (fn [{:keys [:env/time]} state]
-       {:diameter1 (q/map-range (mod (- time offset) interval) 0 interval 0 max-diameter1)
-        :diameter2 (+ (+ 400 stroke-width) (q/map-range (mod (- time offset) interval) 0 interval 0 max-diameter1))})
+       {:inner-diameter (q/map-range (mod (- time offset) interval) 0 interval 0 max-diameter)
+        :outer-diameter (+ (+ 400 stroke-width) (q/map-range (mod (- time offset) interval) 0 interval 0 max-diameter))})
 
      :draw
      (fn [state]
        (q/no-fill)
        (stroke 0)
        (q/stroke-weight 400)
-       (q/ellipse center-x center-y (:diameter2 state) (:diameter2 state))
+       (q/ellipse center-x center-y (:outer-diameter state) (:outer-diameter state))
        (fill 0)
        (q/no-stroke)
-       (q/ellipse center-x center-y (:diameter1 state) (:diameter1 state)))}))
+       (q/ellipse center-x center-y (:inner-diameter state) (:inner-diameter state)))}))
 
 (defn twinkle
   "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
@@ -222,7 +222,7 @@
              (fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
-(defn kaleidoscope
+(defn rotating-star
   "Rotating star around center-x and center-y with specified color and stroke-width"
   [[x y width height] {:keys [center-x center-y interval offset color stroke-width]}]
   (let [center-x (or center-x (/ width 2))
