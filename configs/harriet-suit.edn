@@ -1,6 +1,7 @@
 {:sketch {:title "harriet-suit"
           :size [550 480]
-          :regions [{:name :rings :bounds [210 15 130 130]}]
+          :regions [{:name :rings :bounds [210 15 130 130]}
+                    {:name :justsuit :bounds [100 0 350 300]}]
           :led-layouts {:normal [; left upper arm
                                  {:leds/type :leds/strip
                                   :leds/count 3
@@ -254,19 +255,9 @@
                                                [kaleidoscope {:center-x 275 :center-y 80 :interval 10000 :color [:hsb 40 70 20]}]]}
                        :gradient-heart-beacon {:global [[fill-gradient {:direction :horizontal}]]
                                                :rings [[beacon {:interval 1000 :max-diameter 1400 :color [:rgb 60 60 60]}]]}
-                       :pinwheel {:global [[pinwheel {:interval 2000}]]}
-                       :plasma {:global [[plasma {:interval 300}]]}}
-
-          ;[twinkle {:interval 50 :low-brightness -10 :high-brightness 60 :twinkle-step 0.1 :gradient true}]]
-                                      ;[brians-brain 15 15 250]
-                                      ;[fill-gradient {:direction :horizontal}]
-                                      ;[inverted-beacon {:center-x 275 :center-y 80 :interval 1000 :offset 200 :max-diameter 700 :stroke-width 50}]]
-                                      ;[kaleidoscope {:w 200 :h 100 :interval 10000 :color [:hsb 40 70 50]}]]}}
-                                      ;[beacon {:center-x 275 :center-y 80 :interval 1000 :max-diameter 1400 :color [:rgb 60 60 60]}]
-                                      ;[beacon {:center-x 275 :center-y 80 :interval 1000 :offset 200 :max-diameter 1400 :color [:rgb 60 60 60]}]]
-                                      ;:rings []}}
-                                             ;[inverted-beacon {:center-x 60 :center-y 60 :interval 800 :offset 200 :max-diameter 400 :stroke-width 10}]]}}
-                                             ;[beacon {:center-x 60 :center-y 60 :interval 800 :max-diameter 400 :color [:rgb 60 60 60] :stroke-width 10}]]}}
+                       :pinwheel {:rings [[pinwheel {:interval 2000}]]}
+                       :plasma {:justsuit [[plasma {:interval 300 :gradient true}]]}
+                       :rain {:justsuit [[rain {:interval 10}]]}}
           :scenes {:buzzing-bee {:led-layout :normal
                                  :layer-map :buzzing-bee}
                    :gradient-twinkle-inverse-beacon {:led-layout :normal
@@ -278,9 +269,11 @@
                    :gradient-heart-beacon {:led-layout :normal
                                            :layer-map :gradient-heart-beacon}
                    :pinwheel {:led-layout :normal
-                                           :layer-map :pinwheel}
+                              :layer-map :pinwheel}
                    :plasma {:led-layout :normal
-                            :layer-map :plasma}}
-          :init-scene :plasma}
+                            :layer-map :plasma}
+                   :rain {:led-layout :normal
+                          :layer-map :rain}}
+          :init-scene :rain}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}

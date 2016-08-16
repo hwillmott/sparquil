@@ -49,14 +49,6 @@
   (stroke color)
   (q/rect 0 0 width height))
 
-(defn draw-shape
-  "draw a shape"
-  [[shape-type & args]]
-  (match shape-type))
-
-
-
-
 (spec/fdef parse-number
            :args (spec/cat :s (spec/nilable string?))
            :ret (spec/nilable number?))
@@ -83,7 +75,7 @@
     [i j]))
 
 (defn draw-star
-  "draws a star"
+  "Draws a star centered around x and y with inner radius as radius1 and outer radius as radius2 and points as the number of points on the star"
   [x y radius1 radius2 points]
   (let [angle (/ q/TWO-PI points)
         half-angle (/ angle 2)]
@@ -125,7 +117,7 @@
                            (q/ellipse x y 100 100))))})
 
 (defn fill-gradient
-  "gradient background for testing"
+  "Gradient background for testing. Can set the hue to change vertically or horizontally, with horizontal as the default."
   [[x y width height] {:keys [direction]}] 
   (let [direction (or direction :horizontal)]
    {:draw 
@@ -140,7 +132,7 @@
            (= direction :vertical) (q/rect (* h x-interval) 0 x-interval height)))))}))
 
 (defn beacon
-  "low light beacon visualization"
+  "Low light beacon visualization centered around center-x and center-y. The beacon expands from 0 to max-diameter over the specified interval. You can specify the color and stroke-width of the beacon."
   [[x y width height] {:keys [center-x center-y interval offset max-diameter color stroke-width]}]
   (let [center-x (or center-x (/ width 2))
         center-y (or center-y (/ height 2))
@@ -166,14 +158,13 @@
          (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state))))}))
 
 (defn inverted-beacon
-  "shows a beacon of the layer underneath"
+  "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."
   [[x y width height] {:keys [center-x center-y interval offset max-diameter stroke-width]}]
   (let [center-x (or center-x (+ (/ width 2) x))
         center-y (or center-y (+ (/ height 2) y))
         interval (or interval 200)
         offset (or offset 0)
-        max-diameter1 (or max-diameter (max width height))
-        max-diameter2 (+ max-diameter1 stroke-width)]
+        max-diameter1 (or max-diameter (max width height))]
     {:setup
      (fn [_]
        {:diameter1 0
@@ -195,7 +186,7 @@
        (q/ellipse center-x center-y (:diameter1 state) (:diameter1 state)))}))
 
 (defn twinkle
-  "pulsing twinkle"
+  "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
   [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
   (let [cols (or cols 30)
         rows (or rows 30)
@@ -232,7 +223,7 @@
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn kaleidoscope
-  "rotating shapes"
+  "Rotating star around center-x and center-y with specified color and stroke-width"
   [[x y width height] {:keys [center-x center-y interval offset color stroke-width]}]
   (let [center-x (or center-x (/ width 2))
         center-y (or center-y (/ height 2))
@@ -262,7 +253,7 @@
          (q/pop-matrix))}))
 
 (defn pinwheel
-  "Rotating color wheel"
+  "Rotating color wheel around center-x and center-y"
   [[x y width height] {:keys [center-x center-y interval offset radius]}]
   (let [center-x (or center-x (/ width 2))
         center-y (or center-y (/ height 2))
@@ -291,17 +282,13 @@
 
 (defn plasma
   "Plasma hue effect"
-  [[x y width height] {:keys [cols rows interval perlin-step hue low-brightness high-brightness gradient]}]
+  [[x y width height] {:keys [cols rows interval perlin-step]}]
   (let [cols (or cols 30)
         rows (or rows 30)
         cell-x (/ width cols)
         cell-y (/ height rows)
-        interval (or interval 50)
-        perlin-step (or perlin-step 0.2)
-        hue (or hue 160)
-        low-brightness (or low-brightness -20)
-        high-brightness (or high-brightness 50)
-        gradient (or gradient false)]
+        interval (or interval 30)
+        perlin-step (or perlin-step 0.2)]
     {:setup
      (fn [{:keys [:env/time]}]
        {:last-step-time time
@@ -316,11 +303,34 @@
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] (coord-seq rows cols)]
-         (let [noise (q/sin (* 4 (q/noise (+ (* i 0.1) (:perlin-offset state)) (+ (* j 0.1) (:perlin-offset state)))))]
-           (if (= gradient false)
-             (fill [:hsb hue 60 (q/map-range noise 0 1 low-brightness high-brightness)])
-             (fill [:hsb (q/map-range noise 0 1 150 360) 60 50]))
+         (let [noise (q/sin (* q/TWO-PI (q/noise (* i 0.1) (* j 0.1) (:perlin-offset state))))]
+           (fill [:hsb (q/map-range noise -1 1 150 300) 60 50])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
+
+(defn rain
+  "Falling/fading colored drops."
+  [[x y width height] {:keys [interval num-droplets hue]}]
+  (let [interval (or interval 5)
+        num-droplets (or num-droplets 50)
+        hue (or hue 200)
+        droplet-width (/ width num-droplets)]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :droplets (into [] (repeatedly num-droplets #(rand height)))})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time droplets] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :droplets (mapv #(mod (inc %) height) droplets)}))
+     :draw
+     (fn [state]
+       (doseq [[i j] (coord-seq num-droplets 5)]
+         (fill [:hsb hue 50 (* j 10)])
+         (stroke [:hsb hue 50 (* j 10)])
+         (q/rect (* i droplet-width) (+ (* j droplet-width) (get (:droplets state) i)) droplet-width droplet-width)))}))
 
 (defn buzzing-bee
   "Horizontal yellow bars moving downwards"
