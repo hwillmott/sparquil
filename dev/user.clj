@@ -13,7 +13,7 @@
 
 (defn init []
   (alter-var-root #'system
-                  (fn [_] (sparquil-system (read-string (slurp @config-path))))))
+                  (fn [_] (sparquil-system (read-config @config-path)))))
 
 (defn start []
   (alter-var-root #'system component/start))

@@ -15,11 +15,11 @@
                                   :leds/offset [250 250]
                                   :leds/dims [200 200]
                                   :leds/coords-path "configs/coordinate_sequences/test_sequence.edn"}]}
-          :layer-maps {:brians-brain {:global [[brians-brain 100 100 125]]
-                                      :left-arm [[fill-bounds 127]
-                                                 [text "left-arm" {:color 255 :offset [1 10]}]]}}
           :scenes {:brians-brain {:led-layout :normal
-                                  :layer-map :brians-brain}}
+                                  :layer-map {:global [[brians-brain 100 100 125]]
+                                              :left-arm [[fill-bounds 127]
+                                                         [text "left-arm" {:color 255 :offset [1 10]}]]}}}
           :init-scene :brians-brain}
+
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}
