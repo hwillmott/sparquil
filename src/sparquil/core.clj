@@ -12,7 +12,7 @@
             [sparquil.layer :as l]
             [sparquil.kv-store :as kv]
             [sparquil.environment :as env]
-            [clojure.data.json :as json]))
+            [sparquil.util :as u]))
 
 ; TODO: Spec everything
 ; TODO: Add a proper logging library, get rid of printlns
@@ -61,16 +61,6 @@
               [{:name :global-top :bounds [0 0 width height]}
                {:name :global :bounds [0 0 width height]}])))) ; TODO: Remove :global
 
-(defn degrees->radians [degrees]
-  (* degrees (/ Math/PI 180)))
-
-(defn point->pixel-index
-  "Given a size and a point, returns the corresponding index in quil/pixel array"
-  [[width height] [x y]]
-  (if (and (< 0 x width) (< 0 y height))
-    (+ (Math/round (double x)) (* width (Math/round (double y))))
-    nil))
-
 (defmulti inflate
   (fn [size shape] (:leds/type shape)))
 
@@ -78,9 +68,9 @@
   (let [[x-offset y-offset] offset]
     (->> (range 0 length (/ length count))
          (map (fn [radius]
-                [(+ x-offset (* radius (Math/cos (degrees->radians angle))))
-                 (+ y-offset (* radius (Math/sin (degrees->radians angle))))]))
-         (map (partial point->pixel-index size)))))
+                [(+ x-offset (* radius (Math/cos (u/degrees->radians angle))))
+                 (+ y-offset (* radius (Math/sin (u/degrees->radians angle))))]))
+         (map (partial u/point->pixel-index size)))))
 
 ; TODO: Different led-pixel mapping modes. Average over region rather than single pixel?
 
@@ -91,7 +81,7 @@
         y-interval (/ height rows)]
     (for [i (range 0 rows) ; i indexes rows (y-dim)
           j (range 0 cols)] ; j indexes cols  (x-dim)
-      (point->pixel-index size
+      (u/point->pixel-index size
                           [(+ (/ x-interval 2) (* j x-interval))
                            (+ (/ y-interval 2) (* i y-interval))]))))
 
@@ -100,9 +90,9 @@
     (->> (range 0 360 (/ 360 count))
          (map (partial + angle))
          (map (fn [angle]
-                [(+ x-offset (* radius (Math/cos (degrees->radians angle))))
-                 (+ y-offset (* radius (Math/sin (degrees->radians angle))))]))
-         (map (partial point->pixel-index size)))))
+                [(+ x-offset (* radius (Math/cos (u/degrees->radians angle))))
+                 (+ y-offset (* radius (Math/sin (u/degrees->radians angle))))]))
+         (map (partial u/point->pixel-index size)))))
 
 (defmethod inflate :leds/coordinate-sequence [size {:keys [:leds/offset :leds/dims :leds/coords :leds/coords-path]}]
   (let [coords (if coords-path
@@ -115,7 +105,7 @@
                            (* y (/ (second dims) max-y))]))
          (map (fn [[x y]] [(+ x (first offset))
                            (+ y (second offset))]))
-         (map (partial point->pixel-index size)))))
+         (map (partial u/point->pixel-index size)))))
 
 
 (defn region-setup
@@ -203,7 +193,7 @@
             (aset-int pixels i (q/color 255 255 255))))
         (q/update-pixels)))))
 
-(defn resolve-layer-name
+(defn resolve-layer-symbol
   "Returns the value bound to the symbol named by name in the sparquil.layer ns"
   [name]
   (eval (symbol "sparquil.layer" (str name))))
@@ -217,9 +207,11 @@
   the sparquil.clojure namespace and the tail is interpreted as args to that function.
 
   Layer specs are unrelated core.spec"
-  [bounds [layer-name & params :as layer-spec]]
+  [bounds layer-spec]
   (try
-    (apply (resolve-layer-name layer-name) bounds params)
+    (let [resolved-spec (mapv #(if (symbol? %) (resolve-layer-symbol %) %)
+                          layer-spec)]
+      (apply (first resolved-spec) bounds (rest resolved-spec)))
     (catch Exception e
       (println "Unable to realize layer spec:" layer-spec)
       (println "Exception: " (.getMessage e))
@@ -247,6 +239,7 @@
    (let [scene (realize-scene config scene-name)]
      (mapply q/sketch {:title (:title config)
                        :size (:size config)
+                       :renderer :p2d
                        :middleware [m/fun-mode]
                        :setup (sketch-setup env scene) ;(fmap (partial map :setup) layers))
                        :update (sketch-update env scene)

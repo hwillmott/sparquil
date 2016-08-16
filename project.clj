@@ -16,5 +16,5 @@
                                   [org.clojure/test.check "0.9.0"]]}
              :uberjar {:aot :all
                        :main ^:skip-aot sparquil.core
-                       :target-path "target/%s"}})
-
+                       :target-path "target/%s"}}
+  :jvm-opts ^:replace [])
