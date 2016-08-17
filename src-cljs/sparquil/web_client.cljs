@@ -1,15 +1,15 @@
 (ns sparquil.web-client
   (:require [reagent.core :as r]))
 
-(defn some-component []
+(defn root-component []
   [:div
-   [:h3 "I am a component!"]
+   [:h1 "Sparquil control center"]
    [:p.someclass
     "I have " [:strong "bold"]
     [:span {:style {:color "red"}} " and red"]
     " text."]])
 
 (defn mount-root []
-  (r/render [some-component] (.getElementById js/document "app")))
+  (r/render [root-component] (.getElementById js/document "app")))
 
 (mount-root)

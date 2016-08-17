@@ -41,4 +41,5 @@
                           :asset-path "js/out"
                           :main "sparquil.web-client"
                           :optimizations :advanced
-                          :pretty-print true}}]})
+                          :pretty-print true}}]}
+  :figwheel {:css-dirs ["resources/public/css"]})
