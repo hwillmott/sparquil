@@ -1,8 +1,8 @@
 (ns sparquil.interface
   (:require [com.stuartsierra.component :as component]
-            [ring.middleware.file :refer [wrap-file]]
+            [ring.util.response :refer [resource-response]]
             [org.httpkit.server :as hkit :refer [with-channel]]
-            [bidi.ring :refer [make-handler]]
+            [bidi.ring :refer [make-handler ->ResourcesMaybe]]
             [sparquil.sketch :refer [load-scene]]))
 
 ;(defn async-handler [ring-request]
@@ -15,7 +15,7 @@
 ;                                  :headers {"Content-Type" "text/plain"}
 ;                                  :body    "Long polling?"}))))
 
-(defn greeting-handler [req]
+(defn test-handler [req]
   {:status  200
    :headers {"Content-Type" "text/html"}
    :body    "hello HTTP world!"})
@@ -27,8 +27,10 @@
     (load-scene sketch (:name route-params))))
 
 (defn routes-for-sketch [sketch]
-  ["/" {"" greeting-handler
-        ["scene/" [keyword :name]] (sketch-scene-handler sketch)}])
+  ["/" [[["scene/" [keyword :name]] (sketch-scene-handler sketch)]
+        ["" (fn [_] (resource-response "public/index.html"))]
+        ["" (->ResourcesMaybe {:prefix "public/"})]]])
+
 
 (defrecord WebInterface [config server sketch]
   component/Lifecycle
