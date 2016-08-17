@@ -261,8 +261,12 @@
                                                        :rings [[beacon {:interval 1000 :max-diameter 1400 :color [:rgb 60 60 60]}]]}}
                    :pinwheel {:led-layout :normal
                               :layer-map {:rings [[pinwheel {:interval 2000}]]}}
-                   :plasma {:led-layout :normal
-                            :layer-map {:global-bottom [[plasma {:interval 50 :gradient true}]]}}
+                   :plasma-color {:led-layout :normal
+                                  :layer-map {:global-bottom [[perlin-plasma {:interval 50 :variable :color :lower-limit-h 200 :upper-limit-h 300}]]}}
+                   :plasma-brightness {:led-layout :normal
+                                       :layer-map {:global-bottom [[perlin-plasma {:interval 50 :variable :brightness :lower-limit-b -50 :upper-limit-b 50}]]}}
+                   :plasma-ripple {:led-layout :normal
+                                   :layer-map {:global-bottom [[perlin-plasma {:interval 50 :variable :color-and-brightness :lower-limit-b -10 :upper-limit-b 50 :lower-limit-h 0 :upper-limit-h 50}]]}}
                    :rain {:led-layout :normal
                           :layer-map {:global-bottom [[rain {:interval 10}]]}}
                    :heart {:led-layout :normal
@@ -270,6 +274,6 @@
                                                        [beacon {:center-x 185 :center-y 80 :interval 700 :offset 300 :max-diameter 400 :color [:rgb 0 0 0]}]]
                                        :rings [[fill-color [:hsb 0 0 0]]
                                                [beating-heart {:scale 120 :interval 700}]]}}}
-          :init-scene :heart}
+          :init-scene :plasma-ripple}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}

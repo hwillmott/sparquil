@@ -297,13 +297,19 @@
 
 (defn perlin-plasma
   "Plasma hue effect"
-  [[x y width height] {:keys [cols rows interval perlin-step]}]
+  [[x y width height] {:keys [cols rows interval perlin-step variable hue upper-limit-h lower-limit-h upper-limit-b lower-limit-b]}]
   (let [cols (or cols 40)
         rows (or rows 40)
         cell-x (/ width cols)
         cell-y (/ height rows)
         interval (or interval 30)
-        perlin-step (or perlin-step 0.1)]
+        perlin-step (or perlin-step 0.05)
+        variable (or variable :color)
+        hue (or hue 200)
+        upper-limit-h (or upper-limit-h 200)
+        lower-limit-h (or lower-limit-h 300)
+        upper-limit-b (or upper-limit-b -50)
+        lower-limit-b (or lower-limit-b -50)]
     {:setup
      (fn [{:keys [:env/time]}]
        {:last-step-time time
@@ -319,7 +325,10 @@
        (q/no-stroke)
        (doseq [[i j] (coord-seq rows cols)]
          (let [noise (q/sin (* q/TWO-PI (q/noise (* i 0.1) (* j 0.1) (:perlin-offset state))))]
-           (stroke-and-fill [:hsb (q/map-range noise -1 1 100 300) 60 50])
+           (cond
+             (= variable :color) (stroke-and-fill [:hsb (q/map-range noise -1 1 lower-limit-h upper-limit-h) 60 50])
+             (= variable :brightness) (stroke-and-fill [:hsb hue 60 (q/map-range noise -1 1 lower-limit-b upper-limit-b)])
+             (= variable :color-and-brightness) (stroke-and-fill [:hsb (q/map-range noise -1 1 lower-limit-h upper-limit-h) 60 (q/map-range noise -1 1 lower-limit-b upper-limit-b)]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn rain
