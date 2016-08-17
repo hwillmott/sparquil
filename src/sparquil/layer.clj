@@ -2,7 +2,8 @@
   (:require [clojure.spec :as spec]
             [clojure.core.match :refer [match]]
             [bigml.sampling.simple :as simple]
-            [quil.core :as q]))
+            [quil.core :as q]
+            [sparquil.util :as u]))
 
 (defn color-mode
   "Sets the color mode to whatever is appropriate for color."
@@ -28,6 +29,9 @@
   (fn [color]
     (color-mode color)
     (color-apply quil-fn color)))
+
+(def color-int
+  (color-wrap q/color))
 
 (def background
   "Like Quil's background, but takes Sparquil colors"
@@ -547,3 +551,21 @@
                    brians-brain-cell-transition
                    brians-brain-cell-color))
 
+(defn transformation [[x-offset y-offset width height :as bounds] transform]
+  {:draw
+   (fn [_]
+     (let [pixels (q/pixels)
+           coords (for [y (range y-offset (+ y-offset height))
+                        x (range x-offset (+ x-offset width))]
+                    [x y])]
+       (->> coords
+            (map (fn [[x y :as coord]]
+                    (let [pixel-index (int (u/point->pixel-index coord))]
+                      (aset-int pixels pixel-index
+                                (color-int (transform x y (u/pixel-int->rgb (aget ^ints pixels pixel-index))))))))
+            (dorun))
+       (q/update-pixels)))})
+
+(defn switch-rb [bounds]
+  (transformation bounds (fn [x y [r g b]]
+                           [:rgb g b r])))
