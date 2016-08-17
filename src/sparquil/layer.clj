@@ -97,9 +97,7 @@
 
 (defn draw-heart
   "Draws a heart with the bottom at x and y"
-  [x y scale color]
-  (stroke-and-fill color)
-  (q/stroke-weight 2)
+  [x y scale]
   (q/bezier x y x (- y (/ scale 2)) (+ x scale) (- y (/ scale 4)) x (+ y (/ scale 2)))
   (q/bezier x y x (- y (/ scale 2)) (- x scale) (- y (/ scale 4)) x (+ y (/ scale 2))))
 
@@ -238,35 +236,45 @@
              (stroke-and-fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
-(defn rotating-star
-  "Rotating star around center-x and center-y with specified color and stroke-width"
-  [[x y width height] {:keys [center-x center-y interval offset color stroke-width]}]
+(defn kaleidoscope
+  "Rotating shapes around center-x and center-y with specified color and stroke-width. Star, rect, and heart available."
+  [[x y width height] {:keys [center-x center-y interval-r interval-b offset size-change size-1 size-2 color stroke-width shape]}]
   (let [center-x (or center-x (/ width 2))
         center-y (or center-y (/ height 2))
-        interval (or interval 1000)
+        interval-r (or interval-r 1000)
+        interval-b (or interval-b 700)
         offset (or offset 0)
+        size-change (or size-change 10)
+        size-1 (or size-1 25)
+        size-2 (or size-2 45)
         color (or color [:hsb 200 50 50])
-        stroke-width (or stroke-width 10)]
+        stroke-width (or stroke-width 10)
+        shape (or shape :star)] ;rect and heart available
 
     {:setup
      (fn [_]
        (q/rect-mode :center)
-       {:angle 0})
+       {:angle 0
+        :beat 0})
 
      :update
      (fn [{:keys [:env/time]} state]
-       {:angle (q/map-range (mod (- time offset) interval) 0 interval 0 q/TWO-PI)})
+       {:angle (q/map-range (mod (- time offset) interval-r) 0 interval-r 0 q/TWO-PI)
+        :beat (q/map-range (mod (- time offset) interval-b) 0 interval-b 0 size-change)})
 
      :draw
      (fn [state]
-         (q/no-fill)
-         (stroke color)
-         (q/stroke-weight stroke-width)
-         (q/push-matrix)
-         (q/translate center-x center-y)
-         (q/rotate (:angle state))
-         (draw-star 0 0 30 50 5)
-         (q/pop-matrix))}))
+       (q/no-fill)
+       (stroke color)
+       (q/stroke-weight stroke-width)
+       (q/push-matrix)
+       (q/translate center-x center-y)
+       (q/rotate (:angle state))
+       (cond
+         (= shape :star) (draw-star 0 0 (+ (:beat state) size-1) (+ (:beat state) size-2) 5)
+         (= shape :rect) (q/rect 0 0 (+ (:beat state) size-1) (+ (:beat state) size-2))
+         (= shape :heart) (draw-heart 0 0(:beat state)))
+       (q/pop-matrix))}))
 
 (defn pinwheel
   "Rotating color wheel around center-x and center-y"
@@ -392,12 +400,14 @@
 
      :draw
      (fn [state]
-       (draw-heart x y (- scale (:offset state)) color))}))
+       (stroke-and-fill color)
+       (draw-heart x y (- scale (:offset state))))}))
 
-(defn text [_ text {:keys [color offset] :or {color [0] offset [0 0]}}]
-  "A layer that writes text in color at offerset. Defaults to black at [0 0]"
+(defn text [_ text {:keys [color size offset] :or {color [0] size 50 offset [0 0]}}]
+  "A layer that writes text in color at offset. Defaults to black at [0 0]"
   {:draw (fn [_]
            (fill color)
+           (q/text-size size)
            (apply q/text text offset))})
 
 (defn fill-color [bounds color]

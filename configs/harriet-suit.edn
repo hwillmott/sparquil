@@ -255,7 +255,8 @@
                                                                         [inverted-beacon {:center-x 275 :center-y 80 :interval 1100 :offset 200 :max-diameter 700 :stroke-width 50}]]}}
                    :twinkle-star {:led-layout :normal
                                   :layer-map {:global-bottom [[twinkle {:interval 50 :low-brightness -10 :high-brightness 50 :twinkle-step 0.1}]
-                                                              [rotating-star {:center-x 275 :center-y 80 :interval 10000 :color [:hsb 40 70 20]}]]}}
+                                                              [kaleidoscope {:center-x 185 :center-y 80 :interval-r 10000 :color [:hsb 40 70 20]}]]}}
+                                                              ;[rotating-star {:center-x 185 :center-y 80 :interval-r 10000 :color [:hsb 40 70 20]}]]}}
                    :gradient-heart-beacon {:led-layout :normal
                                            :layer-map {:global-bottom [[fill-gradient {:direction :horizontal}]]
                                                        :rings [[beacon {:interval 1000 :max-diameter 1400 :color [:rgb 60 60 60]}]]}}
@@ -272,8 +273,14 @@
                    :heart {:led-layout :normal
                            :layer-map {:global-bottom [[twinkle {:hue 340}]
                                                        [beacon {:center-x 185 :center-y 80 :interval 700 :offset 300 :max-diameter 400 :color [:rgb 0 0 0]}]]
+                                                       ;[text "H" {:color [:rgb 50 50 50] :size 80 :offset [2 90]}]
+                                                       ;[text "B" {:color [:rgb 50 50 50] :size 100 :offset [310 96]}]]
                                        :rings [[fill-color [:hsb 0 0 0]]
-                                               [beating-heart {:scale 120 :interval 700}]]}}}
-          :init-scene :plasma-ripple}
+                                               [beating-heart {:scale 120 :interval 700}]]}}
+                   :kaleidoscope {:led-layout :normal
+                                  :layer-map {:global-bottom [[twinkle {:interval 50 :low-brightness -10 :high-brightness 50 :twinkle-step 0.1}]
+                                                              [kaleidoscope {:center-x 185 :center-y 80 :interval-r 10000 :interval-b 500 :size-change 100 :color [:hsb 40 70 20] :shape :heart}]]}}}
+
+          :init-scene :twinkle-star}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}
