@@ -1,6 +1,7 @@
 (ns sparquil.interface
   (:require [com.stuartsierra.component :as component]
             [ring.util.response :refer [resource-response]]
+            [ring.middleware.transit :refer [wrap-transit-response]]
             [org.httpkit.server :as hkit :refer [with-channel]]
             [bidi.ring :refer [make-handler ->ResourcesMaybe]]
             [sparquil.sketch :refer [load-scene get-config get-scene-spec]]))
@@ -31,16 +32,16 @@
   [sketch]
   (fn [_]
     {:status 200
-     :headers {"Content-Type" "application/edn"}
-     :body (pr-str (get-config sketch))}))
+     :headers {"Content-Type" "application/transit+json"}
+     :body (get-config sketch)}))
 
 (defn sketch-scene-spec-handler
   "Returns a handler that returns the config of sketch"
   [sketch]
   (fn [_]
     {:status 200
-     :headers {"Content-Type" "application/edn"}
-     :body (pr-str (get-scene-spec sketch))}))
+     :headers {"Content-Type" "application/transit+json"}
+     :body (get-scene-spec sketch)}))
 
 (defn routes-for-sketch [sketch]
   ["/" [[["scene/" [keyword :name]] (sketch-scene-handler sketch)]
@@ -53,7 +54,8 @@
 (defrecord InterfaceServer [config server sketch]
   component/Lifecycle
   (start [interface-server]
-    (let [handler (make-handler (routes-for-sketch sketch))]
+    (let [handler (-> (make-handler (routes-for-sketch sketch))
+                      (wrap-transit-response {:encoding :json, :opts {}}))]
       (reset! server (hkit/run-server handler config)))
     interface-server)
 
