@@ -42,7 +42,7 @@
     :env (component/using (env/new-env)
                           [:kv-store])
     :kv-store (kv/new-redis-client (:host redis-config) (:port redis-config))
-    :web-interface (component/using (i/new-web-interface web-interface-config)
+    :web-interface (component/using (i/new-interface-server web-interface-config)
                      [:sketch])))
 
 (defn -main [config-path]

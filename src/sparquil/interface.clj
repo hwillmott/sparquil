@@ -3,7 +3,7 @@
             [ring.util.response :refer [resource-response]]
             [org.httpkit.server :as hkit :refer [with-channel]]
             [bidi.ring :refer [make-handler ->ResourcesMaybe]]
-            [sparquil.sketch :refer [load-scene]]))
+            [sparquil.sketch :refer [load-scene get-config get-scene-spec]]))
 
 ;(defn async-handler [ring-request]
 ;  ;; unified API for WebSocket and HTTP long polling/streaming
@@ -26,24 +26,42 @@
   (fn [{:keys [route-params]}]
     (load-scene sketch (:name route-params))))
 
+(defn sketch-config-handler
+  "Returns a handler that returns the config of sketch"
+  [sketch]
+  (fn [_]
+    {:status 200
+     :headers {"Content-Type" "application/edn"}
+     :body (pr-str (get-config sketch))}))
+
+(defn sketch-scene-spec-handler
+  "Returns a handler that returns the config of sketch"
+  [sketch]
+  (fn [_]
+    {:status 200
+     :headers {"Content-Type" "application/edn"}
+     :body (pr-str (get-scene-spec sketch))}))
+
 (defn routes-for-sketch [sketch]
   ["/" [[["scene/" [keyword :name]] (sketch-scene-handler sketch)]
+        ["scene" (sketch-scene-spec-handler sketch)]
+        ["config" (sketch-config-handler sketch)]
         ["" (fn [_] (resource-response "public/index.html"))]
         ["" (->ResourcesMaybe {:prefix "public/"})]]])
 
 
-(defrecord WebInterface [config server sketch]
+(defrecord InterfaceServer [config server sketch]
   component/Lifecycle
-  (start [web-interface]
+  (start [interface-server]
     (let [handler (make-handler (routes-for-sketch sketch))]
       (reset! server (hkit/run-server handler config)))
-    web-interface)
+    interface-server)
 
-  (stop [web-interface]
+  (stop [interface-server]
     (@server :timeout 100)
     (reset! server nil)
-    web-interface))
+    interface-server))
 
-(defn new-web-interface [config]
-  (map->WebInterface {:config config
-                      :server (atom nil)}))
+(defn new-interface-server [config]
+  (map->InterfaceServer {:config config
+                         :server (atom nil)}))

@@ -184,18 +184,22 @@
                       [region-name (mapv (partial realize-layer bounds) layers)]))
                   layer-map))))
 
-(defn realize-scene [config scene-spec]
-  (let [scene-map (if (keyword? scene-spec)
-                    (get-in config [:scenes scene-spec])
-                    scene-spec)]
-    (-> scene-map
+(defn realize-scene-spec [config scene-spec]
+    (-> scene-spec
         (update :led-layout #(get-in config [:led-layouts %]))
-        (update :layer-map realize-layer-map config))))
+        (update :layer-map realize-layer-map config)))
 
-(defn render-scene
+(defn resolve-scene-spec [config scene]
+  "Returns the full scene-spec for scene, which either a keyword scene name
+  or already a scene-spec (i.e. this operation is idempotent)."
+  (if (keyword? scene)
+    (get-in config [:scenes scene])
+    scene))
+
+(defn restart-sketch
   "Creates and returns a new sketch applet"
-  ([{:keys [config env displayer] :as sketch} scene-spec]
-   (let [scene (realize-scene config scene-spec)]
+  ([{:keys [config scene-spec env displayer] :as sketch}]
+   (let [scene (realize-scene-spec config @scene-spec)]
      (mapply q/sketch {:title (:title config)
                        :size (:size config)
                        :renderer :p2d
@@ -213,12 +217,19 @@
     (Thread/sleep 250)
     (reset! applet nil)))
 
-(defn load-scene [sketch scene]
+(defn load-scene [{:keys [config scene-spec applet] :as sketch} scene]
   (stop-sketch sketch)
-  (reset! (:applet sketch) (render-scene sketch scene))
+  (reset! scene-spec (resolve-scene-spec config scene))
+  (reset! applet (restart-sketch sketch))
   nil)
 
-(defrecord Sketch [config applet env displayer kv-store]
+(defn get-config [sketch]
+  (:config sketch))
+
+(defn get-scene-spec [sketch]
+  @(:scene-spec sketch))
+
+(defrecord Sketch [config scene-spec applet env displayer kv-store]
 
   component/Lifecycle
   (start [sketch]
@@ -237,6 +248,6 @@
    middleware."
   [config]
   (if (spec/valid? :sketch/config config)
-    (map->Sketch {:applet (atom nil) :config config})
+    (map->Sketch {:applet (atom nil) :config config :scene-spec (atom nil)})
     (throw (Exception. (str "Invalid sketch options: "
                             (spec/explain-str :sketch/config config))))))
