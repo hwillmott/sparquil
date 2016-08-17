@@ -4,10 +4,9 @@
 (defn root-component []
   [:div
    [:h1 "Sparquil control center"]
-   [:p.someclass
-    "I have " [:strong "bold"]
-    [:span {:style {:color "red"}} " and red"]
-    " text."]])
+   [:ul.list-group
+    [:li.list-group-item "Cat"]
+    [:li.list-group-item "Dog"]]])
 
 (defn mount-root []
   (r/render [root-component] (.getElementById js/document "app")))
