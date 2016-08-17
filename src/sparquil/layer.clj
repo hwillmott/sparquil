@@ -41,6 +41,13 @@
   "Like Quil's stroke, but takes Sparquil colors"
   (color-wrap q/stroke))
 
+(defn stroke-and-fill
+  "Applies Quil's stroke and Quil's fill, but takes Sparquil colors"
+  [color]
+  (color-mode color)
+  (color-apply q/stroke color)
+  (color-apply q/fill color))
+
 (defn region-background
   "Like Quil's background, but sets the background only for the region specified by bounds
   to color"
@@ -88,6 +95,15 @@
                   (+ y (* inner-radius (q/sin (+ a half-angle)))))))
     (q/end-shape :close)))
 
+(defn draw-heart
+  "Draws a heart with the bottom at x and y"
+  [x y scale color]
+  (stroke-and-fill color)
+  (q/stroke-weight 2)
+  (q/bezier x y x (- y (/ scale 2)) (+ x scale) (- y (/ scale 4)) x (+ y (/ scale 2)))
+  (q/bezier x y x (- y (/ scale 2)) (- x scale) (- y (/ scale 4)) x (+ y (/ scale 2))))
+
+
 (defn rainbow-orbit [[_ _ width height :as bounds]]
   "A disk rotating around the center of the sketch, hue cylcing around
   the color wheel."
@@ -125,8 +141,7 @@
      (let [y-interval (/ height 360)
            x-interval (/ width 360 )]
        (doseq [h (range 360)]
-         (fill [:hsb h 50 50])  
-         (stroke [:hsb h 50 50 ])
+         (stroke-and-fill [:hsb h 50 50])
          (cond
            (= direction :horizontal) (q/rect 0 (* h y-interval) width y-interval)
            (= direction :vertical) (q/rect (* h x-interval) 0 x-interval height)))))}))
@@ -193,9 +208,10 @@
         cell-x (/ width cols)
         cell-y (/ height rows)
         interval (or interval 100)
+        twinkle-step (or twinkle-step 0.1)
         hue (or hue 160)
-        low-brightness (or low-brightness -20)
-        high-brightness (or high-brightness 50)
+        low-brightness (or low-brightness -10)
+        high-brightness (or high-brightness 60)
         gradient (or gradient false)]
 
     {:setup
@@ -218,8 +234,8 @@
        (doseq [[i j] (coord-seq rows cols)]
          (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 low-brightness high-brightness)]
            (if (= gradient false)
-             (fill [:hsb hue 60 brightness])
-             (fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
+             (stroke-and-fill [:hsb hue 60 brightness])
+             (stroke-and-fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn rotating-star
@@ -274,21 +290,20 @@
        (q/begin-shape :triangle-fan)
        (q/vertex center-x center-y)
        (doseq [i (range 361)]
-         (fill [:hsb i 50 50])
-         (stroke [:hsb i 50 50])
+         (stroke-and-fill [:hsb i 50 50])
          (q/vertex (+ center-x (* radius (q/cos (+ (:angle-offset state) (q/radians i)))))
                    (+ center-y (* radius (q/sin (+ (:angle-offset state) (q/radians i)))))))
        (q/end-shape :close))}))
 
-(defn plasma
+(defn perlin-plasma
   "Plasma hue effect"
   [[x y width height] {:keys [cols rows interval perlin-step]}]
-  (let [cols (or cols 30)
-        rows (or rows 30)
+  (let [cols (or cols 40)
+        rows (or rows 40)
         cell-x (/ width cols)
         cell-y (/ height rows)
         interval (or interval 30)
-        perlin-step (or perlin-step 0.2)]
+        perlin-step (or perlin-step 0.1)]
     {:setup
      (fn [{:keys [:env/time]}]
        {:last-step-time time
@@ -304,7 +319,7 @@
        (q/no-stroke)
        (doseq [[i j] (coord-seq rows cols)]
          (let [noise (q/sin (* q/TWO-PI (q/noise (* i 0.1) (* j 0.1) (:perlin-offset state))))]
-           (fill [:hsb (q/map-range noise -1 1 150 300) 60 50])
+           (stroke-and-fill [:hsb (q/map-range noise -1 1 100 300) 60 50])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn rain
@@ -328,8 +343,7 @@
      :draw
      (fn [state]
        (doseq [[i j] (coord-seq num-droplets 5)]
-         (fill [:hsb hue 50 (* j 10)])
-         (stroke [:hsb hue 50 (* j 10)])
+         (stroke-and-fill [:hsb hue 50 (* j 10)])
          (q/rect (* i droplet-width) (+ (* j droplet-width) (get (:droplets state) i)) droplet-width droplet-width)))}))
 
 (defn buzzing-bee
@@ -347,11 +361,29 @@
 
       :draw
       (fn [state]
-        (stroke [:hsb 50 70 50])
-        (fill [:hsb 50 70 50])
+        (stroke-and-fill [:hsb 50 70 50])
         (doseq [i (range (/ height stripe-width))]
           (cond (= (mod i 2) 0) (q/rect 0 (+ (:offset state) (* i stripe-width)) width stripe-width))))}))
 
+(defn beating-heart
+  "A beating heart in the middle of the sketch, or where you define it"
+  [[_ _ width height] {:keys [x y scale color interval]}]
+  (let [x (or x (/ width 2))
+        y (or y (/ height 2))
+        scale (or scale (/ width 4))
+        color (or color [:hsb 340 70 50])
+        interval (or interval 700)]
+    {:setup
+     (fn [_]
+       {:offset 0})
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       {:offset (q/map-range (mod time interval) 0 interval 0 (/ scale 3))})
+
+     :draw
+     (fn [state]
+       (draw-heart x y (- scale (:offset state)) color))}))
 
 (defn text [_ text {:keys [color offset] :or {color [0] offset [0 0]}}]
   "A layer that writes text in color at offerset. Defaults to black at [0 0]"
