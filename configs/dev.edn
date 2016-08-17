@@ -21,14 +21,15 @@
                     :layer-map {:global [[brians-brain 100 100 125]]
                                 :left-arm [[fill-color 127]
                                            [text "left-arm" {:color 255 :offset [1 10]}]]}}
-                   :transformation-test
+                   :twinkle
                    {:led-layout :normal
-                    :layer-map {:global [[brians-brain 100 100 50]
-                                         [switch-rb]]
-                                :left-arm [[fill-color 127]
-                                           [text "left-arm" {:color 255 :offset [1 10]}]]}}}
+                    :layer-map {:global [[twinkle {:interval 50
+                                                   :low-brightness -10
+                                                   :high-brightness 50
+                                                   :twinkle-step 0.1}]]}}}
 
-          :init-scene :transformation-test}
+          :init-scene :twinkle}
 
  :redis {:host "127.0.0.1" :port 6379}
- :fadecandy {:host "127.0.0.1" :port 7890}}
+ :fadecandy {:host "127.0.0.1" :port 7890}
+ :web-interface {:port 8080}}
