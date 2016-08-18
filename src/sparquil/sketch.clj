@@ -227,7 +227,7 @@
   (stop-sketch sketch)
   (reset! scene-spec (resolve-scene-spec config scene))
   (reset! applet (restart-sketch sketch))
-  nil)
+  @scene-spec)
 
 (defn get-config [sketch]
   (:config sketch))

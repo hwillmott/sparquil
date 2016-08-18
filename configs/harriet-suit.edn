@@ -246,7 +246,7 @@
           :scenes {:buzzing-bee {:led-layout :normal
                                  :layer-map {:global-bottom [[fill-color [:rgb 0 0 0]]
                                                              [buzzing-bee {:interval 500 :stripe-width 20}]]}}
-                   :gradient-twinkle-inverse-beacon {:led-layout :normal
+                   :gradient-twinkle-inverse-beacon{:led-layout :normal
                                                      :layer-map {:global-bottom [[twinkle {:interval 50 :low-brightness -10 :high-brightness 60 :twinkle-step 0.1 :gradient true}]
                                                                                  [inverted-beacon {:center-x 185 :center-y 80 :interval 1000 :offset 200 :max-diameter 700 :stroke-width 50}]]
                                                                  :rings [[rotating-star {:interval 10000 :color [:hsb 40 70 20]}]]}}

@@ -1,7 +1,7 @@
 (ns sparquil.web-client
   (:require [cljs.reader :refer [read-string]]
             [reagent.core :as r]
-            [ajax.core :refer [GET]]))
+            [ajax.core :refer [GET PUT]]))
 
 (enable-console-print!)
 
@@ -24,16 +24,26 @@
         :error-handler   #(.log js/console %)
         :format          :transit}))
 
+(defn put-scene! [scene]
+  (PUT "/scene"
+        {:params          {:scene scene}
+         :handler         #(swap! state assoc :scene %)
+         :error-handler   #(.log js/console %)
+         :format          :transit
+         :keywords?       true}))
+
 (defn scene-list-item [{:keys [id display-name]}]
-  [:li {:class (str "list-group-item scene-list-item"
-                    (when (= id (get-in @state [:scene :id])) " active"))}
-       (or display-name name)])
+  [:a {:class (str "list-group-item scene-list-item"
+                   (when (= id (get-in @state [:scene :id])) " active"))
+       :href "#"
+       :on-click #(put-scene! id)}
+   (or display-name name)])
 
 (defn scene-list []
   [:div.panel.panel-default.scene-list-container
    [:div.panel-heading
     [:h2 "Available scenes"]]
-   [:ul.list-group.scene-list
+   [:div.list-group.scene-list
     (for [scene (get-in @state [:config :scenes])]
       ^{:key (:id scene)} [scene-list-item scene])]])
 
