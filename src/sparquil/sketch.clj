@@ -215,13 +215,7 @@
                        :draw (sketch-draw config displayer scene)}))))
 
 (defn stop-sketch [{:keys [applet] :as sketch}]
-  (when @applet
-    (.exit @applet)
-    ; To make sure the applet is totally done exiting before letting other components spin down.
-    ; Without this, when FadecandyDisplayer tries to close the fcserver connection, it throws an
-    ; exception because the applet still tries to send a frame after the exit call above.
-    (Thread/sleep 250)
-    (reset! applet nil)))
+  (swap! applet #(when % (.exit %))))
 
 (defn load-scene [{:keys [config scene-spec applet] :as sketch} scene]
   (stop-sketch sketch)
@@ -244,6 +238,10 @@
 
   (stop [sketch]
     (stop-sketch sketch)
+    ; To make sure the applet is totally done exiting before letting other components spin down.
+    ; Without this, when FadecandyDisplayer tries to close the fcserver connection, it throws an
+    ; exception because the applet still tries to send a frame after the exit call above.
+    (Thread/sleep 250)
     sketch))
 
 (defn new-sketch
