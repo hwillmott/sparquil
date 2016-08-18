@@ -125,9 +125,9 @@
   "Returns a top-level draw function that will call each layer's draw
   function with its state.
 
-  regions is a map from keyword region names to region specs ([x y width height])
+  regions is a map from keyword region ids to region specs
 
-  region-draw-map is a map from keyword region names to vectors of draw fns
+  region-draw-map is a map from keyword region ids to vectors of draw fns
 
   display-fn will be called with the result of (q/pixels) after all layer draw fns
   have executed."
@@ -139,8 +139,8 @@
         led-pixel-indices (mapcat (partial inflate (:size config)) (:led-layout scene))]
     (fn [region-states]
       (l/background 0)
-      (doseq [{region-name :name bounds :bounds} (:regions config)]
-        (region-draw bounds (region-draw-map region-name) (region-states region-name)))
+      (doseq [{region-id :id bounds :bounds} (:regions config)]
+        (region-draw bounds (region-draw-map region-id) (region-states region-id)))
       (q/color-mode :rgb 255)
       (let [pixels (q/pixels)]
         (display displayer (map #(if (nil? %)
@@ -176,12 +176,18 @@
       (println "Exception: " (.getMessage e))
       nil)))
 
+(defn map-on
+  "Returns a map with elements of coll as values and the value at path within those
+  elements as keys"
+  [coll key-path]
+  (zipmap (map #(get-in % key-path) coll) coll))
+
 (defn realize-layer-map
   [layer-map {:keys [regions] :as config}]
-  (let [region-map (zipmap (map :name regions) regions)]
-    (into {} (map (fn [[region-name layers]]
-                    (let [bounds (get-in region-map [region-name :bounds])]
-                      [region-name (mapv (partial realize-layer bounds) layers)]))
+  (let [region-map (map-on regions [:id])]
+    (into {} (map (fn [[region-id layers]]
+                    (let [bounds (get-in region-map [region-id :bounds])]
+                      [region-id (mapv (partial realize-layer bounds) layers)]))
                   layer-map))))
 
 (defn realize-scene-spec [config scene-spec]
@@ -190,10 +196,10 @@
         (update :layer-map realize-layer-map config)))
 
 (defn resolve-scene-spec [config scene]
-  "Returns the full scene-spec for scene, which either a keyword scene name
+  "Returns the full scene-spec for scene, which either a keyword scene id
   or already a scene-spec (i.e. this operation is idempotent)."
   (if (keyword? scene)
-    (get-in config [:scenes scene])
+    (get (map-on (:scenes config) [:id]) scene)
     scene))
 
 (defn restart-sketch

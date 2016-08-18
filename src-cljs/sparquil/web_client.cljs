@@ -24,14 +24,15 @@
         :error-handler   #(.log js/console %)
         :format          :transit}))
 
-(defn scene-list-item [scene-name]
-  (let [scene (get-in @state [:config :scenes scene-name])]
-    [:li.list-group-item.scene-list-item scene-name]))
+(defn scene-list-item [{:keys [id display-name]}]
+  [:li {:class (str "list-group-item scene-list-item"
+                    (when (= id (get-in @state [:scene :id])) " active"))}
+       (or display-name name)])
 
 (defn scene-list []
   [:ul.list-group.scene-list
-   (for [scene-name (keys (get-in @state [:config :scenes]))]
-     ^{:key scene-name} [scene-list-item scene-name])])
+   (for [scene (get-in @state [:config :scenes])]
+     ^{:key (:id scene)} [scene-list-item scene])])
 
 (defn root []
   (refresh-config!)

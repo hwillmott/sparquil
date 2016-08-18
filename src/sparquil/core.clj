@@ -19,10 +19,10 @@
   (let [raw-config (read-string (slurp config-path))
         [width height] (get-in raw-config [:sketch :size])]
     (assoc-in raw-config [:sketch :regions]
-              (concat [{:name :global-bottom :bounds [0 0 width height]}]
+              (concat [{:id :global-bottom :bounds [0 0 width height]}]
                       (get-in raw-config [:sketch :regions])
-                      [{:name :global-top :bounds [0 0 width height]}
-                       {:name :global :bounds [0 0 width height]}])))) ; TODO: Remove :global
+                      [{:id :global-top :bounds [0 0 width height]}
+                       {:id :global :bounds [0 0 width height]}])))) ; TODO: Remove :global
 
 ; ---- System definition ----
 
