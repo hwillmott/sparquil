@@ -30,9 +30,12 @@
        (or display-name name)])
 
 (defn scene-list []
-  [:ul.list-group.scene-list
-   (for [scene (get-in @state [:config :scenes])]
-     ^{:key (:id scene)} [scene-list-item scene])])
+  [:div.panel.panel-default.scene-list-container
+   [:div.panel-heading
+    [:h2 "Available scenes"]]
+   [:ul.list-group.scene-list
+    (for [scene (get-in @state [:config :scenes])]
+      ^{:key (:id scene)} [scene-list-item scene])]])
 
 (defn root []
   (refresh-config!)
