@@ -1,0 +1,27 @@
+{:sketch {:title "dev"
+          :size [600 600]
+          :regions [{:name :left-arm :bounds [0 150 75 200]}]
+          :led-layouts {:normal [
+                                 {:leds/type :leds/coordinate-sequence
+                                  :leds/offset [10 10]
+                                  :leds/dims [500 500]
+                                  :leds/coords-path "configs/coordinate_sequences/fragments1_coords.edn"}]}
+
+          :scenes {:brians-brain
+                   {:led-layout :normal
+                    :layer-map {:global [[brians-brain 100 100 125]]
+                                :left-arm [[fill-color 127]
+                                           [text "left-arm" {:color 255 :offset [1 10]}]]}}
+                   :twinkle
+                   {:led-layout :normal
+                    :layer-map {:global-bottom [[twinkle
+                                                 {:interval 50
+                                                  :low-brightness -10
+                                                  :high-brightness 50
+                                                  :twinkle-step 0.1}]]}}}
+
+          :init-scene :twinkle}
+
+ :redis {:host "127.0.0.1" :port 6379}
+ :fadecandy {:host "127.0.0.1" :port 7890}
+ :web-interface {:port 8080}}

@@ -60,6 +60,14 @@
   (stroke color)
   (q/rect 0 0 width height))
 
+(defn pmapv
+  "An eager version of pmap. Spawns a thread for _every_ element in coll. Use
+   for parallel IO."
+  [f & colls]
+  (->> colls
+       (apply mapv (fn [& args] (future (apply f args))))
+       (mapv deref)))
+
 (spec/fdef parse-number
            :args (spec/cat :s (spec/nilable string?))
            :ret (spec/nilable number?))
@@ -104,6 +112,26 @@
   [x y scale]
   (q/bezier x y x (- y (/ scale 2)) (+ x scale) (- y (/ scale 4)) x (+ y (/ scale 2)))
   (q/bezier x y x (- y (/ scale 2)) (- x scale) (- y (/ scale 4)) x (+ y (/ scale 2))))
+
+(defn plasma-value
+  "Returns the plasma value for "
+  [x y t scale-x scale-y]
+  (let [x (- (* x scale-x) (/ scale-x 2))
+        y (- (* y scale-y) (/ scale-y 2))
+        v (+ (q/sin (+ x t))
+             (q/sin (/ (+ y t) 2))
+             (q/sin (/ (+ x y t) 2)))
+        c-x (+ x (* (/ scale-x 2) (q/sin (/ t 3))))
+        c-y (+ y (* (/ scale-y 2) (q/cos (/ t 2))))
+        v2 (/
+             (+ v
+                (q/sin
+                  (+ t
+                     (q/sqrt (+
+                               (* c-x c-x)
+                               (* c-y c-y)
+                               1)))))
+             2)]))
 
 
 (defn rainbow-orbit [[_ _ width height :as bounds]]
@@ -227,8 +255,8 @@
          state
          {:last-step-time time
           :grid (let [cells (apply concat (:grid state))]
-                  (mapv vec (partition cols
-                              (mapv (partial + twinkle-step) cells))))}))
+                  (pmapv vec (partition cols
+                               (pmapv (partial + twinkle-step) cells))))}))
 
      :draw
      (fn [state]
@@ -343,6 +371,45 @@
              (= variable :color-and-brightness) (stroke-and-fill [:hsb (q/map-range noise -1 1 lower-limit-h upper-limit-h) 60 (q/map-range noise -1 1 lower-limit-b upper-limit-b)]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
+(defn gradys-plasma
+  "a different noise function"
+  [[_ _ width height] {:keys [cols rows interval time-scale-factor]}]
+  (let [cols (or cols 100)
+        rows (or rows 100)
+        cell-x (/ width cols)
+        cell-y (/ height rows)
+        interval (or interval 30)
+        time-scale-factor (or time-scale-factor 1000)
+        v (fn [x y scaled-time]
+            (let [cx (q/sin (/ scaled-time 3))
+                  cy (q/cos (/ scaled-time 2))]
+              (* 0.5 (+ (q/sin (+ x scaled-time))
+                        (q/sin (* 0.5 (+ y scaled-time)))
+                        (q/sin (* 0.5 (+ x y scaled-time)))
+                        (q/sin (+ scaled-time (q/sqrt (+ 1 (* cx cx) (* cy cy)))))))))]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time})
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time}))
+     :draw
+     (fn [state]
+       (q/no-stroke)
+       (doseq [[i j] (coord-seq rows cols)]
+         (let [v-val (v (* i 0.1) (* j 0.1) (:last-step-time state))
+               v-pi (* v-val q/PI)
+               r (q/map-range (q/sin (* v-pi)) -1 1 0 100)
+               g (q/map-range (q/sin (+ v-pi (* (/ 2 3) q/PI))) -1 1 0 100)
+               b (q/map-range (q/sin (+ v-pi (* (/ 4 3) q/PI))) -1 1 0 100)]
+           (stroke-and-fill [:rgb r g b])
+           (q/rect (* i cell-x) (* j cell-y) cell-x cell-y)))
+       (q/text-size 30)
+       (stroke-and-fill [:rgb 100 100 100])
+       (q/text (str (:last-step-time state)) 100 250))}))
+
 (defn rain
   "Falling/fading colored drops."
   [[x y width height] {:keys [interval num-droplets hue]}]
@@ -407,6 +474,57 @@
        (stroke-and-fill color)
        (draw-heart x y (- scale (:offset state))))}))
 
+(defn chevron
+  "chevrons moving"
+  [[x y width height] {:keys [interval stripe-width chevron-height]}]
+  (let [interval (or interval 500)
+        stripe-width (or stripe-width 15)
+        chevron-height (or chevron-height (/ width 2))]
+    {:setup
+     (fn [_]
+       {:offset 0})
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       {:offset (q/map-range (mod time interval) 0 interval 0 (* 4 stripe-width))})
+
+     :draw
+     (fn [state]
+       (stroke-and-fill [:hsb 50 70 50])
+       (doseq [i (range (/ (* 2 height) stripe-width))]
+         (if (= (mod i 2) 0)
+           (do
+             (q/stroke-weight stripe-width)
+             (q/line (/ width 2) (+ (:offset state) (* i stripe-width 2)) 0 (- (+ (:offset state) (* i stripe-width 2)) chevron-height))
+             (q/line (/ width 2) (+ (:offset state) (* i stripe-width 2)) width (- (+ (:offset state) (* i stripe-width 2)) chevron-height))))))}))
+
+(defn bounce
+  "a bouncing line"
+  [[x y width height] {:keys [interval stripe-width]}]
+  (let [interval (or interval 10000)
+        stripe-width (or stripe-width 10)]
+    {:setup
+     (fn [_]
+       {:offset 0})
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       {:offset (q/map-range (mod time interval) 0 interval 0 q/TWO-PI)})
+
+     :draw
+     (fn [state]
+       (stroke-and-fill [:hsb 50 70 50])
+       (q/stroke-weight stripe-width)
+       (let [val (if (< (q/sin (:offset state)) 0)
+                     (* -1 (q/sin (:offset state)))
+                     (q/sin (:offset state)))
+             factor (if (< (q/sin (:offset state)) 0)
+                        -1
+                        1)]
+
+         (let [y-coord (+ (/ height 2) (* 50 factor (q/sqrt val)))]
+           (q/line 0 y-coord width y-coord))))}))
+
 (defn text [_ text {:keys [color size offset] :or {color [0] size 50 offset [0 0]}}]
   "A layer that writes text in color at offset. Defaults to black at [0 0]"
   {:draw (fn [_]
@@ -444,14 +562,6 @@
   (for [i (range rows)
         j (range cols)]
     [i j]))
-
-(defn pmapv
-  "An eager version of pmap. Spawns a thread for _every_ element in coll. Use
-   for parallel IO."
-  [f & colls]
-  (->> colls
-       (apply mapv (fn [& args] (future (apply f args))))
-       (mapv deref)))
 
 (defn moore-automaton
   "Return a layer that will run a cellular automaton whose cell transitions are a function
