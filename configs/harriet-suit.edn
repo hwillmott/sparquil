@@ -241,8 +241,9 @@
                                   :leds/count 4
                                   :leds/length 80
                                   :leds/offset [145 200]
-                                  :leds/angle 180}]}
+                                  :leds/angle 180}]}}}
 
+<<<<<<< HEAD
           :scenes {:buzzing-bee
                    {:led-layout :normal
                     :layer-map {:global-bottom
@@ -356,14 +357,14 @@
                    :heart
                    {:led-layout :normal
                     :layer-map {:global-bottom
-                                [[twinkle {:hue 340}]]
-                                 ;[beacon]]
-                                  ;{:center-x 185}]]
-                                   ;:center-y 80}]]
-                                   ;:interval 700}]]
-                                   ;:offset 300}]]
-                                   ;:max-diameter 400}]]
-                                   ;:color [:rgb 0 0 0]}]]
+                                [[twinkle {:hue 340}]
+                                 [beacon
+                                  {:center-x 185
+                                   :center-y 80
+                                   :interval 700
+                                   :offset 300
+                                   :max-diameter 400
+                                   :color [:rgb 0 0 0]}]]
                                    ;[text "H" {:color [:rgb 50 50 50] :size 80 :offset [2 90]}]
                                    ;[text "B" {:color [:rgb 50 50 50] :size 100 :offset [310 96]}]]
                                 :rings [[fill-color [:hsb 0 0 0]]
@@ -405,6 +406,6 @@
                                                         :size-change 0
                                                         :color [:hsb 40 70 20]
                                                         :shape :star}]]}}}
-          :init-scene :pinwheel}
+          :init-scene :pinwheel
  :redis {:host "127.0.0.1" :port 6379}
- :fadecandy {:host "127.0.0.1" :port 7890}}
+ :fadecandy {:host "127.0.0.1" :port 7890}

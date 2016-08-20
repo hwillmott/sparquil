@@ -1,6 +1,6 @@
 {:sketch {:title "dev"
           :size [500 500]
-          :regions [{:name :left-arm :bounds [0 150 75 200]}]
+          :regions [{:id :left-arm :bounds [0 150 75 200]}]
           :led-layouts {:normal [{:leds/type :leds/strip
                                   :leds/count 20
                                   :leds/length 100
@@ -16,17 +16,19 @@
                                   :leds/dims [200 200]
                                   :leds/coords-path "configs/coordinate_sequences/test_sequence.edn"}]}
 
-          :scenes {:brians-brain
-                   {:led-layout :normal
+          :scenes [{:id :brians-brain
+                    :display-name "Brian's Brain"
+                    :led-layout :normal
                     :layer-map {:global [[brians-brain 100 100 125]]
                                 :left-arm [[fill-color 127]
                                            [text "left-arm" {:color 255 :offset [1 10]}]]}}
-                   :twinkle
-                   {:led-layout :normal
+                   {:id :twinkle
+                    :display-name "Twinkle"
+                    :led-layout :normal
                     :layer-map {:global [[twinkle {:interval 50
                                                    :low-brightness -10
                                                    :high-brightness 50
-                                                   :twinkle-step 0.1}]]}}}
+                                                   :twinkle-step 0.1}]]}}]
 
           :init-scene :twinkle}
 

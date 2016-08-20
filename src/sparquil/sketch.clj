@@ -125,9 +125,9 @@
   "Returns a top-level draw function that will call each layer's draw
   function with its state.
 
-  regions is a map from keyword region names to region specs ([x y width height])
+  regions is a map from keyword region ids to region specs
 
-  region-draw-map is a map from keyword region names to vectors of draw fns
+  region-draw-map is a map from keyword region ids to vectors of draw fns
 
   display-fn will be called with the result of (q/pixels) after all layer draw fns
   have executed."
@@ -139,8 +139,8 @@
         led-pixel-indices (mapcat (partial inflate (:size config)) (:led-layout scene))]
     (fn [region-states]
       (l/background 0)
-      (doseq [{region-name :name bounds :bounds} (:regions config)]
-        (region-draw bounds (region-draw-map region-name) (region-states region-name)))
+      (doseq [{region-id :id bounds :bounds} (:regions config)]
+        (region-draw bounds (region-draw-map region-id) (region-states region-id)))
       (q/color-mode :rgb 255)
       (let [pixels (q/pixels)]
         (display displayer (map #(if (nil? %)
@@ -176,26 +176,36 @@
       (println "Exception: " (.getMessage e))
       nil)))
 
+(defn map-on
+  "Returns a map with elements of coll as values and the value at path within those
+  elements as keys"
+  [coll key-path]
+  (zipmap (map #(get-in % key-path) coll) coll))
+
 (defn realize-layer-map
   [layer-map {:keys [regions] :as config}]
-  (let [region-map (zipmap (map :name regions) regions)]
-    (into {} (map (fn [[region-name layers]]
-                    (let [bounds (get-in region-map [region-name :bounds])]
-                      [region-name (mapv (partial realize-layer bounds) layers)]))
+  (let [region-map (map-on regions [:id])]
+    (into {} (map (fn [[region-id layers]]
+                    (let [bounds (get-in region-map [region-id :bounds])]
+                      [region-id (mapv (partial realize-layer bounds) layers)]))
                   layer-map))))
 
-(defn realize-scene [config scene-spec]
-  (let [scene-map (if (keyword? scene-spec)
-                    (get-in config [:scenes scene-spec])
-                    scene-spec)]
-    (-> scene-map
+(defn realize-scene-spec [config scene-spec]
+    (-> scene-spec
         (update :led-layout #(get-in config [:led-layouts %]))
-        (update :layer-map realize-layer-map config))))
+        (update :layer-map realize-layer-map config)))
 
-(defn render-scene
+(defn resolve-scene-spec [config scene]
+  "Returns the full scene-spec for scene, which either a keyword scene id
+  or already a scene-spec (i.e. this operation is idempotent)."
+  (if (keyword? scene)
+    (get (map-on (:scenes config) [:id]) scene)
+    scene))
+
+(defn restart-sketch
   "Creates and returns a new sketch applet"
-  ([{:keys [config env displayer] :as sketch} scene-spec]
-   (let [scene (realize-scene config scene-spec)]
+  ([{:keys [config scene-spec env displayer] :as sketch}]
+   (let [scene (realize-scene-spec config @scene-spec)]
      (mapply q/sketch {:title (:title config)
                        :size (:size config)
                        :renderer :p2d
@@ -205,20 +215,21 @@
                        :draw (sketch-draw config displayer scene)}))))
 
 (defn stop-sketch [{:keys [applet] :as sketch}]
-  (when @applet
-    (.exit @applet)
-    ; To make sure the applet is totally done exiting before letting other components spin down.
-    ; Without this, when FadecandyDisplayer tries to close the fcserver connection, it throws an
-    ; exception because the applet still tries to send a frame after the exit call above.
-    (Thread/sleep 250)
-    (reset! applet nil)))
+  (swap! applet #(when % (.exit %))))
 
-(defn load-scene [sketch scene]
+(defn load-scene [{:keys [config scene-spec applet] :as sketch} scene]
   (stop-sketch sketch)
-  (reset! (:applet sketch) (render-scene sketch scene))
-  nil)
+  (reset! scene-spec (resolve-scene-spec config scene))
+  (reset! applet (restart-sketch sketch))
+  @scene-spec)
 
-(defrecord Sketch [config applet env displayer kv-store]
+(defn get-config [sketch]
+  (:config sketch))
+
+(defn get-scene-spec [sketch]
+  @(:scene-spec sketch))
+
+(defrecord Sketch [config scene-spec applet env displayer kv-store]
 
   component/Lifecycle
   (start [sketch]
@@ -227,6 +238,10 @@
 
   (stop [sketch]
     (stop-sketch sketch)
+    ; To make sure the applet is totally done exiting before letting other components spin down.
+    ; Without this, when FadecandyDisplayer tries to close the fcserver connection, it throws an
+    ; exception because the applet still tries to send a frame after the exit call above.
+    (Thread/sleep 250)
     sketch))
 
 (defn new-sketch
@@ -237,6 +252,6 @@
    middleware."
   [config]
   (if (spec/valid? :sketch/config config)
-    (map->Sketch {:applet (atom nil) :config config})
+    (map->Sketch {:applet (atom nil) :config config :scene-spec (atom nil)})
     (throw (Exception. (str "Invalid sketch options: "
                             (spec/explain-str :sketch/config config))))))
