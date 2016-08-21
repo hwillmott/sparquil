@@ -312,7 +312,8 @@
                     :layer-map {:global-bottom [[checkers {:interval 50
                                                            :low-brightness 10
                                                            :high-brightness 50
-                                                           :gradient true}]]}}
+                                                           :gradient true
+                                                           :update true}]]}}
 
                    {:id :twinkle-star
                     :display-name "ts"
@@ -328,6 +329,36 @@
                                    :center-y 80
                                    :interval-r 10000
                                    :color [:hsb 40 70 20]}]]}}
+
+                   {:id :twinkle-star2
+                    :display-name "Twinkle star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers-no-update {:interval 50
+                                                                     :low-brightness 10
+                                                                     :high-brightness 50
+                                                                     :hue 160
+                                                                     :gradient false}]]
+                                :rings [[fill-color [:rgb 0 0 0]]
+                                        [rotate-shape-odroid {:interval 10
+                                                              :angle-step 0.3
+                                                              :size-1 30
+                                                              :size-2 50
+                                                              :stroke-width 10
+                                                              :color [:hsb 40 50 50]
+                                                              :shape :star}]]}}
+
+                   {:id :twinkle-star3
+                    :display-name "Twinkle star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[fill-gradient {:variable :color :upper-limit-h 100 :lower-limit-h 10}]]
+                                :rings [[fill-color [:rgb 0 0 0]]
+                                        [rotate-shape-odroid {:interval 10
+                                                              :angle-step 0.3
+                                                              :size-1 30
+                                                              :size-2 50
+                                                              :stroke-width 10
+                                                              :color [:hsb 40 50 50]
+                                                              :shape :star}]]}}
 
                    {:id :gradient-beacon
                     :display-name "gb"

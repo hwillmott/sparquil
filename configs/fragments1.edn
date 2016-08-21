@@ -23,13 +23,46 @@
                                                                  :high-brightness 40
                                                                  :twinkle-step 0.4}]
                                                 [rotate-shape-odroid {:interval 25 :angle-step 0.15 :size-1 70 :size-2 150 :stroke-width 20 :color [:hsb 40 50 50] :shape :star}]]}}
-                   {:id :checkers
-                    :display-name "checkers"
+
+                   {:id :twinkle-star
+                    :display-name "Twinkle star"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[checkers {:interval 200
-                                                           :low-brightness -10
-                                                           :high-brightness 50
-                                                           :gradient true}]]}}
+                    :layer-map {:global-bottom [[twinkle-odroid {:hue 160
+                                                                 :interval 25
+                                                                 :low-brightness 0
+                                                                 :high-brightness 40
+                                                                 :twinkle-step 0.4}]
+                                                [kaleidoscope {:interval 25 :angle-step 0.15 :size-1 70 :size-2 150 :stroke-width 20 :color [:hsb 40 50 50] :shape :star}]]}}
+                   {:id :twinkle-gradient
+                    :display-name "Twinkle gradient"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[twinkle {:interval 25
+                                                          :low-brightness -10
+                                                          :high-brightness 60
+                                                          :twinkle-step 0.4
+                                                          :gradient true}]]}}
+
+                   {:id :plasma-ripple
+                    :display-name "pr"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-plasma
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
+                                   :variable :color-and-brightness
+                                   :lower-limit-b -10
+                                   :upper-limit-b 50
+                                   :lower-limit-h 260
+                                   :upper-limit-h 330}]]}}
+
+                   {:id :beacon
+                    :display-name "beacon"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[beacon {:color [:hsb 105 50 50] :interval 1300 :stroke-width 15 :size-step 50}]
+                                                [beacon {:color [:hsb 110 50 50] :interval 1300 :stroke-width 15 :offset 200 :size-step 50}]]}}
+
 
                    {:id :pulse
                     :display-name "pulse"
@@ -54,29 +87,13 @@
                    {:id :rotating-star
                     :display-name "rotating star"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[rotate-shape-odroid {:interval 200 :size-1 60 :size-2 120 :stroke-width 30 :color [:hsb 300 50 30] :shape :star}]]}}
+                    :layer-map {:global-bottom [[rotate-shape-odroid {:interval 200 :size-1 60 :size-2 120 :stroke-width 30 :color [:hsb 300 50 30] :shape :star}]]}}]
 
-                   {:id :beacon
-                    :display-name "beacon"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[beacon-odroid {:color [:rgb 50 50 50] :interval 50 :size-step 50}]]}}
 
-                   {:id :plasma-ripple
-                    :display-name "pr"
-                    :led-layout :normal
-                    :layer-map {:global-bottom
-                                [[perlin-plasma
-                                  {:interval 25
-                                   :rows 20
-                                   :cols 20
-                                   :perlin-step 0.2
-                                   :variable :color-and-brightness
-                                   :lower-limit-b -10
-                                   :upper-limit-b 50
-                                   :lower-limit-h 260
-                                   :upper-limit-h 330}]]}}]
 
-          :init-scene :twinkle}
+
+
+          :init-scene :twinkle-gradient}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

@@ -164,14 +164,26 @@
 
 (defn fill-gradient
   "Gradient background for testing. Can set the hue to change vertically or horizontally, with horizontal as the default."
-  [[x y width height] {:keys [direction]}] 
-  (let [direction (or direction :horizontal)]
+  [[x y width height] {:keys [direction upper-limit-h lower-limit-h upper-limit-b lower-limit-b lower-bound hue variable]}] 
+  (let [direction (or direction :horizontal)
+        variable (or variable :color)
+        hue (or hue 70)
+        upper-limit-h (or upper-limit-h 360)
+        lower-limit-h (or lower-limit-h 0)
+        upper-limit-b (or upper-limit-b 0)
+        lower-limit-b (or lower-limit-b 50)]
    {:draw 
     (fn [_]  
      (let [y-interval (/ height 360)
            x-interval (/ width 360 )]
        (doseq [h (range 360)]
          (stroke-and-fill [:hsb h 50 50])
+         (let [h-val (q/map-range h 0 360 lower-limit-h upper-limit-h)
+               b-val (q/map-range h 0 360 lower-limit-b upper-limit-b)]
+           (cond
+             (= variable :color) (stroke-and-fill [:hsb h-val 60 50])
+             (= variable :brightness) (stroke-and-fill [:hsb hue 60 b-val])
+             (= variable :color-and-brightness) (stroke-and-fill [:hsb h-val 60 b-val])))
          (cond
            (= direction :horizontal) (q/rect 0 (* h y-interval) width y-interval)
            (= direction :vertical) (q/rect (* h x-interval) 0 x-interval height)))))}))
@@ -280,6 +292,7 @@
     {:setup
      (fn [{:keys [:env/time]}]
        {:last-step-time time
+        :offset 0
         :grid (cellwise-grid-init #(rand 10) cols rows)})
 
      :update
@@ -287,6 +300,7 @@
        (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
+          :offset (inc (:offset state))
           :grid (let [cells (apply concat (:grid state))]
                   (pmapv vec (partition cols
                                (pmapv (partial + twinkle-step) cells))))}))
@@ -298,7 +312,7 @@
          (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 low-brightness high-brightness)]
            (if (= gradient false)
              (stroke-and-fill [:hsb hue 60 brightness])
-             (stroke-and-fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
+             (stroke-and-fill [:hsb (q/map-range (mod (+ i (:offset state)) rows) 0 rows 0 360) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn twinkle-odroid
@@ -313,7 +327,8 @@
         hue (or hue 160)
         low-brightness (or low-brightness -10)
         high-brightness (or high-brightness 60)
-        gradient (or gradient false)]
+        gradient (or gradient false)
+        coords (coord-seq rows cols)]
 
     {:setup
      (fn [{:keys [:env/time]}]
@@ -332,7 +347,7 @@
      :draw
      (fn [state]
        (q/no-stroke)
-       (doseq [[i j] (coord-seq rows cols)]
+       (doseq [[i j] coords]
          (let [brightness (q/map-range (q/sin (+ (:offset state) (get-in (:grid state) [i j]))) -1 1 low-brightness high-brightness)]
            (if (= gradient false)
              (stroke-and-fill [:hsb hue 60 brightness])
@@ -340,8 +355,8 @@
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn checkers
-  "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
-  [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
+  "checker pattern of specified color or gradient. Can do non-update"
+  [[x y width height] {:keys [cols rows interval hue low-brightness high-brightness gradient update]}]
   (let [cols (or cols 20)
         rows (or rows 20)
         cell-x (/ width cols)
@@ -350,26 +365,53 @@
         hue (or hue 160)
         low-brightness (or low-brightness -10)
         high-brightness (or high-brightness 60)
-        gradient (or gradient false)]
+        gradient (or gradient false)
+        coords (coord-seq rows cols)]
 
     {:setup
      (fn [{:keys [:env/time]}]
        {:last-step-time time
-        :offset 0
-        :grid (cellwise-grid-init #(rand 10) cols rows)})
+        :offset 0})
 
      :update
-     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
-       (if (< time (+ last-step-time interval))
+     (fn [{:keys [:env/time]} {:keys [last-step-time] :as state}]
+       (if (< time (+ last-step-time interval) update)
          state
          {:last-step-time time
-          :offset (inc (:offset state))
-          :grid grid}))
+          :offset (inc (:offset state))}))
 
      :draw
      (fn [state]
        (q/no-stroke)
-       (doseq [[i j] (coord-seq rows cols)]
+       (doseq [[i j] coords]
+         (let [h (if gradient (q/map-range (mod (+ i (:offset state)) rows) 0 rows 0 360) hue)
+               b (if (= (mod (+ i j (:offset state)) 2) 0) low-brightness high-brightness)]
+           (stroke-and-fill [:hsb h 60 b])
+           (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
+
+(defn checkers-no-update
+  "checker pattern of specified color or gradient. Can do non-update"
+  [[x y width height] {:keys [cols rows interval hue low-brightness high-brightness gradient]}]
+  (let [cols (or cols 20)
+        rows (or rows 20)
+        cell-x (/ width cols)
+        cell-y (/ height rows)
+        interval (or interval 100)
+        hue (or hue 160)
+        low-brightness (or low-brightness -10)
+        high-brightness (or high-brightness 60)
+        gradient (or gradient false)
+        coords (coord-seq rows cols)]
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :offset 0})
+
+     :draw
+     (fn [state]
+       (q/no-stroke)
+       (doseq [[i j] coords]
          (let [h (if gradient (q/map-range (mod (+ i (:offset state)) rows) 0 rows 0 360) hue)
                b (if (= (mod (+ i j (:offset state)) 2) 0) low-brightness high-brightness)]
            (stroke-and-fill [:hsb h 60 b])
