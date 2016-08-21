@@ -202,6 +202,37 @@
          (q/stroke-weight stroke-width)
          (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state))))}))
 
+(defn beacon-odroid
+  "Low light beacon visualization centered around center-x and center-y. The beacon expands from 0 to max-diameter over the specified interval. You can specify the color and stroke-width of the beacon."
+  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter color stroke-width]}]
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
+        interval (or interval 200)
+        size-step (or size-step 40)
+        offset (or offset 0)
+        max-diameter (or max-diameter (max width height))
+        color (or color [:hsb 115 50 50])
+        stroke-width (or stroke-width 20)]
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :diameter 0})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :diameter (mod (+ size-step (:diameter state)) max-diameter)}))
+
+     :draw
+     (fn [state]
+       (q/no-fill)
+       (stroke color)
+       (q/stroke-weight stroke-width)
+       (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state))))}))
+
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."
   [[x y width height] {:keys [center-x center-y interval offset max-diameter stroke-width]}]
@@ -268,6 +299,105 @@
              (stroke-and-fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
+(defn twinkle-odroid
+  "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
+  [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
+  (let [cols (or cols 20)
+        rows (or rows 20)
+        cell-x (/ width cols)
+        cell-y (/ height rows)
+        interval (or interval 100)
+        twinkle-step (or twinkle-step 1)
+        hue (or hue 160)
+        low-brightness (or low-brightness -10)
+        high-brightness (or high-brightness 60)
+        gradient (or gradient false)]
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :offset 0
+        :grid (cellwise-grid-init #(rand 10) cols rows)})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :offset (+ (:offset state) twinkle-step)
+          :grid grid}))
+
+     :draw
+     (fn [state]
+       (q/no-stroke)
+       (doseq [[i j] (coord-seq rows cols)]
+         (let [brightness (q/map-range (q/sin (+ (:offset state) (get-in (:grid state) [i j]))) -1 1 low-brightness high-brightness)]
+           (if (= gradient false)
+             (stroke-and-fill [:hsb hue 60 brightness])
+             (stroke-and-fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
+           (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
+
+(defn checkers
+  "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
+  [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
+  (let [cols (or cols 20)
+        rows (or rows 20)
+        cell-x (/ width cols)
+        cell-y (/ height rows)
+        interval (or interval 100)
+        hue (or hue 160)
+        low-brightness (or low-brightness -10)
+        high-brightness (or high-brightness 60)
+        gradient (or gradient false)]
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :offset 0
+        :grid (cellwise-grid-init #(rand 10) cols rows)})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :offset (inc (:offset state))
+          :grid grid}))
+
+     :draw
+     (fn [state]
+       (q/no-stroke)
+       (doseq [[i j] (coord-seq rows cols)]
+         (let [h (if gradient (q/map-range (mod (+ i (:offset state)) rows) 0 rows 0 360) hue)
+               b (if (= (mod (+ i j (:offset state)) 2) 0) low-brightness high-brightness)]
+           (stroke-and-fill [:hsb h 60 b])
+           (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
+
+(defn pulse
+  "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
+  [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
+  (let [interval (or interval 100)]
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :brightness 50})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :brightness (cond (= (:brightness state) 50) 10
+                            (= (:brightness state) 10) 50)}))
+
+     :draw
+     (fn [state]
+       (q/no-stroke)
+       (stroke-and-fill [:hsb 280 60 (:brightness state)])
+       (q/rect 0 0 width height))}))
+
+
 (defn kaleidoscope
   "Rotating shapes around center-x and center-y with specified color and stroke-width. Star, rect, and heart available."
   [[x y width height] {:keys [center-x center-y interval-r interval-b offset size-change size-1 size-2 color stroke-width shape]}]
@@ -307,6 +437,83 @@
          (= shape :rect) (q/rect 0 0 (+ (:beat state) size-1) (+ (:beat state) size-2))
          (= shape :heart) (draw-heart 0 0(:beat state)))
        (q/pop-matrix))}))
+
+(defn rotate-shape
+  "Rotating shapes around center-x and center-y with specified color and stroke-width. Star, rect, and heart available."
+  [[x y width height] {:keys [center-x center-y interval-r offset size-change size-1 size-2 color stroke-width shape]}]
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
+        interval-r (or interval-r 1000)
+        offset (or offset 0)
+        size-1 (or size-1 40)
+        size-2 (or size-2 60)
+        color (or color [:hsb 40 50 50])
+        stroke-width (or stroke-width 20)
+        shape (or shape :star)] ;rect and heart available
+
+    {:setup
+     (fn [_]
+       (q/rect-mode :center)
+       {:angle 0})
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       {:angle (q/map-range (mod (- time offset) interval-r) 0 interval-r 0 q/TWO-PI)})
+
+     :draw
+     (fn [state]
+       (q/no-fill)
+       (stroke color)
+       (q/stroke-weight stroke-width)
+       (q/push-matrix)
+       (q/translate center-x center-y)
+       (q/rotate (:angle state))
+       (cond
+         (= shape :star) (draw-star 0 0 size-1 size-2 5)
+         (= shape :rect) (q/rect 0 0 size-1 size-2)
+         (= shape :heart) (draw-heart 0 0 50))
+       (q/pop-matrix))}))
+
+(defn rotate-shape-odroid
+  "Rotating shapes around center-x and center-y with specified color and stroke-width. Star, rect, and heart available."
+  [[x y width height] {:keys [center-x center-y interval offset angle-step size-1 size-2 color stroke-width shape]}]
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
+        interval (or interval 1000)
+        offset (or offset 0)
+        angle-step (or angle-step 0.5)
+        size-1 (or size-1 40)
+        size-2 (or size-2 60)
+        color (or color [:hsb 40 50 50])
+        stroke-width (or stroke-width 20)
+        shape (or shape :star)] ;rect and heart available
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :angle 0})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :angle (+ angle-step (:angle state))}))
+
+     :draw
+     (fn [state]
+       (q/no-fill)
+       (stroke color)
+       (q/stroke-weight stroke-width)
+       (q/push-matrix)
+       (q/translate center-x center-y)
+       (q/rotate (:angle state))
+       (cond
+         (= shape :star) (draw-star 0 0 size-1 size-2 5)
+         (= shape :rect) (q/rect 0 0 size-1 size-2)
+         (= shape :heart) (draw-heart 0 0 50))
+       (q/pop-matrix))}))
+
 
 (defn pinwheel
   "Rotating color wheel around center-x and center-y"
@@ -413,7 +620,7 @@
 (defn rain
   "Falling/fading colored drops."
   [[x y width height] {:keys [interval num-droplets hue]}]
-  (let [interval (or interval 5)
+  (let [interval (or interval 100)
         num-droplets (or num-droplets 50)
         hue (or hue 200)
         droplet-width (/ width num-droplets)]
@@ -427,18 +634,44 @@
        (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
-          :droplets (mapv #(mod (inc %) height) droplets)}))
+          :droplets (mapv #(mod (+ 10 %) height) droplets)}))
      :draw
      (fn [state]
        (doseq [[i j] (coord-seq num-droplets 5)]
          (stroke-and-fill [:hsb hue 50 (* j 10)])
          (q/rect (* i droplet-width) (+ (* j droplet-width) (get (:droplets state) i)) droplet-width droplet-width)))}))
 
+(defn rain-odroid
+  "Falling/fading colored drops."
+  [[x y width height] {:keys [interval num-droplets hue]}]
+  (let [interval (or interval 100)
+        num-droplets (or num-droplets 50)
+        hue (or hue 200)
+        droplet-width (/ width num-droplets)]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :droplets (into [] (repeatedly num-droplets #(rand height)))})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time droplets] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :droplets (mapv #(mod (+ 10 %) height) droplets)}))
+     :draw
+     (fn [state]
+       (doseq [i (range num-droplets)]
+         (stroke-and-fill [:hsb hue 50 40])
+         (q/rect (* i droplet-width) (* droplet-width (get (:droplets state) i)) droplet-width droplet-width)))}))
+
+
 (defn buzzing-bee
   "Horizontal yellow bars moving downwards"
-  [[x y width height] {:keys [interval stripe-width]}]
+  [[x y width height] {:keys [interval stripe-width color]}]
   (let [interval (or interval 500)
-        stripe-width (or stripe-width 20)]
+        stripe-width (or stripe-width 20)
+        color (or color [:hsb 50 70 50])]
     {:setup
       (fn [_]
         {:offset 0})
@@ -449,7 +682,7 @@
 
       :draw
       (fn [state]
-        (stroke-and-fill [:hsb 50 70 50])
+        (stroke-and-fill color)
         (doseq [i (range (/ height stripe-width))]
           (cond (= (mod i 2) 0) (q/rect 0 (+ (:offset state) (* i stripe-width)) width stripe-width))))}))
 
@@ -468,6 +701,32 @@
      :update
      (fn [{:keys [:env/time]} state]
        {:offset (q/map-range (mod time interval) 0 interval 0 (/ scale 3))})
+
+     :draw
+     (fn [state]
+       (stroke-and-fill color)
+       (draw-heart x y (- scale (:offset state))))}))
+
+(defn beating-heart-odroid
+  "A beating heart in the middle of the sketch, or where you define it"
+  [[_ _ width height] {:keys [x y scale color interval]}]
+  (let [x (or x (/ width 2))
+        y (or y (/ height 2))
+        scale (or scale (/ width 4))
+        color (or color [:hsb 340 70 50])
+        interval (or interval 5)]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:offset 0
+        :last-step-time time})
+
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :offset (mod (+ 10 (:offset state)) 100)}))
 
      :draw
      (fn [state]

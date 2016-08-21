@@ -1,26 +1,93 @@
-{:sketch {:title "dev"
-          :size [600 600]
-          :regions [{:name :left-arm :bounds [0 150 75 200]}]
-          :led-layouts {:normal [
-                                 {:leds/type :leds/coordinate-sequence
+{:sketch {:title "fragments1"
+          :size [550 550]
+          :regions [{:id :left-half :bounds [0 0 274 550]}
+                    {:id :right-half :bounds [276 0 274 50]}]
+          :led-layouts {:normal [{:leds/type :leds/coordinate-sequence
                                   :leds/offset [10 10]
                                   :leds/dims [500 500]
                                   :leds/coords-path "configs/coordinate_sequences/fragments1_coords.edn"}]}
 
-          :scenes {:brians-brain
-                   {:led-layout :normal
+          :scenes [{:id :brians-brain
+                    :display-name "Brian's Brain"
+                    :led-layout :normal
                     :layer-map {:global [[brians-brain 100 100 125]]
                                 :left-arm [[fill-color 127]
                                            [text "left-arm" {:color 255 :offset [1 10]}]]}}
-                   :twinkle
-                   {:led-layout :normal
-                    :layer-map {:global-bottom [[twinkle
-                                                 {:interval 50
-                                                  :low-brightness -10
-                                                  :high-brightness 50
-                                                  :twinkle-step 0.1}]]}}}
+                   {:id :twinkle
+                    :display-name "Twinkle"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[twinkle {:hue 140
+                                                          :interval 100
+                                                          :low-brightness -10
+                                                          :high-brightness 50
+                                                          :twinkle-step 0.1}]]}}
+                   {:id :twinkle2
+                    :display-name "Twinkle2"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[twinkle-odroid {:hue 180
+                                                                 :interval 25
+                                                                 :low-brightness 0
+                                                                 :high-brightness 40
+                                                                 :twinkle-step 0.4}]
+                                                [rotate-shape-odroid {:interval 25 :angle-step 0.15 :size-1 70 :size-2 150 :stroke-width 20 :color [:hsb 40 50 50] :shape :star}]]}}
+                   {:id :checkers
+                    :display-name "checkers"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers {:interval 100
+                                                           :low-brightness -10
+                                                           :high-brightness 50
+                                                           :gradient true}]]}}
+                   {:id :onecolor
+                    :display-name "green"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[fill-color [:hsb 70 50 50]]]}}
 
-          :init-scene :twinkle}
+                   {:id :pulse
+                    :display-name "pulse"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[pulse {:interval 100}]]}}
+
+                   {:id :rain
+                    :display-name "rain"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rain-odroid {:interval 100}]]}}
+
+                   {:id :chevron
+                    :display-name "chevron"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[chevron {:interval 300}]]}}
+
+                   {:id :buzzing-bee
+                    :display-name "Buzzing bee"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[buzzing-bee {:interval 500 :color [:hsb 300 50 30]}]]}}
+
+                   {:id :rotating-star
+                    :display-name "rotating star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rotate-shape-odroid {:interval 200 :size-1 60 :size-2 120 :stroke-width 30 :color [:hsb 300 50 30] :shape :star}]]}}
+
+                   {:id :beacon
+                    :display-name "beacon"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[beacon-odroid {:color [:rgb 50 50 50] :interval 50 :size-step 50}]]}}
+
+                   {:id :plasma-ripple
+                    :display-name "pr"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-plasma
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
+                                   :variable :color-and-brightness
+                                   :lower-limit-b -10
+                                   :upper-limit-b 50
+                                   :lower-limit-h 260
+                                   :upper-limit-h 330}]]}}]
+
+          :init-scene :twinkle2}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

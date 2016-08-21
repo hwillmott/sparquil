@@ -1,6 +1,6 @@
-{:sketch {:title "harriet-suit"
+{:sketch {:title "dev"
           :size [370 300]
-          :regions [{:name :rings :bounds [120 15 130 130]}]
+          :regions [{:id :rings :bounds [120 15 130 130]}]
           :led-layouts {:normal [; left upper arm
                                  {:leds/type :leds/strip
                                   :leds/count 3
@@ -241,17 +241,18 @@
                                   :leds/count 4
                                   :leds/length 80
                                   :leds/offset [145 200]
-                                  :leds/angle 180}]}}}
+                                  :leds/angle 180}]}
 
-<<<<<<< HEAD
-          :scenes {:buzzing-bee
-                   {:led-layout :normal
+          :scenes [{:id :buzzing-bee
+                    :display-name "bb"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[fill-color [:rgb 0 0 0]]
                                  [buzzing-bee {:interval 500 :stripe-width 20}]]}}
 
-                   :gradient-twinkle-inverse-beacon
-                   {:led-layout :normal
+                   {:id :gradient-twinkle-inverse-beacon
+                    :display-name "gtib"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[twinkle
                                   {:interval 50
@@ -274,8 +275,9 @@
                                    :color [:hsb 40 70 20]
                                    :shape :star}]]}}
 
-                   :twinkle-inverse-beacon
-                   {:led-layout :normal
+                   {:id :twinkle-inverse-beacon
+                    :display-name "tib"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[twinkle
                                   {:hue 150
@@ -290,9 +292,9 @@
                                    :offset 200
                                    :max-diameter 700
                                    :stroke-width 50}]]}}
-
-                   :twinkle-star
-                   {:led-layout :normal
+                   {:id :twinkle-star
+                    :display-name "ts"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[twinkle
                                   {:interval 50
@@ -305,8 +307,9 @@
                                    :interval-r 10000
                                    :color [:hsb 40 70 20]}]]}}
 
-                   :gradient-beacon
-                   {:led-layout :normal
+                   {:id :gradient-beacon
+                    :display-name "gb"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[fill-gradient {:direction :horizontal}]]
                                 :rings
@@ -314,13 +317,14 @@
                                   {:interval 1000
                                    :max-diameter 1400
                                    :color [:rgb 60 60 60]}]]}}
-
-                   :pinwheel
-                   {:led-layout :normal
+                   {:id :pinwheel
+                    :display-name "pw"
+                    :led-layout :normal
                     :layer-map {:rings [[pinwheel {:interval 2000}]]}}
 
-                   :plasma-color
-                   {:led-layout :normal
+                   {:id :plasma-color
+                    :display-name "pc"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[perlin-plasma
                                   {:interval 50
@@ -328,49 +332,57 @@
                                    :lower-limit-h 200
                                    :upper-limit-h 300}]]}}
 
-                   :plasma-brightness
-                   {:led-layout :normal
+                   {:id :plasma-brightness
+                    :display-name "pb"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[perlin-plasma
-                                  {:interval 50
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
                                    :variable :brightness
                                    :lower-limit-b -50
                                    :upper-limit-b 50}]]}}
 
-                   :plasma-ripple
-                   {:led-layout :normal
+                   {:id :plasma-ripple
+                    :display-name "pr"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[perlin-plasma
-                                  {:interval 50
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
                                    :variable :color-and-brightness
                                    :lower-limit-b -10
                                    :upper-limit-b 50
-                                   :lower-limit-h 0
-                                   :upper-limit-h 50}]]}}
+                                   :lower-limit-h 260
+                                   :upper-limit-h 330}]]}}
 
-                   :rain {:led-layout :normal
-                          :layer-map {:global-bottom [[rain {:interval 10}]]}}
+                   {:id :rain
+                    :display-name "r"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rain {:interval 10}]]}}
 
-                   :gradys-plasma {:led-layout :normal
-                                   :layer-map {:global-bottom [[gradys-plasma {:interval 100}]]}}
-
-                   :heart
-                   {:led-layout :normal
+                   {:id :heart
+                    :display-name "h"
+                    :led-layout :normal
                     :layer-map {:global-bottom
-                                [[twinkle {:hue 340}]
-                                 [beacon
-                                  {:center-x 185
-                                   :center-y 80
-                                   :interval 700
-                                   :offset 300
-                                   :max-diameter 400
-                                   :color [:rgb 0 0 0]}]]
-                                   ;[text "H" {:color [:rgb 50 50 50] :size 80 :offset [2 90]}]
-                                   ;[text "B" {:color [:rgb 50 50 50] :size 100 :offset [310 96]}]]
+                                       [[twinkle {:hue 340}]
+                                        [beacon
+                                         {:center-x 185
+                                          :center-y 80
+                                          :interval 700
+                                          :offset 300
+                                          :max-diameter 400
+                                          :color [:rgb 0 0 0]}]]
                                 :rings [[fill-color [:hsb 0 0 0]]
                                         [beating-heart {:scale 120 :interval 700}]]}}
-                   :kaleidoscope
-                   {:led-layout :normal
+
+                   {:id :kaleidoscope
+                    :display-name "k"
+                    :led-layout :normal
                     :layer-map {:global-bottom
                                 [[twinkle
                                   {:interval 50
@@ -385,27 +397,38 @@
                                    :size-change 100
                                    :color [:hsb 40 70 20]
                                    :shape :heart}]]}}
-                   :chevron {:led-layout :normal
-                             :layer-map {:global-bottom [[chevron {:interval 700}]]}}
-                   :bounce {:led-layout :normal
-                            :layer-map {:global-bottom [[bounce {:interval 3000}]]}}
-                   :beacon {:led-layout :normal
-                            :layer-map {:global-bottom [[beacon
-                                                         {:center-x 185
-                                                          :center-y 80
-                                                          :interval 2000
-                                                          :max-diameter 600
-                                                          :color [:hsb 210 60 50]
-                                                          :stroke-width 10}]]}}
-                   :test {:led-layout :normal
-                          :layer-map {:global-bottom [[kaleidoscope
-                                                       {:center-x 185
-                                                        :center-y 80
-                                                        :interval-r 10000
-                                                        :interval-b 500
-                                                        :size-change 0
-                                                        :color [:hsb 40 70 20]
-                                                        :shape :star}]]}}}
-          :init-scene :pinwheel
+                   {:id :chevron
+                    :display-name "c"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[chevron {:interval 700}]]}}
+
+                   {:id :bounce
+                    :display-name "bo"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[bounce {:interval 3000}]]}}
+
+                   {:id :beacon
+                    :display-name "be"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[beacon
+                                                 {:center-x 185
+                                                  :center-y 80
+                                                  :interval 2000
+                                                  :max-diameter 600
+                                                  :color [:hsb 210 60 50]
+                                                  :stroke-width 10}]]}}
+
+                   {:id :test
+                    :display-name "test"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[kaleidoscope
+                                                 {:center-x 185
+                                                  :center-y 80
+                                                  :interval-r 10000
+                                                  :interval-b 500
+                                                  :size-change 0
+                                                  :color [:hsb 40 70 20]
+                                                  :shape :star}]]}}]
+          :init-scene :plasma-ripple}
  :redis {:host "127.0.0.1" :port 6379}
- :fadecandy {:host "127.0.0.1" :port 7890}
+ :fadecandy {:host "127.0.0.1" :port 7890}}
