@@ -232,8 +232,8 @@
        (q/no-fill)
        (stroke color)
        (q/stroke-weight stroke-width)
-       (if restrict-size (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state))
-                                  (q/ellipse center-x center-y (:diameter state) (:diameter state)))))}))
+       (if restrict-size (q/ellipse center-x center-y (:diameter state) (:diameter state))
+                         (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state)))))}))
 
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."

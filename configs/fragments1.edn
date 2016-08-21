@@ -10,19 +10,12 @@
           :scenes [{:id :brians-brain
                     :display-name "Brian's Brain"
                     :led-layout :normal
-                    :layer-map {:global [[brians-brain 100 100 125]]
+                    :layer-map {:global [[brians-brain 20 20 125]]
                                 :left-arm [[fill-color 127]
                                            [text "left-arm" {:color 255 :offset [1 10]}]]}}
+
                    {:id :twinkle
                     :display-name "Twinkle"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[twinkle {:hue 140
-                                                          :interval 100
-                                                          :low-brightness -10
-                                                          :high-brightness 50
-                                                          :twinkle-step 0.1}]]}}
-                   {:id :twinkle2
-                    :display-name "Twinkle2"
                     :led-layout :normal
                     :layer-map {:global-bottom [[twinkle-odroid {:hue 180
                                                                  :interval 25
@@ -87,7 +80,7 @@
                                    :lower-limit-h 260
                                    :upper-limit-h 330}]]}}]
 
-          :init-scene :twinkle2}
+          :init-scene :brians-brain}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
