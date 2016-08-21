@@ -539,7 +539,7 @@
        (q/begin-shape :triangle-fan)
        (q/vertex center-x center-y)
        (doseq [i (range 361)]
-         (stroke-and-fill [:hsb i 50 50])
+         (stroke-and-fill [:hsb i 60 50])
          (q/vertex (+ center-x (* radius (q/cos (+ (:angle-offset state) (q/radians i)))))
                    (+ center-y (* radius (q/sin (+ (:angle-offset state) (q/radians i)))))))
        (q/end-shape :close))}))
@@ -690,19 +690,26 @@
 
 (defn beating-heart
   "A beating heart in the middle of the sketch, or where you define it"
-  [[_ _ width height] {:keys [x y scale color interval]}]
+  [[_ _ width height] {:keys [x y scale color interval size-step max-size-diff]}]
   (let [x (or x (/ width 2))
         y (or y (/ height 2))
         scale (or scale (/ width 4))
         color (or color [:hsb 340 70 50])
-        interval (or interval 700)]
+        interval (or interval 100)
+        size-step (or size-step 10)
+        max-size-diff (or max-size-diff 20)]
+
     {:setup
-     (fn [_]
-       {:offset 0})
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :offset 0})
 
      :update
-     (fn [{:keys [:env/time]} state]
-       {:offset (q/map-range (mod time interval) 0 interval 0 (/ scale 3))})
+     (fn [{:keys [:env/time]} {:keys [last-step-time offset] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time
+          :offset (mod (+ offset size-step) max-size-diff)}))
 
      :draw
      (fn [state]

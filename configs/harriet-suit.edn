@@ -250,6 +250,70 @@
                                 [[fill-color [:rgb 0 0 0]]
                                  [buzzing-bee {:interval 500 :stripe-width 20}]]}}
 
+                   {:id :rain
+                    :display-name "r"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]]}}
+
+                   {:id :beacon
+                    :display-name "be"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[beacon-odroid
+                                                 {:center-x 185
+                                                  :center-y 80
+                                                  :interval 80
+                                                  :size-step 20
+                                                  :max-diameter 650
+                                                  :restrict-size false
+                                                  :color [:hsb 210 60 50]
+                                                  :stroke-width 12}]]}}
+
+                   {:id :plasma-ripple
+                    :display-name "pr"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-plasma
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
+                                   :variable :color-and-brightness
+                                   :lower-limit-b -10
+                                   :upper-limit-b 50
+                                   :lower-limit-h 260
+                                   :upper-limit-h 330}]]}}
+
+                   {:id :pinwheel
+                    :display-name "pw"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[pinwheel {:center-x 185 :center-y 80 :radius 260 :interval 5000}]]}}
+
+                   {:id :twinkle
+                    :display-name "t"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[twinkle
+                                  {:interval 50
+                                   :low-brightness -20
+                                   :high-brightness 50
+                                   :twinkle-step 0.8}]]}}
+
+                   {:id :heart
+                    :display-name "h"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                       [[twinkle-odroid {:hue 340 :interval 100 :twinkle-step 0.5}]]
+                                :rings [[fill-color [:hsb 0 0 0]]
+                                        [beating-heart {:scale 130 :size-step 20 :max-size-diff 40}]]}}
+
+                   {:id :checkers
+                    :display-name "checkers"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers {:interval 50
+                                                           :low-brightness 10
+                                                           :high-brightness 50
+                                                           :gradient true}]]}}
+
                    {:id :twinkle-star
                     :display-name "ts"
                     :led-layout :normal
@@ -275,10 +339,6 @@
                                   {:interval 1000
                                    :max-diameter 1400
                                    :color [:rgb 60 60 60]}]]}}
-                   {:id :pinwheel
-                    :display-name "pw"
-                    :led-layout :normal
-                    :layer-map {:rings [[pinwheel {:interval 2000}]]}}
 
                    {:id :plasma-color
                     :display-name "pc"
@@ -303,50 +363,18 @@
                                    :lower-limit-b -50
                                    :upper-limit-b 50}]]}}
 
-                   {:id :plasma-ripple
-                    :display-name "pr"
-                    :led-layout :normal
-                    :layer-map {:global-bottom
-                                [[perlin-plasma
-                                  {:interval 25
-                                   :rows 20
-                                   :cols 20
-                                   :perlin-step 0.2
-                                   :variable :color-and-brightness
-                                   :lower-limit-b -10
-                                   :upper-limit-b 50
-                                   :lower-limit-h 260
-                                   :upper-limit-h 330}]]}}
 
-                   {:id :rain
-                    :display-name "r"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[rain {:interval 10}]]}}
 
-                   {:id :heart
-                    :display-name "h"
-                    :led-layout :normal
-                    :layer-map {:global-bottom
-                                       [[twinkle {:hue 340}]
-                                        [beacon
-                                         {:center-x 185
-                                          :center-y 80
-                                          :interval 700
-                                          :offset 300
-                                          :max-diameter 400
-                                          :color [:rgb 0 0 0]}]]
-                                :rings [[fill-color [:hsb 0 0 0]]
-                                        [beating-heart {:scale 120 :interval 700}]]}}
 
                    {:id :kaleidoscope
                     :display-name "k"
                     :led-layout :normal
                     :layer-map {:global-bottom
-                                [[twinkle
+                                [[twinkle-odroid
                                   {:interval 50
                                    :low-brightness -10
                                    :high-brightness 50
-                                   :twinkle-step 0.1}]
+                                   :twinkle-step 0.3}]
                                  [kaleidoscope
                                   {:center-x 185
                                    :center-y 80
@@ -365,19 +393,6 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[bounce {:interval 3000}]]}}
 
-                   {:id :beacon
-                    :display-name "be"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[beacon-odroid
-                                                 {:center-x 185
-                                                  :center-y 80
-                                                  :interval 80
-                                                  :size-step 20
-                                                  :max-diameter 650
-                                                  :restrict-size false
-                                                  :color [:hsb 210 60 50]
-                                                  :stroke-width 12}]]}}
-
                    {:id :test
                     :display-name "test"
                     :led-layout :normal
@@ -389,6 +404,6 @@
                                                   :size-change 0
                                                   :color [:hsb 40 70 20]
                                                   :shape :star}]]}}]
-          :init-scene :beacon}
+          :init-scene :checkers}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}
