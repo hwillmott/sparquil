@@ -204,7 +204,7 @@
 
 (defn beacon-odroid
   "Low light beacon visualization centered around center-x and center-y. The beacon expands from 0 to max-diameter over the specified interval. You can specify the color and stroke-width of the beacon."
-  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter color stroke-width]}]
+  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter restrict-size color stroke-width]}]
   (let [center-x (or center-x (/ width 2))
         center-y (or center-y (/ height 2))
         interval (or interval 200)
@@ -212,7 +212,8 @@
         offset (or offset 0)
         max-diameter (or max-diameter (max width height))
         color (or color [:hsb 115 50 50])
-        stroke-width (or stroke-width 20)]
+        stroke-width (or stroke-width 20)
+        restrict-size (or restrict-size true)]
 
     {:setup
      (fn [{:keys [:env/time]}]
@@ -221,7 +222,7 @@
 
      :update
      (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
-       (if (< time (+ last-step-time interval))
+       (if (< time (+ last-step-time interval offset))
          state
          {:last-step-time time
           :diameter (mod (+ size-step (:diameter state)) max-diameter)}))
@@ -231,7 +232,8 @@
        (q/no-fill)
        (stroke color)
        (q/stroke-weight stroke-width)
-       (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state))))}))
+       (if restrict-size (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state))
+                                  (q/ellipse center-x center-y (:diameter state) (:diameter state)))))}))
 
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."

@@ -250,48 +250,6 @@
                                 [[fill-color [:rgb 0 0 0]]
                                  [buzzing-bee {:interval 500 :stripe-width 20}]]}}
 
-                   {:id :gradient-twinkle-inverse-beacon
-                    :display-name "gtib"
-                    :led-layout :normal
-                    :layer-map {:global-bottom
-                                [[twinkle
-                                  {:interval 50
-                                   :low-brightness -10
-                                   :high-brightness 60
-                                   :twinkle-step 0.1
-                                   :gradient true}]
-                                 [inverted-beacon
-                                  {:center-x 185
-                                   :center-y 80
-                                   :interval 1000
-                                   :offset 200
-                                   :max-diameter 700
-                                   :stroke-width 50}]]
-                                :rings
-                                [[kaleidoscope
-                                  {:interval-r 10000
-                                   :interval-b 500
-                                   :size-change 0
-                                   :color [:hsb 40 70 20]
-                                   :shape :star}]]}}
-
-                   {:id :twinkle-inverse-beacon
-                    :display-name "tib"
-                    :led-layout :normal
-                    :layer-map {:global-bottom
-                                [[twinkle
-                                  {:hue 150
-                                   :interval 50
-                                   :low-brightness -10
-                                   :high-brightness 60
-                                   :twinkle-step 0.1}]
-                                 [inverted-beacon
-                                  {:center-x 185
-                                   :center-y 80
-                                   :interval 1100
-                                   :offset 200
-                                   :max-diameter 700
-                                   :stroke-width 50}]]}}
                    {:id :twinkle-star
                     :display-name "ts"
                     :led-layout :normal
@@ -410,13 +368,15 @@
                    {:id :beacon
                     :display-name "be"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[beacon
+                    :layer-map {:global-bottom [[beacon-odroid
                                                  {:center-x 185
                                                   :center-y 80
-                                                  :interval 2000
-                                                  :max-diameter 600
+                                                  :interval 80
+                                                  :size-step 20
+                                                  :max-diameter 650
+                                                  :restrict-size false
                                                   :color [:hsb 210 60 50]
-                                                  :stroke-width 10}]]}}
+                                                  :stroke-width 12}]]}}
 
                    {:id :test
                     :display-name "test"
@@ -429,6 +389,6 @@
                                                   :size-change 0
                                                   :color [:hsb 40 70 20]
                                                   :shape :star}]]}}]
-          :init-scene :plasma-ripple}
+          :init-scene :beacon}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}
