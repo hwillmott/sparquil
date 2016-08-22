@@ -277,9 +277,10 @@
 
 (defn twinkle
   "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
-  [[x y width height] {:keys [cols rows interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient shift]}]
+  [[x y width height] {:keys [cols rows length interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient shift]}]
   (let [cols (or cols 30)
         rows (or rows 30)
+        length (or length rows)
         cell-x (/ width cols)
         cell-y (/ height rows)
         interval (or interval 100)
@@ -315,8 +316,8 @@
          (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 lower-limit-b upper-limit-b)]
            (cond
              (= gradient false) (stroke-and-fill [:hsb hue 60 brightness])
-             (= shift true) (stroke-and-fill [:hsb (q/map-range (mod (+ i (:offset state)) rows) 0 rows lower-limit-h upper-limit-h) 60 brightness])
-             (= shift false) (stroke-and-fill [:hsb (q/map-range (mod i rows) 0 rows lower-limit-h upper-limit-h) 60 brightness]))
+             (= shift true) (stroke-and-fill [:hsb (q/map-range (mod (+ i (:offset state)) length) 0 length lower-limit-h upper-limit-h) 60 brightness])
+             (= shift false) (stroke-and-fill [:hsb (q/map-range (mod i length) 0 length lower-limit-h upper-limit-h) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn twinkle-odroid
@@ -861,6 +862,8 @@
          (let [y-coord (+ (/ height 2) (* 50 factor (q/sqrt val)))]
            (q/line 0 y-coord width y-coord))))}))
 
+
+
 (defn text [_ text {:keys [color size offset] :or {color [0] size 50 offset [0 0]}}]
   "A layer that writes text in color at offset. Defaults to black at [0 0]"
   {:draw (fn [_]
@@ -946,6 +949,15 @@
                         :replace true
                         :weigh {true 0.25 false 0.75})))
 
+(defn two-color-conways-cell [hue1 hue2 weigh]
+  (let [alive (if (< (rand 1) weigh) true false)
+        color (if alive
+                (if (< (rand 1) 0.5) hue1 hue2)
+                0)]
+    {:alive alive
+     :color color}))
+
+
 (defn conways-cell-transition
   "Given the value of a cell and a coll of the values of its neighbors,
    return the next value for the cell."
@@ -956,6 +968,22 @@
             (<= 2 live-neighbors 3) true
             (< 3 live-neighbors) false)
       (if (= 3 live-neighbors) true false))))
+
+(defn two-color-conways-transition
+  [cell neighbors hue1 hue2]
+  (let [live-neighbors (count (filter :alive neighbors))
+        color-sum (reduce + (map :color (filter :alive neighbors)))
+        alive (if (:alive cell)
+                (cond (< live-neighbors 2) false
+                      (<= 2 live-neighbors 3) true
+                      (< 3 live-neighbors) false)
+                (if (= 3 live-neighbors) true false))
+        color (if (:alive cell)
+                (if (> live-neighbors 0)
+                  (quot (+ (:color cell) color-sum) (+ 1 live-neighbors))
+                  (:color cell))
+                (if (< (rand 1) 0.5) hue1 hue2))]
+    (if alive {:alive alive :color color} (two-color-conways-cell hue1 hue2 0.007))))
 
 (defn conways-cell-color [cell]
   "Given a conway cell, return the color it should be drawn"
@@ -996,6 +1024,40 @@
                    (partial cellwise-grid-init brians-brain-cell)
                    brians-brain-cell-transition
                    brians-brain-cell-color))
+
+(defn two-color-conways
+  [[_ _ width height :as bounds] {:keys [rows cols step-interval hue1 hue2]}]
+  (let [rows (or rows 20)
+        cols (or cols 20)
+        step-interval (or step-interval 50)
+        hue1 (or hue1 0)
+        hue2 (or hue2 50)]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :grid (cellwise-grid-init #(two-color-conways-cell hue1 hue2 0.25) rows cols)})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+       (if (< time (+ last-step-time step-interval))
+         state
+         {:last-step-time time
+          :grid (let [neighbors (partial moore-neighbors grid)
+                      cells (apply concat grid)]
+                  (mapv vec (partition cols
+                                       (mapv #(two-color-conways-transition %1 %2 hue1 hue2)
+                                             cells
+                                             (map neighbors (coord-seq rows cols))))))}))
+     :draw
+     (fn [{:keys [grid]}]
+       (let [x-interval (/ width cols)
+             y-interval (/ height rows)]
+         (doseq [[i j] (coord-seq rows cols)]
+           (let [h (:color (get-in grid [i j]))]
+             (if (:alive (get-in grid [i j]))
+               (stroke-and-fill [:hsb h 50 50])
+               (stroke-and-fill [:rgb 0 0 0]))
+             (q/rect (* j x-interval) (* i y-interval) x-interval y-interval)))))}))
 
 (defn transformation [[x-offset y-offset width height :as bounds] transform]
   {:draw

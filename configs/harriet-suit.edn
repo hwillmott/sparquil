@@ -315,22 +315,8 @@
                                                            :gradient true
                                                            :update true}]]}}
 
-                   {:id :twinkle-star
-                    :display-name "ts"
-                    :led-layout :normal
-                    :layer-map {:global-bottom
-                                [[twinkle
-                                  {:interval 50
-                                   :low-brightness -10
-                                   :high-brightness 50
-                                   :twinkle-step 0.1}]
-                                 [kaleidoscope
-                                  {:center-x 185
-                                   :center-y 80
-                                   :interval-r 10000
-                                   :color [:hsb 40 70 20]}]]}}
 
-                   {:id :twinkle-star2
+                   {:id :twinkle-star
                     :display-name "Twinkle star"
                     :led-layout :normal
                     :layer-map {:global-bottom [[checkers-no-update {:interval 50
@@ -357,6 +343,22 @@
                                                             :stroke-width 10
                                                             :color [:hsb 40 50 50]
                                                             :shape :star}]]}}
+
+                   {:id :checker-star
+                    :display-name "sunset star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers {:interval 50
+                                                           :low-brightness 10
+                                                           :high-brightness 50
+                                                           :gradient false
+                                                           :update true}]]
+                                :rings [[fill-color [:rgb 0 0 0]]
+                                        [draw-shape-odroid {:size-1 30
+                                                            :size-2 50
+                                                            :stroke-width 10
+                                                            :color [:hsb 40 50 50]
+                                                            :shape :star}]]}}
+
 
                    {:id :gradient-beacon
                     :display-name "gb"
@@ -433,6 +435,6 @@
                                                   :size-change 0
                                                   :color [:hsb 40 70 20]
                                                   :shape :star}]]}}]
-          :init-scene :twinkle-star2}
+          :init-scene :checker-star}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}
