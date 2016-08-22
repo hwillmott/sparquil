@@ -422,7 +422,7 @@
                    {:id :bounce
                     :display-name "bo"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[bounce {:interval 3000}]]}}
+                    :layer-map {:global-bottom [[bounce {:interval 500}]]}}
 
                    {:id :test
                     :display-name "test"
@@ -435,6 +435,6 @@
                                                   :size-change 0
                                                   :color [:hsb 40 70 20]
                                                   :shape :star}]]}}]
-          :init-scene :checker-star}
+          :init-scene :bounce}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}

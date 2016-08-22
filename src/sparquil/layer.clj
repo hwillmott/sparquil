@@ -288,10 +288,11 @@
         hue (or hue 160)
         lower-limit-b (or lower-limit-b -10)
         upper-limit-b (or upper-limit-b 60)
-        lower-limit-h (or lower-limit-h -10)
-        upper-limit-h (or upper-limit-h 60)
+        lower-limit-h (or lower-limit-h 0)
+        upper-limit-h (or upper-limit-h 360)
         gradient (or gradient false)
-        shift (or shift false)]
+        shift (or shift false)
+        coords (coord-seq rows cols)]
 
     {:setup
      (fn [{:keys [:env/time]}]
@@ -312,24 +313,23 @@
      :draw
      (fn [state]
        (q/no-stroke)
-       (doseq [[i j] (coord-seq rows cols)]
-         (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 lower-limit-b upper-limit-b)]
-           (cond
-             (= gradient false) (stroke-and-fill [:hsb hue 60 brightness])
-             (= shift true) (stroke-and-fill [:hsb (+ lower-limit-h (q/abs (q/map-range
-                                                                             (mod (+ i (:offset state)) length)
-                                                                             0
-                                                                             length
-                                                                             (* -1 (- upper-limit-h lower-limit-h))
-                                                                             (- upper-limit-h lower-limit-h))))
-                                                   60
-                                                   brightness])
-             (= shift false) (stroke-and-fill [:hsb (q/map-range (mod i length) 0 length lower-limit-h upper-limit-h) 60 brightness]))
+       (doseq [[i j] coords]
+         (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 lower-limit-b upper-limit-b)
+               h-val (cond
+                       (= gradient false) hue
+                       (= shift true) (+ lower-limit-h (q/abs (q/map-range
+                                                                (mod (+ i (:offset state)) length)
+                                                                0
+                                                                length
+                                                                (* -1 (- upper-limit-h lower-limit-h))
+                                                                (- upper-limit-h lower-limit-h))))
+                       (= shift false) (q/map-range (mod i length) 0 length lower-limit-h upper-limit-h))]
+           (stroke-and-fill [:hsb h-val 50 brightness])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn twinkle-odroid
-  "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
-  [[x y width height] {:keys [cols rows interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient]}]
+  "uses sin instead of perlin noise"
+  [[x y width height] {:keys [cols rows interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient shift]}]
   (let [cols (or cols 20)
         rows (or rows 20)
         cell-x (/ width cols)
@@ -342,6 +342,7 @@
         lower-limit-h (or lower-limit-h -10)
         upper-limit-h (or upper-limit-h 60)
         gradient (or gradient false)
+        shift (or shift false)
         coords (coord-seq rows cols)]
 
     {:setup
@@ -369,8 +370,15 @@
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn checkers
-  "checker pattern of specified color or gradient. Can do non-update"
-  [[x y width height] {:keys [cols rows interval hue low-brightness high-brightness gradient update]}]
+  "strobing checker pattern
+    cols: number of columns
+    rows: number of rows
+    interval: milliseconds between updates
+    hue: the hue you want the checkers to be
+    low-brightness: brightness for darker cells
+    high-brightness: brightness for lighter cells
+    gradient: true or false, specifies whether you want the hue to change or not"
+  [[x y width height] {:keys [cols rows interval hue low-brightness high-brightness gradient]}]
   (let [cols (or cols 20)
         rows (or rows 20)
         cell-x (/ width cols)
@@ -389,7 +397,7 @@
 
      :update
      (fn [{:keys [:env/time]} {:keys [last-step-time] :as state}]
-       (if (< time (+ last-step-time interval) update)
+       (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
           :offset (inc (:offset state))}))
@@ -404,8 +412,14 @@
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn checkers-no-update
-  "checker pattern of specified color or gradient. Can do non-update"
-  [[x y width height] {:keys [cols rows interval hue low-brightness high-brightness gradient]}]
+  "checker pattern
+    cols: number of columns
+    rows: number of rows
+    hue: the hue you want the checkers to be
+    low-brightness: brightness for darker cells
+    high-brightness: brightness for lighter cells
+    gradient: true or false, specifies whether you want the hue to change or not"
+  [[x y width height] {:keys [cols rows hue low-brightness high-brightness gradient]}]
   (let [cols (or cols 20)
         rows (or rows 20)
         cell-x (/ width cols)
@@ -720,11 +734,14 @@
          (q/rect (* i droplet-width) (+ (* j droplet-width) (get (:droplets state) i)) droplet-width droplet-width)))}))
 
 (defn rain-odroid
-  "Falling/fading colored drops."
-  [[x y width height] {:keys [interval num-droplets hue]}]
+  "Falling/fading colored drops.
+    interval: milliseconds between updates
+    num-droplets: number of droplets you want to render
+    color: color of droplets"
+  [[x y width height] {:keys [interval num-droplets color]}]
   (let [interval (or interval 100)
         num-droplets (or num-droplets 50)
-        hue (or hue 200)
+        color (or color [:hsb 200 50 40])
         droplet-width (/ width num-droplets)]
     {:setup
      (fn [{:keys [:env/time]}]
@@ -740,12 +757,15 @@
      :draw
      (fn [state]
        (doseq [i (range num-droplets)]
-         (stroke-and-fill [:hsb hue 50 40])
+         (stroke-and-fill color)
          (q/rect (* i droplet-width) (* droplet-width (get (:droplets state) i)) droplet-width droplet-width)))}))
 
 
 (defn buzzing-bee
-  "Horizontal yellow bars moving downwards"
+  "Horizontal yellow bars moving downwards
+    interval: millisecond interval for one bar to move full range (stripe-width)
+    stripe-width: width of bar
+    color: color of bars"
   [[x y width height] {:keys [interval stripe-width color]}]
   (let [interval (or interval 500)
         stripe-width (or stripe-width 20)
@@ -765,7 +785,12 @@
           (cond (= (mod i 2) 0) (q/rect 0 (+ (:offset state) (* i stripe-width)) width stripe-width))))}))
 
 (defn beating-heart
-  "A beating heart in the middle of the sketch, or where you define it"
+  "A beating heart in the middle of the sketch, or where you define it
+    x and y: top point where sides join
+    scale: for bezier curve - related to size
+    interval: milliseconds between updates
+    size-step: pixel difference to change size at update
+    max-size-diff: to limit the heartbeat"
   [[_ _ width height] {:keys [x y scale color interval size-step max-size-diff]}]
   (let [x (or x (/ width 2))
         y (or y (/ height 2))
@@ -786,32 +811,6 @@
          state
          {:last-step-time time
           :offset (mod (+ offset size-step) max-size-diff)}))
-
-     :draw
-     (fn [state]
-       (stroke-and-fill color)
-       (draw-heart x y (- scale (:offset state))))}))
-
-(defn beating-heart-odroid
-  "A beating heart in the middle of the sketch, or where you define it"
-  [[_ _ width height] {:keys [x y scale color interval]}]
-  (let [x (or x (/ width 2))
-        y (or y (/ height 2))
-        scale (or scale (/ width 4))
-        color (or color [:hsb 340 70 50])
-        interval (or interval 5)]
-    {:setup
-     (fn [{:keys [:env/time]}]
-       {:offset 0
-        :last-step-time time})
-
-
-     :update
-     (fn [{:keys [:env/time]} {:keys [last-step-time] :as state}]
-       (if (< time (+ last-step-time interval))
-         state
-         {:last-step-time time
-          :offset (mod (+ 10 (:offset state)) 100)}))
 
      :draw
      (fn [state]
@@ -843,31 +842,30 @@
              (q/line (/ width 2) (+ (:offset state) (* i stripe-width 2)) width (- (+ (:offset state) (* i stripe-width 2)) chevron-height))))))}))
 
 (defn bounce
-  "a bouncing line"
-  [[x y width height] {:keys [interval stripe-width]}]
-  (let [interval (or interval 10000)
-        stripe-width (or stripe-width 10)]
+  "a bouncing line
+    interval: how long it takes to bounce
+    stripe-width: thickness of line
+    y-top: top of bounce
+    bounce-height: total range of bounce"
+  [[x y width height] {:keys [interval stripe-width y-top bounce-height]}]
+  (let [interval (or interval 500)
+        stripe-width (or stripe-width 10)
+        y-top (or y-top 0)
+        bounce-height (or bounce-height height)]
     {:setup
      (fn [_]
        {:offset 0})
 
      :update
      (fn [{:keys [:env/time]} state]
-       {:offset (q/map-range (mod time interval) 0 interval 0 q/TWO-PI)})
+       {:offset (q/map-range (mod time interval) 0 interval 0 bounce-height)})
 
      :draw
      (fn [state]
        (stroke-and-fill [:hsb 50 70 50])
        (q/stroke-weight stripe-width)
-       (let [val (if (< (q/sin (:offset state)) 0)
-                     (* -1 (q/sin (:offset state)))
-                     (q/sin (:offset state)))
-             factor (if (< (q/sin (:offset state)) 0)
-                        -1
-                        1)]
-
-         (let [y-coord (+ (/ height 2) (* 50 factor (q/sqrt val)))]
-           (q/line 0 y-coord width y-coord))))}))
+       (let [val (+ y-top (q/abs (q/map-range (:offset state) 0 bounce-height (* -1 bounce-height) bounce-height)))]
+         (q/line 0 val width val)))}))
 
 
 
