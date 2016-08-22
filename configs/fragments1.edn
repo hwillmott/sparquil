@@ -43,7 +43,7 @@
                                                           :lower-limit-b -10
                                                           :upper-limit-b 60
                                                           :twinkle-step 0.4
-                                                          :lower-limit-h 0
+                                                          :lower-limit-h 200
                                                           :upper-limit-h 360
                                                           :gradient true
                                                           :shift true}]]}}
@@ -98,11 +98,11 @@
                    {:id :two-color-conways
                     :display-name "two color conways"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[two-color-conways {:rows 20 :cols 20 :interval 50 :hue1 0 :hue2 40}]]}}]
+                    :layer-map {:global-bottom [[two-color-conways {:rows 20 :cols 20 :interval 100 :hue1 0 :hue2 40}]]}}]
 
 
 
-          :init-scene :two-color-conways}
+          :init-scene :twinkle-gradient}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

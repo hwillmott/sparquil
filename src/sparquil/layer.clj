@@ -316,7 +316,14 @@
          (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 lower-limit-b upper-limit-b)]
            (cond
              (= gradient false) (stroke-and-fill [:hsb hue 60 brightness])
-             (= shift true) (stroke-and-fill [:hsb (q/map-range (mod (+ i (:offset state)) length) 0 length lower-limit-h upper-limit-h) 60 brightness])
+             (= shift true) (stroke-and-fill [:hsb (+ lower-limit-h (q/abs (q/map-range
+                                                                             (mod (+ i (:offset state)) length)
+                                                                             0
+                                                                             length
+                                                                             (* -1 (- upper-limit-h lower-limit-h))
+                                                                             (- upper-limit-h lower-limit-h))))
+                                                   60
+                                                   brightness])
              (= shift false) (stroke-and-fill [:hsb (q/map-range (mod i length) 0 length lower-limit-h upper-limit-h) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
@@ -983,7 +990,7 @@
                   (quot (+ (:color cell) color-sum) (+ 1 live-neighbors))
                   (:color cell))
                 (if (< (rand 1) 0.5) hue1 hue2))]
-    (if alive {:alive alive :color color} (two-color-conways-cell hue1 hue2 0.007))))
+    (if alive {:alive alive :color color} (two-color-conways-cell hue1 hue2 0.01))))
 
 (defn conways-cell-color [cell]
   "Given a conway cell, return the color it should be drawn"
