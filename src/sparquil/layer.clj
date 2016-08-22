@@ -558,6 +558,32 @@
          (= shape :heart) (draw-heart 0 0 50))
        (q/pop-matrix))}))
 
+(defn draw-shape-odroid
+  "Rotating shapes around center-x and center-y with specified color and stroke-width. Star, rect, and heart available."
+  [[x y width height] {:keys [center-x center-y size-1 size-2 color stroke-width shape]}]
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
+        size-1 (or size-1 40)
+        size-2 (or size-2 60)
+        color (or color [:hsb 40 50 50])
+        stroke-width (or stroke-width 20)
+        shape (or shape :star) ;rect and heart available
+        rotation (if (= shape :star) 0.94 0)]
+
+    {:draw
+     (fn [state]
+       (q/no-fill)
+       (stroke color)
+       (q/stroke-weight stroke-width)
+       (q/push-matrix)
+       (q/translate center-x center-y)
+       (q/rotate rotation)
+       (cond
+         (= shape :star) (draw-star 0 0 size-1 size-2 5)
+         (= shape :rect) (q/rect 0 0 size-1 size-2)
+         (= shape :heart) (draw-heart 0 0 50))
+       (q/pop-matrix))}))
+
 
 (defn pinwheel
   "Rotating color wheel around center-x and center-y"

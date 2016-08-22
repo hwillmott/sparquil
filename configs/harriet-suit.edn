@@ -347,18 +347,16 @@
                                                               :color [:hsb 40 50 50]
                                                               :shape :star}]]}}
 
-                   {:id :twinkle-star3
-                    :display-name "Twinkle star"
+                   {:id :sunset-star
+                    :display-name "sunset star"
                     :led-layout :normal
                     :layer-map {:global-bottom [[fill-gradient {:variable :color :upper-limit-h 100 :lower-limit-h 10}]]
                                 :rings [[fill-color [:rgb 0 0 0]]
-                                        [rotate-shape-odroid {:interval 10
-                                                              :angle-step 0.3
-                                                              :size-1 30
-                                                              :size-2 50
-                                                              :stroke-width 10
-                                                              :color [:hsb 40 50 50]
-                                                              :shape :star}]]}}
+                                        [draw-shape-odroid {:size-1 30
+                                                            :size-2 50
+                                                            :stroke-width 10
+                                                            :color [:hsb 40 50 50]
+                                                            :shape :star}]]}}
 
                    {:id :gradient-beacon
                     :display-name "gb"
@@ -435,6 +433,6 @@
                                                   :size-change 0
                                                   :color [:hsb 40 70 20]
                                                   :shape :star}]]}}]
-          :init-scene :checkers}
+          :init-scene :sunset-star}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}
