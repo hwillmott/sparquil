@@ -277,7 +277,7 @@
 
 (defn twinkle
   "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
-  [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
+  [[x y width height] {:keys [cols rows interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient shift]}]
   (let [cols (or cols 30)
         rows (or rows 30)
         cell-x (/ width cols)
@@ -285,9 +285,12 @@
         interval (or interval 100)
         twinkle-step (or twinkle-step 0.1)
         hue (or hue 160)
-        low-brightness (or low-brightness -10)
-        high-brightness (or high-brightness 60)
-        gradient (or gradient false)]
+        lower-limit-b (or lower-limit-b -10)
+        upper-limit-b (or upper-limit-b 60)
+        lower-limit-h (or lower-limit-h -10)
+        upper-limit-h (or upper-limit-h 60)
+        gradient (or gradient false)
+        shift (or shift false)]
 
     {:setup
      (fn [{:keys [:env/time]}]
@@ -309,15 +312,16 @@
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] (coord-seq rows cols)]
-         (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 low-brightness high-brightness)]
-           (if (= gradient false)
-             (stroke-and-fill [:hsb hue 60 brightness])
-             (stroke-and-fill [:hsb (q/map-range (mod (+ i (:offset state)) rows) 0 rows 0 360) 60 brightness]))
+         (let [brightness (q/map-range (q/noise (get-in (:grid state) [i j])) 0 1 lower-limit-b upper-limit-b)]
+           (cond
+             (= gradient false) (stroke-and-fill [:hsb hue 60 brightness])
+             (= shift true) (stroke-and-fill [:hsb (q/map-range (mod (+ i (:offset state)) rows) 0 rows lower-limit-h upper-limit-h) 60 brightness])
+             (= shift false) (stroke-and-fill [:hsb (q/map-range (mod i rows) 0 rows lower-limit-h upper-limit-h) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn twinkle-odroid
   "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
-  [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
+  [[x y width height] {:keys [cols rows interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient]}]
   (let [cols (or cols 20)
         rows (or rows 20)
         cell-x (/ width cols)
@@ -325,8 +329,10 @@
         interval (or interval 100)
         twinkle-step (or twinkle-step 1)
         hue (or hue 160)
-        low-brightness (or low-brightness -10)
-        high-brightness (or high-brightness 60)
+        lower-limit-b (or lower-limit-b -10)
+        upper-limit-b (or upper-limit-b 60)
+        lower-limit-h (or lower-limit-h -10)
+        upper-limit-h (or upper-limit-h 60)
         gradient (or gradient false)
         coords (coord-seq rows cols)]
 
@@ -348,10 +354,10 @@
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] coords]
-         (let [brightness (q/map-range (q/sin (+ (:offset state) (get-in (:grid state) [i j]))) -1 1 low-brightness high-brightness)]
+         (let [brightness (q/map-range (q/sin (+ (:offset state) (get-in (:grid state) [i j]))) -1 1 lower-limit-b upper-limit-b)]
            (if (= gradient false)
              (stroke-and-fill [:hsb hue 60 brightness])
-             (stroke-and-fill [:hsb (q/map-range i 0 rows 0 360) 60 brightness]))
+             (stroke-and-fill [:hsb (q/map-range i 0 rows lower-limit-h upper-limit-h) 60 brightness]))
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn checkers

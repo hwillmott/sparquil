@@ -19,8 +19,8 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[twinkle-odroid {:hue 160
                                                                  :interval 25
-                                                                 :low-brightness 0
-                                                                 :high-brightness 40
+                                                                 :lower-limit-b 0
+                                                                 :upper-limit-b 40
                                                                  :twinkle-step 0.4}]
                                                 [rotate-shape-odroid {:interval 25 :angle-step 0.15 :size-1 70 :size-2 150 :stroke-width 20 :color [:hsb 40 50 50] :shape :star}]]}}
 
@@ -29,18 +29,21 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[twinkle-odroid {:hue 160
                                                                  :interval 25
-                                                                 :low-brightness 0
-                                                                 :high-brightness 40
+                                                                 :lower-limit-b 0
+                                                                 :upper-limit-b 40
                                                                  :twinkle-step 0.4}]
                                                 [kaleidoscope {:interval 25 :angle-step 0.15 :size-1 70 :size-2 150 :stroke-width 20 :color [:hsb 40 50 50] :shape :star}]]}}
                    {:id :twinkle-gradient
                     :display-name "Twinkle gradient"
                     :led-layout :normal
                     :layer-map {:global-bottom [[twinkle {:interval 25
-                                                          :low-brightness -10
-                                                          :high-brightness 60
+                                                          :lower-limit-b -10
+                                                          :upper-limit-b 60
                                                           :twinkle-step 0.4
-                                                          :gradient true}]]}}
+                                                          :lower-limit-h 200
+                                                          :upper-limit-h 350
+                                                          :gradient true
+                                                          :shift false}]]}}
 
                    {:id :plasma-ripple
                     :display-name "pr"

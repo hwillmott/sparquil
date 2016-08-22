@@ -433,6 +433,6 @@
                                                   :size-change 0
                                                   :color [:hsb 40 70 20]
                                                   :shape :star}]]}}]
-          :init-scene :sunset-star}
+          :init-scene :twinkle-star2}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}
