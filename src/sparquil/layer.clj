@@ -396,24 +396,18 @@
         rows (or rows 20)
         cell-x (/ width cols)
         cell-y (/ height rows)
-        interval (or interval 100)
         hue (or hue 160)
         low-brightness (or low-brightness -10)
         high-brightness (or high-brightness 60)
         gradient (or gradient false)
         coords (coord-seq rows cols)]
 
-    {:setup
-     (fn [{:keys [:env/time]}]
-       {:last-step-time time
-        :offset 0})
-
-     :draw
+    {:draw
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] coords]
-         (let [h (if gradient (q/map-range (mod (+ i (:offset state)) rows) 0 rows 0 360) hue)
-               b (if (= (mod (+ i j (:offset state)) 2) 0) low-brightness high-brightness)]
+         (let [h (if gradient (q/map-range (mod i rows) 0 rows 0 360) hue)
+               b (if (= (mod (+ i j) 2) 0) low-brightness high-brightness)]
            (stroke-and-fill [:hsb h 60 b])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
@@ -443,7 +437,7 @@
 
 
 (defn kaleidoscope
-  "Rotating shapes around center-x and center-y with specified color and stroke-width. Star, rect, and heart available."
+  "Rotating, pulsing shapes around center-x and center-y with specified color and stroke-width. Star, rect, and heart available."
   [[x y width height] {:keys [center-x center-y interval-r interval-b offset size-change size-1 size-2 color stroke-width shape]}]
   (let [center-x (or center-x (/ width 2))
         center-y (or center-y (/ height 2))
