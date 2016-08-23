@@ -247,29 +247,24 @@
                     :display-name "buzzing bee"
                     :led-layout :normal
                     :layer-map {:global-bottom
-                                [[fill-color [:rgb 0 0 0]]
-                                 [buzzing-bee {:interval 500 :stripe-width 20}]]}}
+                                [[buzzing-bee {:interval 500 :stripe-width 20}]
+                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 270 60 50] :direction :horizontal}]]}}
 
-                   {:id :rain
-                    :display-name "rain"
+                   {:id :chevron
+                    :display-name "chevron"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]]}}
+                    :layer-map {:global-bottom [[chevron {:interval 700 :color [:hsb 200 70 50]}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 310 60 50] :direction :horizontal}]]}}
 
-                   {:id :beacon
-                    :display-name "beacon"
+                   {:id :bounce
+                    :display-name "bounce"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[beacon-odroid
-                                                 {:center-x 185
-                                                  :center-y 80
-                                                  :interval 80
-                                                  :size-step 20
-                                                  :max-diameter 650
-                                                  :restrict-size false
-                                                  :color [:hsb 210 60 50]
-                                                  :stroke-width 12}]]}}
+                    :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 150 70 50]}]
+                                                [bounce {:interval 450 :color [:hsb 60 70 50]}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 115 60 50] :direction :horizontal}]]}}
 
-                   {:id :plasma-ripple
-                    :display-name "plasma ripple"
+                   {:id :plasma-ripple-purple
+                    :display-name "plasma ripple purp"
                     :led-layout :normal
                     :layer-map {:global-bottom
                                 [[perlin-plasma
@@ -281,12 +276,87 @@
                                    :lower-limit-b -10
                                    :upper-limit-b 50
                                    :lower-limit-h 260
-                                   :upper-limit-h 330}]]}}
+                                   :upper-limit-h 330}]
+                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
+                   {:id :plasma-ripple-blue
+                    :display-name "plasma ripple blue"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-plasma
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
+                                   :variable :color-and-brightness
+                                   :lower-limit-b -10
+                                   :upper-limit-b 50
+                                   :lower-limit-h 145
+                                   :upper-limit-h 215}]
+                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}
+
+                   {:id :heart
+                    :display-name "heart"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                       [[twinkle-odroid {:hue 340 :interval 100 :twinkle-step 0.5}]
+                                        [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]
+                                :rings [[fill-color [:hsb 0 0 0]]
+                                        [beating-heart {:scale 130 :size-step 20 :max-size-diff 40}]]}}
+
+
+
+                   {:id :twinkle-star
+                    :display-name "Twinkle star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers-no-update {:interval 50
+                                                                     :low-brightness 10
+                                                                     :high-brightness 50
+                                                                     :hue 160
+                                                                     :gradient false}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]
+                                :rings [[fill-color [:rgb 0 0 0]]
+                                        [rotate-shape-odroid {:interval 10
+                                                              :angle-step 0.3
+                                                              :size-1 30
+                                                              :size-2 50
+                                                              :stroke-width 10
+                                                              :color [:hsb 40 50 50]
+                                                              :shape :star}]]}}
+
+                   {:id :sunset-star
+                    :display-name "sunset star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[fill-gradient {:variable :color :upper-limit-h 60 :lower-limit-h 0}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]
+                                :rings [[fill-color [:rgb 0 0 0]]
+                                        [draw-shape-odroid {:size-1 30
+                                                            :size-2 50
+                                                            :stroke-width 10
+                                                            :color [:hsb 40 50 50]
+                                                            :shape :star}]]}}
+
+                   {:id :checker-star
+                    :display-name "checker star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers {:interval 50
+                                                           :low-brightness 10
+                                                           :high-brightness 50
+                                                           :gradient false
+                                                           :update true}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]
+                                :rings [[fill-color [:rgb 0 0 0]]
+                                        [draw-shape-odroid {:size-1 30
+                                                            :size-2 50
+                                                            :stroke-width 10
+                                                            :color [:hsb 40 50 50]
+                                                            :shape :star}]]}}
 
                    {:id :pinwheel
                     :display-name "pinwheel"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[pinwheel {:center-x 185 :center-y 80 :radius 260 :interval 5000}]]}}
+                    :layer-map {:global-bottom [[pinwheel {:center-x 185 :center-y 80 :radius 260 :interval 5000}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}
 
                    {:id :twinkle
                     :display-name "twinkle"
@@ -296,7 +366,8 @@
                                   {:interval 50
                                    :lower-limit-b -20
                                    :upper-limit-b  50
-                                   :twinkle-step 0.8}]]}}
+                                   :twinkle-step 0.8}]
+                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}
 
                    {:id :twinkle-gradient
                     :display-name "twinkle gradient"
@@ -313,15 +384,8 @@
                                    :upper-limit-h 300
                                    :twinkle-step 0.8
                                    :gradient true
-                                   :shift true}]]}}
-
-                   {:id :heart
-                    :display-name "heart"
-                    :led-layout :normal
-                    :layer-map {:global-bottom
-                                       [[twinkle-odroid {:hue 340 :interval 100 :twinkle-step 0.5}]]
-                                :rings [[fill-color [:hsb 0 0 0]]
-                                        [beating-heart {:scale 130 :size-step 20 :max-size-diff 40}]]}}
+                                   :shift true}]
+                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
 
                    {:id :checkers-rainbow
                     :display-name "checkers rainbow"
@@ -332,7 +396,9 @@
                                                            :length 40
                                                            :lower-limit-b 10
                                                            :upper-limit-b 50
-                                                           :gradient true}]]}}
+                                                           :gradient true}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
                    {:id :checkers-gradient
                     :display-name "checkers gradient"
                     :led-layout :normal
@@ -341,74 +407,63 @@
                                                            :upper-limit-b 50
                                                            :lower-limit-h 0
                                                            :upper-limit-h 80
-                                                           :gradient true}]]}}
+                                                           :gradient true}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
 
-                   {:id :twinkle-star
-                    :display-name "Twinkle star"
+                   {:id :rain-blue
+                    :display-name "rain blue"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[checkers-no-update {:interval 50
-                                                                     :low-brightness 10
-                                                                     :high-brightness 50
-                                                                     :hue 160
-                                                                     :gradient false}]]
-                                :rings [[fill-color [:rgb 0 0 0]]
-                                        [rotate-shape-odroid {:interval 10
-                                                              :angle-step 0.3
-                                                              :size-1 30
-                                                              :size-2 50
-                                                              :stroke-width 10
-                                                              :color [:hsb 40 50 50]
-                                                              :shape :star}]]}}
+                    :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
 
-                   {:id :sunset-star
-                    :display-name "sunset star"
+                   {:id :rain-yellow
+                    :display-name "rain yellow"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[fill-gradient {:variable :color :upper-limit-h 60 :lower-limit-h 0}]]
-                                :rings [[fill-color [:rgb 0 0 0]]
-                                        [draw-shape-odroid {:size-1 30
-                                                            :size-2 50
-                                                            :stroke-width 10
-                                                            :color [:hsb 40 50 50]
-                                                            :shape :star}]]}}
+                    :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50 :hue 40}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 40 60 50] :direction :horizontal}]]}}
 
-                   {:id :checker-star
-                    :display-name "checker star"
+                   {:id :beacon
+                    :display-name "beacon"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[checkers {:interval 50
-                                                           :low-brightness 10
-                                                           :high-brightness 50
-                                                           :gradient false
-                                                           :update true}]]
-                                :rings [[fill-color [:rgb 0 0 0]]
-                                        [draw-shape-odroid {:size-1 30
-                                                            :size-2 50
-                                                            :stroke-width 10
-                                                            :color [:hsb 40 50 50]
-                                                            :shape :star}]]}}
-
+                    :layer-map {:global-bottom [[beacon-odroid
+                                                 {:center-x 185
+                                                  :center-y 80
+                                                  :interval 80
+                                                  :size-step 20
+                                                  :max-diameter 650
+                                                  :restrict-size false
+                                                  :color [:hsb 210 60 50]
+                                                  :stroke-width 12}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
 
                    {:id :fill-gradient
                     :display-name "fill gradient"
                     :led-layout :normal
                     :layer-map {:global-bottom
-                                [[fill-gradient {:direction :horizontal}]]}}
-                   {:id :chevron
-                    :display-name "chevron"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[chevron {:interval 700 :color [:hsb 200 70 50]}]]}}
+                                [[fill-gradient {:direction :horizontal}]
+                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}]
 
-                   {:id :bounce
-                    :display-name "bounce"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]
-                                                [hive-status {:start-x 325 :start-y 248 :color [:hsb 115 60 50] :direction :horizontal}]]}}
 
-                   {:id :hive
-                    :display-name "hive status"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[hive-status {:start-x 325 :start-y 250 :color [:hsb 115 60 50] :direction :horizontal}]]}}]
-
-          :init-scene :hive}
+          :init-scene :rain-yellow}
+ ;buzzing-bee
+ ;chevron
+ ;bounce
+ ;plasma-ripple-purple
+ ;plasma-ripple-blue
+ ;heart
+ ;twinkle-star
+ ;sunset-star
+ ;checker-star
+ ;pinwheel
+ ;twinkle
+ ;twinkle-gradient
+ ;checkers-rainbow
+ ;checkers-gradient
+ ;rain-blue
+ ;rain-yellow
+ ;beacon
+ ;fill-gradient
+ ;hive
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
  :web-interface {:host "127.0.0.1" :port 8080}}
