@@ -457,7 +457,6 @@
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn pulse
-  "Randomized grid of twinkling lights. The brightness is a function of Perlin noise, with the low and high range as available parameters. You can specify the hue, or it is 160 by default, or set :gradient to true for a color gradient."
   [[x y width height] {:keys [cols rows interval twinkle-step hue low-brightness high-brightness gradient]}]
   (let [interval (or interval 100)]
 
@@ -836,10 +835,11 @@
 
 (defn chevron
   "chevrons moving"
-  [[x y width height] {:keys [interval stripe-width chevron-height]}]
+  [[x y width height] {:keys [interval stripe-width chevron-height color]}]
   (let [interval (or interval 500)
         stripe-width (or stripe-width 15)
-        chevron-height (or chevron-height (/ width 2))]
+        chevron-height (or chevron-height (/ width 2))
+        color (or color [:hsb 50 70 50])]
     {:setup
      (fn [_]
        {:offset 0})
@@ -850,7 +850,7 @@
 
      :draw
      (fn [state]
-       (stroke-and-fill [:hsb 50 70 50])
+       (stroke-and-fill color)
        (doseq [i (range (/ (* 2 height) stripe-width))]
          (if (= (mod i 2) 0)
            (do
@@ -864,11 +864,12 @@
     stripe-width: thickness of line
     y-top: top of bounce
     bounce-height: total range of bounce"
-  [[x y width height] {:keys [interval stripe-width y-top bounce-height]}]
+  [[x y width height] {:keys [interval stripe-width y-top bounce-height color]}]
   (let [interval (or interval 500)
         stripe-width (or stripe-width 10)
         y-top (or y-top 0)
-        bounce-height (or bounce-height height)]
+        bounce-height (or bounce-height height)
+        color (or color [:hsb 50 70 50])]
     {:setup
      (fn [_]
        {:offset 0})
@@ -879,7 +880,7 @@
 
      :draw
      (fn [state]
-       (stroke-and-fill [:hsb 50 70 50])
+       (stroke-and-fill color)
        (q/stroke-weight stripe-width)
        (let [val (+ y-top (q/abs (q/map-range (:offset state) 0 bounce-height (* -1 bounce-height) bounce-height)))]
          (q/line 0 val width val)))}))
