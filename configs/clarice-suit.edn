@@ -215,6 +215,11 @@
                     :led-layout :normal 
                     :layer-map {:global-bottom [[fade-rainbow {:step-interval 900}]]}}
 
+                   {:id :stripe
+                    :display-name "stripe"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[stripe {:interval 500}]]}}
+
                    {:id :fireworks 
                     :display-name "Fireworks" 
                     :led-layout :normal 
@@ -225,7 +230,7 @@
                                                 [stripe {:interval 500 :offset 0 :x-coord 165 :y-coord 265 :color [:hsb 40 50 50]}] ;left center 
                                                 [stripe {:interval 500 :offset 0 :x-coord 195 :y-coord 220 :color [:hsb 10 90 70]}]]}}]
 
-          :init-scene :brians-brain}
+          :init-scene :stripe}
 
 
  ; ~~~~~~ Shit I don't need to touch ~~~~~~~~~~~~~~~

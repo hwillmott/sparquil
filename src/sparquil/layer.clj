@@ -1083,6 +1083,89 @@
                (stroke-and-fill [:rgb 0 0 0]))
              (q/rect (* j x-interval) (* i y-interval) x-interval y-interval)))))}))
 
+(defn fade-rainbow
+  "glimmery gradient"
+  [[x y width height] {:keys [step-interval sat bri ]}]
+  (let [step-interval (or step-interval  200)
+        sat (or sat 50)
+        bri (or bri 50)]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :seed 0})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time seed] :as state}]
+       (if (< time (+ last-step-time step-interval))
+         state
+         {:seed (+ seed 0.1)
+          :last-step-time time}))
+
+     :draw
+     (fn [state]
+       (let [x-interval (/ width 360)]
+         (doseq [h (range 360)]
+           (let [sat (* 200 (* 0.4 (q/sin (* 14 (q/noise h 5 (:seed state))))))
+                 bri (* 100 (* 0.4 (q/sin (* 21 (q/noise 6 (* -1 (:seed state) (* h 5)))))))]
+             (fill [:hsb h sat bri])
+             (stroke [:hsb h sat bri ])
+             (q/rect (* h x-interval) 0 x-interval height)))))}))
+
+(defn fireworks
+  [[x y width height] {:keys [interval offset x-coord]}]
+  (let [interval (or interval 200)
+        offset (or offset 0)
+        x-coord (or x-coord 230)]
+
+    {:setup
+     (fn [env]
+       {:y 230
+        :diameter 10})
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       (let [time-in-interval (mod (- time offset) interval)]
+         (if (< 0 time-in-interval (/ interval 3))
+           (let [time-in-stage time-in-interval]
+             {:y (q/map-range time-in-stage 0 (/ interval 3) 230 100)
+              :diameter 10})
+           (let [time-in-stage (- time-in-interval (/ interval 3))]
+             {:y 100
+              :diameter (q/map-range time-in-stage 0 (* 2 (/ interval 3)) 0 72)}))))
+
+     :draw
+     (fn [{:keys [y diameter]}]
+       (q/no-fill)
+       (q/stroke-weight 10)
+       (stroke [:rgb 127 64 0])
+       (q/ellipse x-coord y diameter diameter))}))
+
+(defn stripe
+  [[x y width height] {:keys [interval offset x-coord y-coord color]}]
+  (let [interval (or interval 200)
+        offset (or offset 0)
+        x-coord (or x-coord 230)
+        y-coord (or y-coord 230)
+        color (or color [:hsb 200 50 50])]
+
+    {:setup
+     (fn [env]
+       {:y y-coord})
+
+
+     :update
+     (fn [{:keys [:env/time]} state]
+       (let [time-in-interval (mod (- time offset) interval)]
+         (let [time-in-stage time-in-interval]
+           {:y (q/map-range time-in-stage 0 interval y-coord 140)})))
+
+     :draw
+     (fn [{:keys [y]}]
+       (q/no-fill)
+       (q/stroke-weight 10)
+       (stroke color)
+       (q/ellipse x-coord y 10 10))}))
+
 (defn transformation [[x-offset y-offset width height :as bounds] transform]
   {:draw
    (fn [_]
