@@ -423,15 +423,16 @@
                    {:id :bounce
                     :display-name "bounce"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]]}}
+                    :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 115 60 50] :direction :vertical}]]}}
 
                    {:id :hive
                     :display-name "hive status"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[hive-status {:start-x 218 :start-y 140 :spacing 20 :color [:hsb 115 60 50] :direction :vertical}]]}}]
+                    :layer-map {:global-bottom [[hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 115 60 50] :direction :vertical}]]}}]
 
 
-          :init-scene :hive}
+          :init-scene :bounce}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

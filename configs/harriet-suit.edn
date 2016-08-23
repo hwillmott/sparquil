@@ -400,12 +400,13 @@
                    {:id :bounce
                     :display-name "bounce"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]]}}
+                    :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]
+                                                [hive-status {:start-x 325 :start-y 248 :color [:hsb 115 60 50] :direction :horizontal}]]}}
 
                    {:id :hive
                     :display-name "hive status"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[hive-status {:start-x 325 :start-y 248 :color [:hsb 115 60 50] :direction :horizontal}]]}}]
+                    :layer-map {:global-bottom [[hive-status {:start-x 325 :start-y 250 :color [:hsb 115 60 50] :direction :horizontal}]]}}]
 
           :init-scene :hive}
  :redis {:host "127.0.0.1" :port 6379}

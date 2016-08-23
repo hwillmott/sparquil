@@ -184,11 +184,11 @@
      :draw
      (fn [state]
        (stroke-and-fill color)
-       (q/no-stroke)
+       (q/stroke-weight 1)
        (let [length (* spacing (:homies state))]
          (if (= direction :horizontal)
-           (q/rect start-x start-y length 3)
-           (q/rect start-x start-y 3 length))))}))
+           (q/line start-x start-y (+ start-x length) start-y)
+           (q/line start-x start-y start-x (+ start-y length)))))}))
 
 (defn fill-gradient
   "Gradient background for testing. Can set the hue to change vertically or horizontally, with horizontal as the default."
