@@ -244,19 +244,19 @@
                                   :leds/angle 180}]}
 
           :scenes [{:id :buzzing-bee
-                    :display-name "bb"
+                    :display-name "buzzing bee"
                     :led-layout :normal
                     :layer-map {:global-bottom
                                 [[fill-color [:rgb 0 0 0]]
                                  [buzzing-bee {:interval 500 :stripe-width 20}]]}}
 
                    {:id :rain
-                    :display-name "r"
+                    :display-name "rain"
                     :led-layout :normal
                     :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]]}}
 
                    {:id :beacon
-                    :display-name "be"
+                    :display-name "beacon"
                     :led-layout :normal
                     :layer-map {:global-bottom [[beacon-odroid
                                                  {:center-x 185
@@ -269,7 +269,7 @@
                                                   :stroke-width 12}]]}}
 
                    {:id :plasma-ripple
-                    :display-name "pr"
+                    :display-name "plasma ripple"
                     :led-layout :normal
                     :layer-map {:global-bottom
                                 [[perlin-plasma
@@ -284,12 +284,12 @@
                                    :upper-limit-h 330}]]}}
 
                    {:id :pinwheel
-                    :display-name "pw"
+                    :display-name "pinwheel"
                     :led-layout :normal
                     :layer-map {:global-bottom [[pinwheel {:center-x 185 :center-y 80 :radius 260 :interval 5000}]]}}
 
                    {:id :twinkle
-                    :display-name "t"
+                    :display-name "twinkle"
                     :led-layout :normal
                     :layer-map {:global-bottom
                                 [[twinkle
@@ -299,7 +299,7 @@
                                    :twinkle-step 0.8}]]}}
 
                    {:id :twinkle-gradient
-                    :display-name "tg"
+                    :display-name "twinkle gradient"
                     :led-layout :normal
                     :layer-map {:global-bottom
                                 [[twinkle-odroid
@@ -316,7 +316,7 @@
                                    :shift true}]]}}
 
                    {:id :heart
-                    :display-name "h"
+                    :display-name "heart"
                     :led-layout :normal
                     :layer-map {:global-bottom
                                        [[twinkle-odroid {:hue 340 :interval 100 :twinkle-step 0.5}]]
@@ -324,7 +324,7 @@
                                         [beating-heart {:scale 130 :size-step 20 :max-size-diff 40}]]}}
 
                    {:id :checkers-rainbow
-                    :display-name "c"
+                    :display-name "checkers rainbow"
                     :led-layout :normal
                     :layer-map {:global-bottom [[checkers {:interval 50
                                                            :rows 20
@@ -334,7 +334,7 @@
                                                            :upper-limit-b 50
                                                            :gradient true}]]}}
                    {:id :checkers-gradient
-                    :display-name "cg"
+                    :display-name "checkers gradient"
                     :led-layout :normal
                     :layer-map {:global-bottom [[checkers {:interval 50
                                                            :lower-limit-b 10
