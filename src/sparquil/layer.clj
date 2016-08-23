@@ -184,6 +184,7 @@
      :draw
      (fn [state]
        (stroke-and-fill color)
+       (q/no-stroke)
        (let [length (* spacing (:homies state))]
          (if (= direction :horizontal)
            (q/rect start-x start-y length 3)
