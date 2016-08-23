@@ -179,7 +179,7 @@
      :update
      (fn [env state]
        {:homies (or (parse-number (:env/neighbours env))
-                    3)})
+                    0)})
 
      :draw
      (fn [state]
