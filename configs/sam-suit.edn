@@ -271,25 +271,14 @@
                     :led-layout :normal
                     :layer-map {:global-bottom
                                 [[fill-color [:rgb 0 0 0]]
-                                 [buzzing-bee {:interval 500 :stripe-width 20}]]}}
+                                 [buzzing-bee {:interval 500 :stripe-width 20}]
+                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :rain
                     :display-name "rain"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]]}}
-
-                   {:id :beacon
-                    :display-name "beacon"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[beacon-odroid
-                                                 {:center-x 185
-                                                  :center-y 80
-                                                  :interval 80
-                                                  :size-step 20
-                                                  :max-diameter 650
-                                                  :restrict-size false
-                                                  :color [:hsb 210 60 50]
-                                                  :stroke-width 12}]]}}
+                    :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :plasma-ripple
                     :display-name "plasma ripple"
@@ -304,12 +293,14 @@
                                    :lower-limit-b -10
                                    :upper-limit-b 50
                                    :lower-limit-h 260
-                                   :upper-limit-h 330}]]}}
+                                   :upper-limit-h 330}]
+                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :pinwheel
                     :display-name "pinwheel"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[pinwheel {:center-x 185 :center-y 80 :radius 260 :interval 5000}]]}}
+                    :layer-map {:global-bottom [[pinwheel {:center-x 185 :center-y 80 :radius 260 :interval 5000}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :twinkle
                     :display-name "twinkle"
@@ -319,7 +310,8 @@
                                   {:interval 50
                                    :lower-limit-b -20
                                    :upper-limit-b  50
-                                   :twinkle-step 0.8}]]}}
+                                   :twinkle-step 0.8}]
+                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :twinkle-gradient
                     :display-name "twinkle gradient"
@@ -336,15 +328,15 @@
                                    :upper-limit-h 300
                                    :twinkle-step 0.8
                                    :gradient true
-                                   :shift true}]]}}
+                                   :shift true}]
+                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :heart
                     :display-name "heart"
                     :led-layout :normal
                     :layer-map {:global-bottom
-                                       [[twinkle-odroid {:hue 340 :interval 100 :twinkle-step 0.5}]]
-                                :rings [[fill-color [:hsb 0 0 0]]
-                                        [beating-heart {:scale 130 :size-step 20 :max-size-diff 40}]]}}
+                                       [[twinkle-odroid {:hue 340 :interval 100 :twinkle-step 0.5}]
+                                        [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :checkers-rainbow
                     :display-name "checkers rainbow"
@@ -355,7 +347,8 @@
                                                            :length 40
                                                            :lower-limit-b 10
                                                            :upper-limit-b 50
-                                                           :gradient true}]]}}
+                                                           :gradient true}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
                    {:id :checkers-gradient
                     :display-name "checkers gradient"
                     :led-layout :normal
@@ -364,35 +357,14 @@
                                                            :upper-limit-b 50
                                                            :lower-limit-h 0
                                                            :upper-limit-h 80
-                                                           :gradient true}]]}}
-
-                   {:id :twinkle-star
-                    :display-name "Twinkle star"
-                    :led-layout :normal
-                    :layer-map {:global-bottom [[checkers-no-update {:interval 50
-                                                                     :low-brightness 10
-                                                                     :high-brightness 50
-                                                                     :hue 160
-                                                                     :gradient false}]]
-                                :rings [[fill-color [:rgb 0 0 0]]
-                                        [rotate-shape-odroid {:interval 10
-                                                              :angle-step 0.3
-                                                              :size-1 30
-                                                              :size-2 50
-                                                              :stroke-width 10
-                                                              :color [:hsb 40 50 50]
-                                                              :shape :star}]]}}
+                                                           :gradient true}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :sunset-star
                     :display-name "sunset star"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[fill-gradient {:variable :color :upper-limit-h 60 :lower-limit-h 0}]]
-                                :rings [[fill-color [:rgb 0 0 0]]
-                                        [draw-shape-odroid {:size-1 30
-                                                            :size-2 50
-                                                            :stroke-width 10
-                                                            :color [:hsb 40 50 50]
-                                                            :shape :star}]]}}
+                    :layer-map {:global-bottom [[fill-gradient {:variable :color :upper-limit-h 60 :lower-limit-h 0}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :checker-star
                     :display-name "checker star"
@@ -401,38 +373,35 @@
                                                            :low-brightness 10
                                                            :high-brightness 50
                                                            :gradient false
-                                                           :update true}]]
-                                :rings [[fill-color [:rgb 0 0 0]]
-                                        [draw-shape-odroid {:size-1 30
-                                                            :size-2 50
-                                                            :stroke-width 10
-                                                            :color [:hsb 40 50 50]
-                                                            :shape :star}]]}}
+                                                           :update true}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
 
                    {:id :fill-gradient
                     :display-name "fill gradient"
                     :led-layout :normal
                     :layer-map {:global-bottom
-                                [[fill-gradient {:direction :horizontal}]]}}
+                                [[fill-gradient {:direction :horizontal}]
+                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
                    {:id :chevron
                     :display-name "chevron"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[chevron {:interval 700 :color [:hsb 200 70 50]}]]}}
+                    :layer-map {:global-bottom [[chevron {:interval 700 :color [:hsb 200 70 50]}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :bounce
                     :display-name "bounce"
                     :led-layout :normal
                     :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]
-                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 115 60 50] :direction :vertical}]]}}
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :hive
                     :display-name "hive status"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 115 60 50] :direction :vertical}]]}}]
+                    :layer-map {:global-bottom [[hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}]
 
 
-          :init-scene :bounce}
+          :init-scene :buzzing-bee}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
