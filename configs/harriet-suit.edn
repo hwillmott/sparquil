@@ -294,9 +294,26 @@
                     :layer-map {:global-bottom
                                 [[twinkle
                                   {:interval 50
-                                   :low-brightness -20
-                                   :high-brightness 50
+                                   :lower-limit-b -20
+                                   :upper-limit-b  50
                                    :twinkle-step 0.8}]]}}
+
+                   {:id :twinkle2
+                    :display-name "to"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[twinkle-odroid
+                                  {:interval 50
+                                   :rows 20
+                                   :columns 20
+                                   :length 40
+                                   :lower-limit-b -20
+                                   :upper-limit-b 50
+                                   :lower-limit-h 200
+                                   :upper-limit-h 300
+                                   :twinkle-step 0.8
+                                   :gradient true
+                                   :shift true}]]}}
 
                    {:id :heart
                     :display-name "h"
@@ -310,11 +327,18 @@
                     :display-name "checkers"
                     :led-layout :normal
                     :layer-map {:global-bottom [[checkers {:interval 50
-                                                           :low-brightness 10
-                                                           :high-brightness 50
-                                                           :gradient true
-                                                           :update true}]]}}
-
+                                                           :lower-limit-b 10
+                                                           :upper-limit-b 50
+                                                           :gradient true}]]}}
+                   {:id :checkers2
+                    :display-name "checkers"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers {:interval 50
+                                                           :lower-limit-b 10
+                                                           :upper-limit-b 50
+                                                           :lower-limit-h 80
+                                                           :upper-limit-h 200
+                                                           :gradient true}]]}}
 
                    {:id :twinkle-star
                     :display-name "Twinkle star"
@@ -394,9 +418,6 @@
                                    :lower-limit-b -50
                                    :upper-limit-b 50}]]}}
 
-
-
-
                    {:id :kaleidoscope
                     :display-name "k"
                     :led-layout :normal
@@ -435,6 +456,6 @@
                                                   :size-change 0
                                                   :color [:hsb 40 70 20]
                                                   :shape :star}]]}}]
-          :init-scene :bounce}
+          :init-scene :checkers2}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}}

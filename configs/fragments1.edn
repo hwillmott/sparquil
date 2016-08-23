@@ -95,14 +95,22 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[rotate-shape-odroid {:interval 200 :size-1 60 :size-2 120 :stroke-width 30 :color [:hsb 300 50 30] :shape :star}]]}}
 
-                   {:id :two-color-conways
+                   {:id :two-color-conways-red
                     :display-name "two color conways"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[two-color-conways {:rows 20 :cols 20 :interval 100 :hue1 0 :hue2 40}]]}}]
+                    :layer-map {:global-bottom [[two-color-conways {:rows 30 :cols 30 :interval 150 :hue1 0 :hue2 40}]]}}
+
+                   {:id :two-color-conways-blue
+                    :display-name "two color conways"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[two-color-conways {:rows 30
+                                                                    :cols 30
+                                                                    :interval 150
+                                                                    :hue1 170
+                                                                    :hue2 220}]]}}]
 
 
-
-          :init-scene :twinkle-gradient}
+          :init-scene :two-color-conways-blue}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

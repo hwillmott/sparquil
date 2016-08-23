@@ -329,9 +329,10 @@
 
 (defn twinkle-odroid
   "uses sin instead of perlin noise"
-  [[x y width height] {:keys [cols rows interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient shift]}]
+  [[x y width height] {:keys [cols rows length interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient shift]}]
   (let [cols (or cols 20)
         rows (or rows 20)
+        length (or length rows)
         cell-x (/ width cols)
         cell-y (/ height rows)
         interval (or interval 100)
@@ -363,10 +364,17 @@
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] coords]
-         (let [brightness (q/map-range (q/sin (+ (:offset state) (get-in (:grid state) [i j]))) -1 1 lower-limit-b upper-limit-b)]
-           (if (= gradient false)
-             (stroke-and-fill [:hsb hue 60 brightness])
-             (stroke-and-fill [:hsb (q/map-range i 0 rows lower-limit-h upper-limit-h) 60 brightness]))
+         (let [brightness (q/map-range (q/sin (+ (:offset state) (get-in (:grid state) [i j]))) -1 1 lower-limit-b upper-limit-b)
+               h-val (cond
+                       (= gradient false) hue
+                       (= shift true) (+ lower-limit-h (q/abs (q/map-range
+                                                                (mod (+ i (:offset state)) length)
+                                                                0
+                                                                length
+                                                                (* -1 (- upper-limit-h lower-limit-h))
+                                                                (- upper-limit-h lower-limit-h))))
+                       (= shift false) (q/map-range (mod i length) 0 length lower-limit-h upper-limit-h))]
+           (stroke-and-fill [:hsb h-val 50 brightness])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn checkers
@@ -378,15 +386,18 @@
     low-brightness: brightness for darker cells
     high-brightness: brightness for lighter cells
     gradient: true or false, specifies whether you want the hue to change or not"
-  [[x y width height] {:keys [cols rows interval hue low-brightness high-brightness gradient]}]
+  [[x y width height] {:keys [cols rows length interval hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient]}]
   (let [cols (or cols 20)
         rows (or rows 20)
+        length (or length rows)
         cell-x (/ width cols)
         cell-y (/ height rows)
         interval (or interval 100)
         hue (or hue 160)
-        low-brightness (or low-brightness -10)
-        high-brightness (or high-brightness 60)
+        lower-limit-b (or lower-limit-b -10)
+        upper-limit-b  (or upper-limit-b 60)
+        lower-limit-h (or lower-limit-h 0)
+        upper-limit-h (or upper-limit-h 360)
         gradient (or gradient false)
         coords (coord-seq rows cols)]
 
@@ -406,8 +417,14 @@
      (fn [state]
        (q/no-stroke)
        (doseq [[i j] coords]
-         (let [h (if gradient (q/map-range (mod (+ i (:offset state)) rows) 0 rows 0 360) hue)
-               b (if (= (mod (+ i j (:offset state)) 2) 0) low-brightness high-brightness)]
+         (let [h (if gradient (+ lower-limit-h (q/abs (q/map-range
+                                                        (mod (+ i (:offset state)) length)
+                                                        0
+                                                        length
+                                                        (* -1 (- upper-limit-h lower-limit-h))
+                                                        (- upper-limit-h lower-limit-h))))
+                              hue)
+               b (if (= (mod (+ i j (:offset state)) 2) 0) lower-limit-b upper-limit-b)]
            (stroke-and-fill [:hsb h 60 b])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
@@ -1031,12 +1048,14 @@
                    brians-brain-cell-color))
 
 (defn two-color-conways
-  [[_ _ width height :as bounds] {:keys [rows cols step-interval hue1 hue2]}]
+  [[_ _ width height :as bounds] {:keys [rows cols step-interval hue1 hue2 sat bri]}]
   (let [rows (or rows 20)
         cols (or cols 20)
         step-interval (or step-interval 50)
         hue1 (or hue1 0)
-        hue2 (or hue2 50)]
+        hue2 (or hue2 50)
+        sat (or sat 40)
+        bri (or bri 40)]
     {:setup
      (fn [{:keys [:env/time]}]
        {:last-step-time time
@@ -1060,7 +1079,7 @@
          (doseq [[i j] (coord-seq rows cols)]
            (let [h (:color (get-in grid [i j]))]
              (if (:alive (get-in grid [i j]))
-               (stroke-and-fill [:hsb h 50 50])
+               (stroke-and-fill [:hsb h sat bri])
                (stroke-and-fill [:rgb 0 0 0]))
              (q/rect (* j x-interval) (* i y-interval) x-interval y-interval)))))}))
 
