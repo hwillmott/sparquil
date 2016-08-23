@@ -388,34 +388,26 @@
 
 
                    {:id :fill-gradient
-                    :display-name "gb"
+                    :display-name "fill gradient"
                     :led-layout :normal
                     :layer-map {:global-bottom
                                 [[fill-gradient {:direction :horizontal}]]}}
-
-                   {:id :plasma-brightness
-                    :display-name "pb"
-                    :led-layout :normal
-                    :layer-map {:global-bottom
-                                [[perlin-plasma
-                                  {:interval 25
-                                   :rows 20
-                                   :cols 20
-                                   :perlin-step 0.4
-                                   :variable :brightness
-                                   :lower-limit-b -50
-                                   :upper-limit-b 50}]]}}
                    {:id :chevron
-                    :display-name "c"
+                    :display-name "chevron"
                     :led-layout :normal
                     :layer-map {:global-bottom [[chevron {:interval 700 :color [:hsb 200 70 50]}]]}}
 
                    {:id :bounce
-                    :display-name "bo"
+                    :display-name "bounce"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]]}}]
+                    :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]]}}
 
-          :init-scene :bounce}
+                   {:id :hive
+                    :display-name "hive status"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[hive-status {:start-x 325 :start-y 248 :color [:hsb 115 60 50] :direction :horizontal}]]}}]
+
+          :init-scene :hive}
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
  :web-interface {:host "127.0.0.1" :port 8080}}

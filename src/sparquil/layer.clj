@@ -162,6 +162,33 @@
                            ; Draw the circle.
                            (q/ellipse x y 100 100))))})
 
+(defn hive-status
+  "0-3 colored pixels as a horizontal or vertical line, showing how many of the hive are close to you"
+  [[x y width height] {:keys [start-x start-y color spacing direction]}]
+  (let [start-x (or start-x (/ width 2))
+        start-y (or start-y (/ height 2))
+        direction (or direction :vertical)
+        color (or color [:hsb 50 70 50])
+        spacing (or spacing 10)]
+
+    {:setup
+     (fn [env]
+       {:homies (or (parse-number (:env/neighbours env))
+                    0)})
+
+     :update
+     (fn [env state]
+       {:homies (or (parse-number (:env/neighbours env))
+                    3)})
+
+     :draw
+     (fn [state]
+       (stroke-and-fill color)
+       (let [length (* spacing (:homies state))]
+         (if (= direction :horizontal)
+           (q/rect start-x start-y length 3)
+           (q/rect start-x start-y 3 length))))}))
+
 (defn fill-gradient
   "Gradient background for testing. Can set the hue to change vertically or horizontally, with horizontal as the default."
   [[x y width height] {:keys [direction upper-limit-h lower-limit-h upper-limit-b lower-limit-b lower-bound hue variable]}] 
