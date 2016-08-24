@@ -208,7 +208,7 @@
    (let [scene (realize-scene-spec config @scene-spec)]
      (mapply q/sketch {:title (:title config)
                        :size (:size config)
-                       :renderer :p2d
+                       :renderer :java2d
                        :middleware [m/fun-mode]
                        :setup (sketch-setup env scene) ;(fmap (partial map :setup) layers))
                        :update (sketch-update env scene)

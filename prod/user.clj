@@ -42,6 +42,13 @@
 
 (def s "Alias for load-scene" load-scene)
 
+(defn list-scenes []
+  (let [scenes (:scenes (s/get-config (:sketch system)))
+        scene-ids (map :id scenes)]
+    (println scene-ids)))
+
+(def ls list-scenes)
+
 (def redis-conn {:pool {} :spec {:host "127.0.0.1" :port 6379}}) ; See `wcar` docstring for opts
 (defmacro wcar* [& body] `(wcar redis-conn ~@body))
 
