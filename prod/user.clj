@@ -6,7 +6,8 @@
             [clojure.tools.namespace.repl :refer [refresh disable-reload!]]
             [taoensso.carmine :as carm :refer [wcar]]
             [sparquil.core :refer :all]
-            [sparquil.layer :as l]))
+            [sparquil.layer :as l]
+            [sparquil.sketch :as s]))
 
 (def system nil)
 
@@ -36,6 +37,10 @@
    (reset! config-path config-path-)
    (reset)))
 
+(defn load-scene [scene]
+  (s/load-scene (:sketch system) scene))
+
+(def s "Alias for load-scene" load-scene)
 
 (def redis-conn {:pool {} :spec {:host "127.0.0.1" :port 6379}}) ; See `wcar` docstring for opts
 (defmacro wcar* [& body] `(wcar redis-conn ~@body))
