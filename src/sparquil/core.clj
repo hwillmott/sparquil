@@ -1,5 +1,4 @@
 (ns sparquil.core
-  (:gen-class)
   (:require [clojure.algo.generic.functor :refer [fmap]]
             [org.tobereplaced.mapply :refer [mapply]]
             [com.stuartsierra.component :as component]
@@ -45,6 +44,6 @@
     :web-interface (component/using (i/new-interface-server web-interface-config)
                      [:sketch])))
 
-(defn -main [config-path]
-  (let [config (read-config config-path)]
-    (component/start (sparquil-system config))))
+;(defn -main [config-path]
+;  (let [config (read-config config-path)]
+;    (component/start (sparquil-system config))))

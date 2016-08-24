@@ -21,7 +21,9 @@
                                   [org.clojure/java.classpath "0.2.0"]
                                   [org.clojure/test.check "0.9.0"]]}
              :uberjar {:aot :all
-                       :main ^:skip-aot sparquil.core
+                       :source-paths ["prod"]
+                       :dependencies [[org.clojure/tools.namespace "0.2.3"]]
+                       :main ^:skip-aot user
                        :target-path "target/%s"}}
   :resource-paths ["resources"]
   :jvm-opts ^:replace []
