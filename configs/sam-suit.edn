@@ -401,7 +401,7 @@
                     :layer-map {:global-bottom [[hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}]
 
 
-          :init-scene :buzzing-bee}
+          :init-scene :twinkle-gradient}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
