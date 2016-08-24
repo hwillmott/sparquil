@@ -357,7 +357,7 @@
 
 (defn twinkle-odroid
   "uses sin instead of perlin noise"
-  [[x y width height] {:keys [cols rows length interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h gradient shift]}]
+  [[x y width height] {:keys [cols rows length interval twinkle-step hue lower-limit-b upper-limit-b lower-limit-h upper-limit-h sat gradient shift]}]
   (let [cols (or cols 20)
         rows (or rows 20)
         length (or length rows)
@@ -370,6 +370,7 @@
         upper-limit-b (or upper-limit-b 60)
         lower-limit-h (or lower-limit-h -10)
         upper-limit-h (or upper-limit-h 60)
+        sat (or sat 50)
         gradient (or gradient false)
         shift (or shift false)
         coords (coord-seq rows cols)]
@@ -402,7 +403,7 @@
                                                                 (* -1 (- upper-limit-h lower-limit-h))
                                                                 (- upper-limit-h lower-limit-h))))
                        (= shift false) (q/map-range (mod i length) 0 length lower-limit-h upper-limit-h))]
-           (stroke-and-fill [:hsb h-val 50 brightness])
+           (stroke-and-fill [:hsb h-val sat brightness])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 
 (defn checkers
