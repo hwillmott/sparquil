@@ -280,6 +280,12 @@
                     :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]
                                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
+                   {:id :gold-dust
+                    :display-name "gold dust"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50 :hue 40}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
+
                    {:id :plasma-ripple
                     :display-name "plasma ripple"
                     :led-layout :normal

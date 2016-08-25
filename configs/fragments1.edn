@@ -155,9 +155,13 @@
                    {:id :brbr
                     :display-name "Brian's Brain"
                     :led-layout :normal
-                    :layer-map {:global [[brians-brain 20 20 125]]
-                                :left-arm [[fill-color 127]
-                                           [text "left-arm" {:color 255 :offset [1 10]}]]}}]
+                    :layer-map {:global [[brians-brain 20 20 125]]}}
+
+                   {:id :gd
+                    :display-name "gold dust"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rain {:interval 50 :num-droplets 30 :hue 40}]]}}]
+
 
 
           :init-scene :prp}

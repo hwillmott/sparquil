@@ -399,8 +399,8 @@
                                                            :gradient true}]
                                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
 
-                   {:id :checkers-gradient
-                    :display-name "checkers gradient"
+                   {:id :checkers-red
+                    :display-name "checkers red gradient"
                     :led-layout :normal
                     :layer-map {:global-bottom [[checkers {:interval 50
                                                            :lower-limit-b 10
@@ -410,14 +410,25 @@
                                                            :gradient true}]
                                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
 
+                   {:id :checkers-purp
+                    :display-name "checkers purple gradient"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers {:interval 50
+                                                           :lower-limit-b 10
+                                                           :upper-limit-b 50
+                                                           :lower-limit-h 210
+                                                           :upper-limit-h 290
+                                                           :gradient true}]
+                                                [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
                    {:id :rain-blue
                     :display-name "rain blue"
                     :led-layout :normal
                     :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]
                                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
 
-                   {:id :rain-yellow
-                    :display-name "rain yellow"
+                   {:id :gold-dust
+                    :display-name "gold dust"
                     :led-layout :normal
                     :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50 :hue 40}]
                                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 40 60 50] :direction :horizontal}]]}}
@@ -477,7 +488,7 @@
                                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}]
 
 
-          :init-scene :heart}
+          :init-scene :checkers-purp}
  ;buzzing-bee
  ;chevron
  ;bounce

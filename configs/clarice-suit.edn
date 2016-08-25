@@ -321,6 +321,11 @@
                     :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50}]
                                                 [hive-status {:start-x 235 :start-y 238 :spacing 10 :color [:hsb 310 60 50] :direction :vertical}]]}}
 
+                   {:id :gold-dust
+                    :display-name "gold dust"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rain {:interval 10 :num-droplets 50 :hue 40}]
+                                                [hive-status {:start-x 235 :start-y 238 :spacing 10 :color [:hsb 310 60 50] :direction :vertical}]]}}
 
                    {:id :plasma-pink
                     :display-name "Pink Plasma"
