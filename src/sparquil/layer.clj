@@ -746,7 +746,7 @@
        (q/no-stroke)
        (doseq [[i j] (coord-seq rows cols)]
          (let [noise (q/sin (* q/TWO-PI (q/noise (* i 0.1) (* j 0.1) (:perlin-offset state))))
-               h (q/abs (q/map-range noise -1 1 (:offset state) (+ (:offset state) hue-diff)))]
+               h (q/abs (q/map-range noise 0 1 (:offset state) (+ (:offset state) hue-diff)))]
            (stroke-and-fill [:hsb h sat (q/map-range noise -1 1 lower-limit-b upper-limit-b)])
            (q/rect (* i cell-x) (* j cell-y) cell-x cell-y))))}))
 

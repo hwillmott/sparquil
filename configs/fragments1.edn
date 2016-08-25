@@ -106,7 +106,7 @@
                                    :upper-limit-h 10
                                    :sat 60}]]}}
 
-                   {:id :prain
+                   {:id :plrain
                     :display-name "plasma rainbow"
                     :led-layout :normal
                     :layer-map {:global-bottom
@@ -119,7 +119,7 @@
                                    :lower-limit-b -10
                                    :upper-limit-b 45
                                    :sat 60
-                                   :hue-diff 80}]]}}
+                                   :hue-diff 50}]]}}
 
                    {:id :be
                     :display-name "beacon"
@@ -199,7 +199,7 @@
                                                 [bounce {:interval 650 :color [:hsb 60 70 50]}]
                                                 [bounce {:interval 600 :color [:hsb 230 70 50]}]]}}]
 
-          :init-scene :prain}
+          :init-scene :plrain}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
