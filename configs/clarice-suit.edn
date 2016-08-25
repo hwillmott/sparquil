@@ -433,10 +433,38 @@
                     :layer-map {:global-bottom [[stripe {:interval 500}]
                                                 [hive-status {:start-x 235 :start-y 238 :spacing 10 :color [:hsb 310 60 50] :direction :vertical}]]}}
 
-                   {:id :hive
-                    :display-name "hive status"
+                   {:id :two-color-conways-blue
+                    :display-name "two color conways blue"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[hive-status {:start-x 235 :start-y 238 :spacing 10 :color [:hsb 310 60 50] :direction :vertical}]]}}]
+                    :layer-map {:global-bottom [[two-color-conways {:rows 20
+                                                                    :cols 20
+                                                                    :interval 50
+                                                                    :hue1 170
+                                                                    :hue2 220
+                                                                    :sat 60}]
+                                                [hive-status {:start-x 235 :start-y 238 :spacing 10 :color [:hsb 310 60 50] :direction :vertical}]]}}
+
+                   {:id :two-color-conways-purple
+                    :display-name "two color conways purple"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[two-color-conways {:rows 20
+                                                                    :cols 20
+                                                                    :interval 50
+                                                                    :hue1 270
+                                                                    :hue2 320
+                                                                    :sat 60}]
+                                                [hive-status {:start-x 235 :start-y 238 :spacing 10 :color [:hsb 175 60 50] :direction :vertical}]]}}
+
+                   {:id :two-color-conways-red
+                    :display-name "two color conways red"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[two-color-conways {:rows 20
+                                                                    :cols 20
+                                                                    :interval 50
+                                                                    :hue1 0
+                                                                    :hue2 40
+                                                                    :sat 60}]
+                                                [hive-status {:start-x 235 :start-y 238 :spacing 10 :color [:hsb 310 60 50] :direction :vertical}]]}}]
 
           ; End Harriet
 
@@ -444,7 +472,6 @@
           ; adding color to scenes ":color [:hsb 40 50 50]" within curly (on same line/inside bracket as global-bottom)
 
           :init-scene :pinwheel}
-
 
  ; ~~~~~~ Shit I don't need to touch ~~~~~~~~~~~~~~~
 
