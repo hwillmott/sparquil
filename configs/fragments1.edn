@@ -106,23 +106,48 @@
                                    :upper-limit-h 10
                                    :sat 60}]]}}
 
+                   {:id :prain
+                    :display-name "plasma rainbow"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-rainbow
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :length 40
+                                   :perlin-step 0.2
+                                   :lower-limit-b -10
+                                   :upper-limit-b 45
+                                   :sat 60
+                                   :hue-diff 80}]]}}
+
                    {:id :be
                     :display-name "beacon"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[beacon {:color [:hsb 105 50 50] :interval 1300 :stroke-width 15 :size-step 50}]
-                                                [beacon {:color [:hsb 110 50 50] :interval 1300 :stroke-width 15 :offset 200 :size-step 50}]]}}
+                    :layer-map {:global-bottom [[beacon {:color [:hsb 175 50 50] :interval 1300 :stroke-width 15 :size-step 50}]
+                                                [beacon {:color [:hsb 200 50 50] :interval 1300 :stroke-width 15 :offset 200 :size-step 50}]]}}
 
-                   {:id :ch
+                   {:id :chev
                     :display-name "chevron"
                     :led-layout :normal
                     :layer-map {:global-bottom [[chevron {:interval 700 :color [:hsb 50 70 30]}]]}}
 
-                   {:id :bube
-                    :display-name "Buzzing bee"
+                   {:id :bubep
+                    :display-name "Buzzing bee purple"
                     :led-layout :normal
                     :layer-map {:global-bottom [[buzzing-bee {:interval 700 :color [:hsb 300 50 30]}]]}}
 
-                   {:id :rs
+                   {:id :bubeb
+                    :display-name "Buzzing bee blue"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[buzzing-bee {:interval 700 :color [:hsb 175 50 30]}]]}}
+
+                   {:id :bubeo
+                    :display-name "Buzzing bee orange"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[buzzing-bee {:interval 700 :color [:hsb 45 50 30]}]]}}
+
+                   {:id :rost
                     :display-name "rotating star"
                     :led-layout :normal
                     :layer-map {:global-bottom [[rotate-shape-odroid {:interval 50 :angle-step 0.1 :size-1 60 :size-2 120 :stroke-width 30 :color [:hsb 300 50 30] :shape :star}]]}}
@@ -160,11 +185,21 @@
                    {:id :gd
                     :display-name "gold dust"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[rain {:interval 50 :num-droplets 30 :hue 40}]]}}]
+                    :layer-map {:global-bottom [[rain {:interval 30 :num-droplets 40 :hue 40}]]}}
 
+                   {:id :pinwheel
+                    :display-name "pinwheel"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[pinwheel {:center-x 200 :center-y 200 :radius 400 :interval 5000}]]}}
 
+                   {:id :bounce
+                    :display-name "bounce"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[bounce {:interval 700 :color [:hsb 150 70 50]}]
+                                                [bounce {:interval 650 :color [:hsb 60 70 50]}]
+                                                [bounce {:interval 600 :color [:hsb 230 70 50]}]]}}]
 
-          :init-scene :prp}
+          :init-scene :prain}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
