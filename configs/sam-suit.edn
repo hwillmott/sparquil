@@ -355,8 +355,19 @@
                                                            :upper-limit-b 50
                                                            :gradient true}]
                                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
-                   {:id :checkers-gradient
-                    :display-name "checkers gradient"
+                   {:id :checkers-gradient-purple
+                    :display-name "checkers gradient purple"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[checkers {:interval 50
+                                                           :lower-limit-b 10
+                                                           :upper-limit-b 50
+                                                           :lower-limit-h 210
+                                                           :upper-limit-h 290
+                                                           :gradient true}]
+                                                [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
+
+                   {:id :checkers-gradient-red
+                    :display-name "checkers gradient red"
                     :led-layout :normal
                     :layer-map {:global-bottom [[checkers {:interval 50
                                                            :lower-limit-b 10
@@ -399,6 +410,7 @@
                     :display-name "bounce"
                     :led-layout :normal
                     :layer-map {:global-bottom [[bounce {:interval 500 :color [:hsb 115 60 50]}]
+                                                [bounce {:interval 450 :color [:hsb 60 70 50]}]
                                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 0 60 50] :direction :vertical}]]}}
 
                    {:id :two-color-conways-blue
@@ -435,7 +447,7 @@
                                                 [hive-status {:start-x 220 :start-y 140 :spacing 20 :color [:hsb 175 60 50] :direction :vertical}]]}}]
 
 
-          :init-scene :buzzing-bee}
+          :init-scene :checkers-gradient-purple}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

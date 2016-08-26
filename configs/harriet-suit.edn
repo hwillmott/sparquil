@@ -488,7 +488,7 @@
                                                 [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}]
 
 
-          :init-scene :two-color-conways-red}
+          :init-scene :heart}
  ;buzzing-bee
  ;chevron
  ;bounce
