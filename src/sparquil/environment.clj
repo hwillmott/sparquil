@@ -16,10 +16,7 @@
 
 (defn update-env-cache! [cache key value]
   "If key is valid, sets that key in env atom to value."
-  (if (valid-env-key? key)
-    (do (println "Updating env:" key "->" value)
-        (swap! cache assoc (keyword key) value))
-    (println "Ingoring invalid env key:" key)))
+  (when (valid-env-key? key) (swap! cache assoc (keyword key) value)))
 
 (defn env-get
   ([env key]
