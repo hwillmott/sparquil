@@ -1,7 +1,6 @@
 {:sketch {:title "Grady's Suit"
           :size [310 275]
-          :regions [{:id :chest :bounds [75 5 160 175]}
-                    {:id :hive-status-zone :bounds [0 0 50 50]}]
+          :regions [{:id :chest :bounds [75 5 160 175]}]
           :led-layouts
             {:normal
 
@@ -449,8 +448,7 @@
               :layer-map
                 {:global-bottom
                    [[fill-gradient {:direction :horizontal}]
-                    [hive-status {:start-x 280 :start-y 215 :color [:hsb 175 60 50] :direction :vertical :spacing 20}]]
-                 :hive-status-zone [[fill-color 127]]}}
+                    [hive-status {:start-x 280 :start-y 215 :color [:hsb 175 60 50] :direction :vertical :spacing 20}]]}}
              
              {:id :two-color-conways-blue
               :display-name "two color conways blue"
