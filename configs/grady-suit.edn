@@ -1,5 +1,5 @@
 {:sketch {:title "Grady's Suit"
-          :size [310 310]
+          :size [310 275]
           :regions [{:id :chest :bounds [75 5 70 190]}]
           :led-layouts
             {:normal
@@ -15,7 +15,7 @@
               {:leds/type :leds/strip
                :leds/count 4
                :leds/length 80
-               :leds/offset [40 120]
+               :leds/offset [40 80]
                :leds/angle 270}
 
               {:leds/type :leds/strip
@@ -27,7 +27,7 @@
               {:leds/type :leds/strip
                :leds/count 4
                :leds/length 80
-               :leds/offset [10 110]
+               :leds/offset [10 70]
                :leds/angle 270}
 
               {:leds/type :leds/strip
@@ -41,31 +41,31 @@
               {:leds/type :leds/strip
                :leds/count 3
                :leds/length 60
-               :leds/offset [50 180]
+               :leds/offset [50 160]
                :leds/angle 90}
 
               {:leds/type :leds/strip
                :leds/count 3
                :leds/length 60
-               :leds/offset [40 290]
+               :leds/offset [40 210]
                :leds/angle 270}
 
               {:leds/type :leds/strip
                :leds/count 3
                :leds/length 60
-               :leds/offset [20 190]
+               :leds/offset [20 170]
                :leds/angle 90}
 
               {:leds/type :leds/strip
                :leds/count 3
                :leds/length 60
-               :leds/offset [10 280]
+               :leds/offset [10 200]
                :leds/angle 270}
 
               {:leds/type :leds/strip
                :leds/count 6
                :leds/length 120
-               :leds/offset [30 180]
+               :leds/offset [30 160]
                :leds/angle 90}
              
               ;;;;;; Left chest
@@ -79,7 +79,7 @@
               {:leds/type :leds/strip
                :leds/count 6
                :leds/length 120
-               :leds/offset [90 140]
+               :leds/offset [90 120]
                :leds/angle 270}
 
               {:leds/type :leds/strip
@@ -91,7 +91,7 @@
               {:leds/type :leds/strip
                :leds/count 7
                :leds/length 140
-               :leds/offset [110 160]
+               :leds/offset [110 140]
                :leds/angle 270}
 
               {:leds/type :leds/strip
@@ -103,7 +103,7 @@
               {:leds/type :leds/strip
                :leds/count 8
                :leds/length 160
-               :leds/offset [130 180]
+               :leds/offset [130 160]
                :leds/angle 270}
              
               {:leds/type :leds/strip
@@ -123,7 +123,7 @@
               {:leds/type :leds/strip
                :leds/count 6
                :leds/length 120
-               :leds/offset [220 140]
+               :leds/offset [220 120]
                :leds/angle 270}
 
               {:leds/type :leds/strip
@@ -135,7 +135,7 @@
               {:leds/type :leds/strip
                :leds/count 7
                :leds/length 140
-               :leds/offset [200 160]
+               :leds/offset [200 140]
                :leds/angle 270}
 
               {:leds/type :leds/strip
@@ -147,7 +147,7 @@
               {:leds/type :leds/strip
                :leds/count 8
                :leds/length 160
-               :leds/offset [180 180]
+               :leds/offset [180 160]
                :leds/angle 270}
              
               {:leds/type :leds/strip
@@ -167,7 +167,7 @@
               {:leds/type :leds/strip
                :leds/count 4
                :leds/length 80
-               :leds/offset [270 120]
+               :leds/offset [270 80]
                :leds/angle 270}
 
               {:leds/type :leds/strip
@@ -179,7 +179,7 @@
               {:leds/type :leds/strip
                :leds/count 4
                :leds/length 80
-               :leds/offset [300 110]
+               :leds/offset [300 70]
                :leds/angle 270}
 
               {:leds/type :leds/strip
@@ -193,31 +193,31 @@
               {:leds/type :leds/strip
                :leds/count 3
                :leds/length 60
-               :leds/offset [260 180]
+               :leds/offset [260 160]
                :leds/angle 90}
 
               {:leds/type :leds/strip
                :leds/count 3
                :leds/length 60
-               :leds/offset [270 290]
+               :leds/offset [270 210]
                :leds/angle 270}
 
               {:leds/type :leds/strip
                :leds/count 3
                :leds/length 60
-               :leds/offset [280 190]
+               :leds/offset [290 170]
                :leds/angle 90}
 
               {:leds/type :leds/strip
                :leds/count 3
                :leds/length 60
-               :leds/offset [290 280]
+               :leds/offset [300 200]
                :leds/angle 270}
 
               {:leds/type :leds/strip
                :leds/count 6
                :leds/length 120
-               :leds/offset [300 180]
+               :leds/offset [280 160]
                :leds/angle 90}]}
 
           :scenes
@@ -489,7 +489,7 @@
                                         :sat 60}]
                     [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}]
 
-          :init-scene :two-color-conways-purple}
+          :init-scene :fill-gradient}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
