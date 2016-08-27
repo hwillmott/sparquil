@@ -1,6 +1,7 @@
 {:sketch {:title "Grady's Suit"
           :size [310 275]
-          :regions [{:id :chest :bounds [75 5 70 190]}]
+          :regions [{:id :chest :bounds [75 5 160 175]}
+                    {:id :hive-status-zone :bounds [0 0 50 50]}]
           :led-layouts
             {:normal
 
