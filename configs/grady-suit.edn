@@ -1,0 +1,496 @@
+{:sketch {:title "Grady's Suit"
+          :size [310 310]
+          :regions [{:id :chest :bounds [75 5 70 190]}]
+          :led-layouts
+            {:normal
+
+              ;;;;; left upper arm
+              
+             [{:leds/type :leds/strip
+               :leds/count 5
+               :leds/length 100
+               :leds/offset [50 10]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 5
+               :leds/length 100
+               :leds/offset [40 120]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 5
+               :leds/length 100
+               :leds/offset [20 20]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 5
+               :leds/length 100
+               :leds/offset [10 110]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 7
+               :leds/length 140
+               :leds/offset [30 10]
+               :leds/angle 90}
+              
+              ;;;;; left lower arm
+
+              {:leds/type :leds/strip
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [50 180]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [40 290]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [20 190]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [10 280]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 6
+               :leds/length 80
+               :leds/offset [30 180]
+               :leds/angle 90}
+             
+              ;;;;;; Left chest
+
+              {:leds/type :leds/strip
+               :leds/count 6
+               :leds/length 120
+               :leds/offset [80 10]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 6
+               :leds/length 120
+               :leds/offset [90 140]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 7
+               :leds/length 140
+               :leds/offset [100 10]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 7
+               :leds/length 140
+               :leds/offset [110 160]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 8
+               :leds/length 160
+               :leds/offset [120 10]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 8
+               :leds/length 160
+               :leds/offset [130 180]
+               :leds/angle 270}
+             
+              {:leds/type :leds/strip
+               :leds/count 9
+               :leds/length 180
+               :leds/offset [140 10]
+               :leds/angle 90}
+             
+           ;;;;; Right chest
+
+              {:leds/type :leds/strip
+               :leds/count 6
+               :leds/length 120
+               :leds/offset [230 10]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 6
+               :leds/length 120
+               :leds/offset [220 140]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 7
+               :leds/length 140
+               :leds/offset [210 10]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 7
+               :leds/length 140
+               :leds/offset [200 160]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 8
+               :leds/length 160
+               :leds/offset [190 10]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 8
+               :leds/length 160
+               :leds/offset [180 180]
+               :leds/angle 270}
+             
+              {:leds/type :leds/strip
+               :leds/count 9
+               :leds/length 180
+               :leds/offset [170 10]
+               :leds/angle 90}
+
+              ;;;;; Right upper arm
+
+              {:leds/type :leds/strip
+               :leds/count 5
+               :leds/length 100
+               :leds/offset [260 10]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 5
+               :leds/length 100
+               :leds/offset [270 120]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 5
+               :leds/length 100
+               :leds/offset [280 20]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 5
+               :leds/length 100
+               :leds/offset [290 110]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 7
+               :leds/length 140
+               :leds/offset [300 10]
+               :leds/angle 90}
+              
+              ;;;;; Right lower arms
+
+              {:leds/type :leds/strip
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [260 180]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [270 290]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [280 190]
+               :leds/angle 90}
+
+              {:leds/type :leds/strip
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [290 280]
+               :leds/angle 270}
+
+              {:leds/type :leds/strip
+               :leds/count 6
+               :leds/length 120
+               :leds/offset [300 180]
+               :leds/angle 90}]}
+
+          :scenes
+            [{:id :buzzing-bee
+              :display-name "buzzing bee"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                 [[buzzing-bee {:interval 500 :stripe-width 20}]
+                  [hive-status {:start-x 325 :start-y 250 :color [:hsb 270 60 50] :direction :horizontal}]]}}
+
+             {:id :chevron
+              :display-name "chevron"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[chevron {:interval 700 :color [:hsb 200 70 50]}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 310 60 50] :direction :horizontal}]]}}
+
+             {:id :bounce
+              :display-name "bounce"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                 [[bounce {:interval 500 :color [:hsb 150 70 50]}]
+                  [bounce {:interval 450 :color [:hsb 60 70 50]}]
+                  [hive-status {:start-x 325 :start-y 250 :color [:hsb 115 60 50] :direction :horizontal}]]}}
+
+             {:id :plasma-ripple-purple
+              :display-name "plasma ripple purp"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[perlin-plasma
+                     {:interval 25
+                      :rows 20
+                      :cols 20
+                      :perlin-step 0.2
+                      :variable :color-and-brightness
+                      :lower-limit-b -10
+                      :upper-limit-b 50
+                      :lower-limit-h 260
+                      :upper-limit-h 330}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
+             {:id :plasma-ripple-blue
+              :display-name "plasma ripple blue"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                 [[perlin-plasma
+                   {:interval 25
+                    :rows 20
+                    :cols 20
+                    :perlin-step 0.2
+                    :variable :color-and-brightness
+                    :lower-limit-b -10
+                    :upper-limit-b 50
+                    :lower-limit-h 145
+                    :upper-limit-h 215}]
+                  [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}
+
+             {:id :heart
+              :display-name "heart"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[twinkle-odroid {:hue 340 :interval 100 :twinkle-step 0.5}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]
+                 :chest
+                   [[fill-color [:hsb 0 0 0]]
+                    [beating-heart {:scale 130 :size-step 20 :max-size-diff 40}]]}}
+
+             {:id :twinkle-star
+              :display-name "Twinkle star"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[checkers-no-update {:interval 50
+                                         :low-brightness 10
+                                         :high-brightness 50
+                                         :hue 160
+                                         :gradient false}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]
+                 :chest
+                   [[fill-color [:rgb 0 0 0]]
+                    [rotate-shape-odroid {:interval 10
+                                          :angle-step 0.3
+                                          :size-1 30
+                                          :size-2 50
+                                          :stroke-width 10
+                                          :color [:hsb 40 50 50]
+                                          :shape :star}]]}}
+
+             {:id :sunset-star
+              :display-name "sunset star"
+              :led-layout :normal
+              :layer-map
+              {:global-bottom
+                 [[fill-gradient {:variable :color :upper-limit-h 60 :lower-limit-h 0}]
+                  [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]
+               :chest [[fill-color [:rgb 0 0 0]]
+                       [draw-shape-odroid {:size-1 30
+                                           :size-2 50
+                                           :stroke-width 10
+                                           :color [:hsb 40 50 50]
+                                           :shape :star}]]}}
+
+             {:id :checker-star
+              :display-name "checker star"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[checkers {:interval 50
+                               :low-brightness 10
+                               :high-brightness 50
+                               :gradient false
+                               :update true}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]
+                 :chest
+                   [[fill-color [:rgb 0 0 0]]
+                    [draw-shape-odroid {:size-1 30
+                                        :size-2 50
+                                        :stroke-width 10
+                                        :color [:hsb 40 50 50]
+                                        :shape :star}]]}}
+
+             {:id :pinwheel
+              :display-name "pinwheel"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[pinwheel {:center-x 185 :center-y 80 :radius 260 :interval 5000}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}
+
+             {:id :twinkle
+              :display-name "twinkle"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[twinkle
+                     {:interval 50
+                      :lower-limit-b -20
+                      :upper-limit-b  50
+                      :twinkle-step 0.8}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}
+
+             {:id :twinkle-gradient
+              :display-name "twinkle gradient"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[twinkle-odroid
+                     {:interval 50
+                      :rows 20
+                      :columns 20
+                      :length 40
+                      :lower-limit-b -20
+                      :upper-limit-b 50
+                      :lower-limit-h 200
+                      :upper-limit-h 300
+                      :twinkle-step 0.8
+                      :gradient true
+                      :shift true}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
+             {:id :checkers-rainbow
+              :display-name "checkers rainbow"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[checkers {:interval 50
+                               :rows 20
+                               :cols 20
+                               :length 40
+                               :lower-limit-b 10
+                               :upper-limit-b 50
+                               :gradient true}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
+             {:id :checkers-gradient
+              :display-name "checkers gradient"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[checkers {:interval 50
+                               :lower-limit-b 10
+                               :upper-limit-b 50
+                               :lower-limit-h 0
+                               :upper-limit-h 80
+                               :gradient true}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
+             {:id :rain-blue
+              :display-name "rain blue"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[rain {:interval 10 :num-droplets 50}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
+             {:id :rain-yellow
+              :display-name "rain yellow"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[rain {:interval 10 :num-droplets 50 :hue 40}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 40 60 50] :direction :horizontal}]]}}
+
+             {:id :beacon
+              :display-name "beacon"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[beacon-odroid {:center-x 185
+                                    :center-y 80
+                                    :interval 80
+                                    :size-step 20
+                                    :max-diameter 650
+                                    :restrict-size false
+                                    :color [:hsb 210 60 50]
+                                    :stroke-width 12}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
+             {:id :fill-gradient
+              :display-name "fill gradient"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[fill-gradient {:direction :horizontal}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 175 60 50] :direction :horizontal}]]}}
+
+             {:id :two-color-conways-blue
+              :display-name "two color conways blue"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[two-color-conways {:rows 20
+                                        :cols 20
+                                        :interval 50
+                                        :hue1 170
+                                        :hue2 220
+                                        :sat 60}
+                     [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]]}}
+
+             {:id :two-color-conways-purple
+              :display-name "two color conways purple"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[two-color-conways {:rows 20
+                                        :cols 20
+                                        :interval 50
+                                        :hue1 270
+                                        :hue2 320
+                                        :sat 60}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}
+
+             {:id :two-color-conways-red
+              :display-name "two color conways red"
+              :led-layout :normal
+              :layer-map
+                {:global-bottom
+                   [[two-color-conways {:rows 20
+                                        :cols 20
+                                        :interval 50
+                                        :hue1 0
+                                        :hue2 40
+                                        :sat 60}]
+                    [hive-status {:start-x 325 :start-y 250 :color [:hsb 330 60 50] :direction :horizontal}]]}}]
+
+          :init-scene :two-color-conways-purple}
+
+ :redis {:host "127.0.0.1" :port 6379}
+ :fadecandy {:host "127.0.0.1" :port 7890}
+ :web-interface {:host "127.0.0.1" :port 8080}}
