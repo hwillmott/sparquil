@@ -7,26 +7,26 @@
               ;;;;; left upper arm
               
              [{:leds/type :leds/strip
-               :leds/count 5
-               :leds/length 100
+               :leds/count 4
+               :leds/length 80
                :leds/offset [50 10]
                :leds/angle 90}
 
               {:leds/type :leds/strip
-               :leds/count 5
-               :leds/length 100
+               :leds/count 4
+               :leds/length 80
                :leds/offset [40 120]
                :leds/angle 270}
 
               {:leds/type :leds/strip
-               :leds/count 5
-               :leds/length 100
+               :leds/count 4
+               :leds/length 80
                :leds/offset [20 20]
                :leds/angle 90}
 
               {:leds/type :leds/strip
-               :leds/count 5
-               :leds/length 100
+               :leds/count 4
+               :leds/length 80
                :leds/offset [10 110]
                :leds/angle 270}
 
@@ -39,32 +39,32 @@
               ;;;;; left lower arm
 
               {:leds/type :leds/strip
-               :leds/count 4
-               :leds/length 80
+               :leds/count 3
+               :leds/length 60
                :leds/offset [50 180]
                :leds/angle 90}
 
               {:leds/type :leds/strip
-               :leds/count 4
-               :leds/length 80
+               :leds/count 3
+               :leds/length 60
                :leds/offset [40 290]
                :leds/angle 270}
 
               {:leds/type :leds/strip
-               :leds/count 4
-               :leds/length 80
+               :leds/count 3
+               :leds/length 60
                :leds/offset [20 190]
                :leds/angle 90}
 
               {:leds/type :leds/strip
-               :leds/count 4
-               :leds/length 80
+               :leds/count 3
+               :leds/length 60
                :leds/offset [10 280]
                :leds/angle 270}
 
               {:leds/type :leds/strip
                :leds/count 6
-               :leds/length 80
+               :leds/length 120
                :leds/offset [30 180]
                :leds/angle 90}
              
@@ -159,58 +159,58 @@
               ;;;;; Right upper arm
 
               {:leds/type :leds/strip
-               :leds/count 5
-               :leds/length 100
+               :leds/count 4
+               :leds/length 80
                :leds/offset [260 10]
                :leds/angle 90}
 
               {:leds/type :leds/strip
-               :leds/count 5
-               :leds/length 100
+               :leds/count 4
+               :leds/length 80
                :leds/offset [270 120]
                :leds/angle 270}
 
               {:leds/type :leds/strip
-               :leds/count 5
-               :leds/length 100
-               :leds/offset [280 20]
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [290 20]
                :leds/angle 90}
 
               {:leds/type :leds/strip
-               :leds/count 5
-               :leds/length 100
-               :leds/offset [290 110]
+               :leds/count 4
+               :leds/length 80
+               :leds/offset [300 110]
                :leds/angle 270}
 
               {:leds/type :leds/strip
                :leds/count 7
                :leds/length 140
-               :leds/offset [300 10]
+               :leds/offset [280 10]
                :leds/angle 90}
               
               ;;;;; Right lower arms
 
               {:leds/type :leds/strip
-               :leds/count 4
-               :leds/length 80
+               :leds/count 3
+               :leds/length 60
                :leds/offset [260 180]
                :leds/angle 90}
 
               {:leds/type :leds/strip
-               :leds/count 4
-               :leds/length 80
+               :leds/count 3
+               :leds/length 60
                :leds/offset [270 290]
                :leds/angle 270}
 
               {:leds/type :leds/strip
-               :leds/count 4
-               :leds/length 80
+               :leds/count 3
+               :leds/length 60
                :leds/offset [280 190]
                :leds/angle 90}
 
               {:leds/type :leds/strip
-               :leds/count 4
-               :leds/length 80
+               :leds/count 3
+               :leds/length 60
                :leds/offset [290 280]
                :leds/angle 270}
 
