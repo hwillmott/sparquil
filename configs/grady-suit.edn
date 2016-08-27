@@ -491,7 +491,7 @@
                                         :sat 60}]
                     [hive-status {:start-x 280 :start-y 215 :color [:hsb 330 60 50] :direction :horizontal}]]}}]
 
-          :init-scene :fill-gradient}
+          :init-scene :two-color-conways-red}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
