@@ -1,0 +1,438 @@
+{:sketch {:title "fragments1"
+          :size [600 450]
+          :regions [{:id :left-half :bounds [0 0 274 550]}
+                    {:id :right-half :bounds [276 0 274 50]}]
+          :led-layouts {:normal [
+                                 ; H1
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 43
+                                  :leds/offset [370 273]
+                                  :leds/angle 83.3}
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 43
+                                  :leds/offset [368 319]
+                                  :leds/angle 148.7}
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 21.5
+                                  :leds/offset [326 335]
+                                  :leds/angle 241.4}
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 53.75
+                                  :leds/offset [319 309]
+                                  :leds/angle 318.6}
+                                 ; H2
+                                 {:leds/type :leds/strip
+                                  :leds/count 8
+                                  :leds/length 88
+                                  :leds/offset [410 282]
+                                  :leds/angle -1.5}
+                                 {:leds/type :leds/strip
+                                  :leds/count 8
+                                  :leds/length 88
+                                  :leds/offset [498 289]
+                                  :leds/angle 89.3}
+                                 {:leds/type :leds/strip
+                                  :leds/count 11
+                                  :leds/length 122.5
+                                  :leds/offset [488 374]
+                                  :leds/angle 226.8}
+                                 ; G
+                                 {:leds/type :leds/strip
+                                  :leds/count 6
+                                  :leds/length 64.5
+                                  :leds/offset [381 180]
+                                  :leds/angle -7.4}
+                                 {:leds/type :leds/strip
+                                  :leds/count 10
+                                  :leds/length 108.7
+                                  :leds/offset [450 178]
+                                  :leds/angle 39.7}
+                                 {:leds/type :leds/strip
+                                  :leds/count 12
+                                  :leds/length 131
+                                  :leds/offset [526 252]
+                                  :leds/angle 179}
+                                 {:leds/type :leds/strip
+                                  :leds/count 6
+                                  :leds/length 64.5
+                                  :leds/offset [394 247]
+                                  :leds/angle 260.53}
+                                 ; F
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 43
+                                  :leds/offset [381 154]
+                                  :leds/angle -6.9}
+                                 {:leds/type :leds/strip
+                                  :leds/count 7
+                                  :leds/length 78
+                                  :leds/offset [416 138]
+                                  :leds/angle 227.4}
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 55
+                                  :leds/offset [363 96]
+                                  :leds/angle 70.3}
+                                 ; E
+                                 {:leds/type :leds/strip
+                                  :leds/count 6
+                                  :leds/length 64.5
+                                  :leds/offset [353 232]
+                                  :leds/angle 138}
+                                 {:leds/type :leds/strip
+                                  :leds/count 6
+                                  :leds/length 64.5
+                                  :leds/offset [300 271]
+                                  :leds/angle 227.9}
+                                 {:leds/type :leds/strip
+                                  :leds/count 12
+                                  :leds/length 132
+                                  :leds/offset [260 216]
+                                  :leds/angle -60.1}
+                                 {:leds/type :leds/strip
+                                  :leds/count 11
+                                  :leds/length 120
+                                  :leds/offset [333 109]
+                                  :leds/angle 80}
+                                 ; D
+                                 {:leds/type :leds/strip
+                                  :leds/count 11
+                                  :leds/length 120
+                                  :leds/offset [121 115]
+                                  :leds/angle -11.9}
+                                 {:leds/type :leds/strip
+                                  :leds/count 8
+                                  :leds/length 89
+                                  :leds/offset [236 84]
+                                  :leds/angle 234}
+                                 {:leds/type :leds/strip
+                                  :leds/count 10
+                                  :leds/length 110
+                                  :leds/offset [178 18]
+                                  :leds/angle 121.2}
+                                 ; C1
+                                 {:leds/type :leds/strip
+                                  :leds/count 12
+                                  :leds/length 132
+                                  :leds/offset [103 161]
+                                  :leds/angle 11.2}
+                                 {:leds/type :leds/strip
+                                  :leds/count 7
+                                  :leds/length 76
+                                  :leds/offset [237 180]
+                                  :leds/angle -51.7}
+                                 {:leds/type :leds/strip
+                                  :leds/count 16
+                                  :leds/length 177.3
+                                  :leds/offset [274 120]
+                                  :leds/angle 168.63}
+                                 ; C2
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 44.5
+                                  :leds/offset [137 192]
+                                  :leds/angle 22.1}
+                                 {:leds/type :leds/strip
+                                  :leds/count 5
+                                  :leds/length 55.9
+                                  :leds/offset [170 214]
+                                  :leds/angle 135.9}
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 43.6
+                                  :leds/offset [124 248]
+                                  :leds/angle 210.4}
+                                 {:leds/type :leds/strip
+                                  :leds/count 4
+                                  :leds/length 43.6
+                                  :leds/offset [94 220]
+                                  :leds/angle -38.9}
+                                 ; B
+                                 {:leds/type :leds/strip
+                                  :leds/count 9
+                                  :leds/length 98.4
+                                  :leds/offset [225 224]
+                                  :leds/angle 100.4}
+                                 {:leds/type :leds/strip
+                                  :leds/count 6
+                                  :leds/length 65.2
+                                  :leds/offset [200 325]
+                                  :leds/angle 138}
+                                 {:leds/type :leds/strip
+                                  :leds/count 2
+                                  :leds/length 20
+                                  :leds/offset [144 363]
+                                  :leds/angle 201.8}
+                                 {:leds/type :leds/strip
+                                  :leds/count 6
+                                  :leds/length 66
+                                  :leds/offset [127 346]
+                                  :leds/angle -85.9}
+                                 {:leds/type :leds/strip
+                                  :leds/count 9
+                                  :leds/length 99.6
+                                  :leds/offset [139 277]
+                                  :leds/angle -35.5}
+                                 ; A
+                                 {:leds/type :leds/strip
+                                  :leds/count 17
+                                  :leds/length 186.9
+                                  :leds/offset [252 273]
+                                  :leds/angle 56.8}
+                                 {:leds/type :leds/strip
+                                  :leds/count 11
+                                  :leds/length 123
+                                  :leds/offset [339 427]
+                                  :leds/angle 216.4}
+                                 {:leds/type :leds/strip
+                                  :leds/count 7
+                                  :leds/length 76.2
+                                  :leds/offset [240 349]
+                                  :leds/angle -84.8}]}
+
+
+
+          :scenes [{:id :tws
+                    :display-name "Twinkle star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[twinkle-odroid {:hue 160
+                                                                 :interval 25
+                                                                 :lower-limit-b 0
+                                                                 :upper-limit-b 40
+                                                                 :twinkle-step 0.4}]
+                                                [rotate-shape-odroid {:interval 25 :angle-step 0.15 :size-1 70 :size-2 150 :stroke-width 20 :color [:hsb 40 50 50] :shape :star}]]}}
+                   {:id :testgradient
+                    :display-name "Test gradient"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[fill-gradient {}]]}}
+
+                   {:id :testbackgr
+                    :display-name "Test backgroun image"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[image-background]]}}
+
+                   {:id :twg
+                    :display-name "Twinkle gradient"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[twinkle {:interval 50
+                                                          :rows 40
+                                                          :cols 40
+                                                          :length 150
+                                                          :lower-limit-b -10
+                                                          :upper-limit-b 40
+                                                          :twinkle-step 0.1
+                                                          :lower-limit-h 200
+                                                          :upper-limit-h 360
+                                                          :gradient true
+                                                          :shift true}]]}}
+
+                   {:id :twra
+                    :display-name "Twinkle rainbow"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[twinkle {:interval 50
+                                                          :rows 40
+                                                          :cols 40
+                                                          :length 200
+                                                          :lower-limit-b -10
+                                                          :upper-limit-b 40
+                                                          :twinkle-step 0.1
+                                                          :gradient true
+                                                          :shift true}]]}}
+
+                   {:id :prp
+                    :display-name "plasma ripple purple"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-plasma
+                                  {:interval 50
+                                   :rows 50
+                                   :cols 50
+                                   :perlin-step 0.05
+                                   :variable :color-and-brightness
+                                   :lower-limit-b -10
+                                   :upper-limit-b 30
+                                   :lower-limit-h 260
+                                   :upper-limit-h 330}]]}}
+
+                   {:id :prb
+                    :display-name "plasma ripple blue"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-plasma
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
+                                   :variable :color-and-brightness
+                                   :lower-limit-b -10
+                                   :upper-limit-b 50
+                                   :lower-limit-h 130
+                                   :upper-limit-h 190}]]}}
+
+                   {:id :prg
+                    :display-name "plasma ripple green"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-plasma
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
+                                   :variable :color-and-brightness
+                                   :lower-limit-b -10
+                                   :upper-limit-b 50
+                                   :lower-limit-h 10
+                                   :upper-limit-h 70
+                                   :sat 60}]]}}
+
+                   {:id :prr
+                    :display-name "plasma ripple red"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-plasma
+                                  {:interval 25
+                                   :rows 20
+                                   :cols 20
+                                   :perlin-step 0.2
+                                   :variable :color-and-brightness
+                                   :lower-limit-b -10
+                                   :upper-limit-b 50
+                                   :lower-limit-h 60
+                                   :upper-limit-h 10
+                                   :sat 60}]]}}
+
+                   {:id :plrain
+                    :display-name "plasma rainbow"
+                    :led-layout :normal
+                    :layer-map {:global-bottom
+                                [[perlin-rainbow
+                                  {:interval 60
+                                   :rows 30
+                                   :cols 30
+                                   :length 150
+                                   :perlin-step 0.05
+                                   :lower-limit-b -30
+                                   :upper-limit-b 30
+                                   :sat 60
+                                   :hue-diff 30}]]}}
+
+                   {:id :be1
+                    :display-name "beacon"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[beacon {:color [:hsb 330 50 30] :interval 1000 :stroke-width 15 :size-step 50}]
+                                                [beacon {:color [:hsb 350 50 30] :interval 1000 :stroke-width 15 :offset 200 :size-step 50}]]}}
+
+
+                   {:id :be
+                    :display-name "beacon"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[beacon {:color [:hsb 175 50 40] :interval 1300 :stroke-width 15 :size-step 50}]
+                                                [beacon {:color [:hsb 200 50 40] :interval 1300 :stroke-width 15 :offset 200 :size-step 50}]]}}
+
+                   {:id :chev
+                    :display-name "chevron"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[chevron {:interval 700 :color [:hsb 50 70 30]}]]}}
+
+                   {:id :bubep
+                    :display-name "Buzzing bee purple"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[buzzing-bee {:interval 700 :color [:hsb 300 50 30]}]]}}
+
+                   {:id :bubeb
+                    :display-name "Buzzing bee blue"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[buzzing-bee {:interval 700 :color [:hsb 175 50 30]}]]}}
+
+                   {:id :bubeo
+                    :display-name "Buzzing bee orange"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[buzzing-bee {:interval 700 :color [:hsb 45 50 30]}]]}}
+
+                   {:id :rost
+                    :display-name "rotating star"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rotate-shape-odroid {:interval 50
+                                                                      :angle-step 0.1
+                                                                      :size-1 80
+                                                                      :size-2 160
+                                                                      :stroke-width 8
+                                                                      :color [:hsb 30 50 30]
+                                                                      :shape :star}]
+                                                [rotate-shape-odroid {:interval 50
+                                                                      :angle-step 0.1
+                                                                      :size-1 60
+                                                                      :size-2 120
+                                                                      :stroke-width 8
+                                                                      :color [:hsb 50 50 30]
+                                                                      :shape :star}]
+                                                [rotate-shape-odroid {:interval 50
+                                                                      :angle-step 0.1
+                                                                      :size-1 40
+                                                                      :size-2 80
+                                                                      :stroke-width 8
+                                                                      :color [:hsb 80 50 30]
+                                                                      :shape :star}]]}}
+
+
+                   {:id :tccr
+                    :display-name "two color conways red"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[two-color-conways {:rows 50
+                                                                    :cols 50
+                                                                    :interval 500
+                                                                    :hue1 0
+                                                                    :hue2 40
+                                                                    :sat 60
+                                                                    :bri 30}]]}}
+
+                   {:id :tccb
+                    :display-name "two color conways blue"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[two-color-conways {:rows 30
+                                                                    :cols 30
+                                                                    :interval 150
+                                                                    :hue1 170
+                                                                    :hue2 220
+                                                                    :sat 60}]]}}
+
+                   {:id :tccp
+                    :display-name "two color conways purple"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[two-color-conways {:rows 50
+                                                                    :cols 50
+                                                                    :interval 500
+                                                                    :hue1 270
+                                                                    :hue2 320
+                                                                    :sat 60}]]}}
+                   {:id :brbr
+                    :display-name "Brian's Brain"
+                    :led-layout :normal
+                    :layer-map {:global [[brians-brain 20 20 125]]}}
+
+                   {:id :gd
+                    :display-name "gold dust"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[rain {:interval 80 :num-droplets 100 :hue 40}]]}}
+
+                   {:id :pinwheel
+                    :display-name "pinwheel"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[pinwheel {:center-x 200 :center-y 200 :radius 400 :interval 5000}]]}}
+
+                   {:id :bounce
+                    :display-name "bounce"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[bounce {:interval 700 :color [:hsb 150 70 50]}]
+                                                [bounce {:interval 650 :color [:hsb 60 70 50]}]
+                                                [bounce {:interval 600 :color [:hsb 230 70 50]}]]}}]
+
+          :init-scene :twra}
+
+ :redis {:host "127.0.0.1" :port 6379}
+ :fadecandy {:host "127.0.0.1" :port 7890}
+ :web-interface {:port 8080}}
