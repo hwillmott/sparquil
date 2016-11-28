@@ -210,10 +210,14 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[fill-gradient {}]]}}
 
-                   {:id :testbackgr
-                    :display-name "Test backgroun image"
+                   {:id :twinkle
+                    :display-name "Twinkle star"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[image-background]]}}
+                    :layer-map {:global-bottom [[twinkle-odroid {:hue 160
+                                                                 :interval 50
+                                                                 :lower-limit-b 0
+                                                                 :upper-limit-b 20
+                                                                 :twinkle-step 0.1}]]}}
 
                    {:id :twg
                     :display-name "Twinkle gradient"
@@ -222,11 +226,11 @@
                                                           :rows 40
                                                           :cols 40
                                                           :length 150
-                                                          :lower-limit-b -10
-                                                          :upper-limit-b 40
+                                                          :lower-limit-b -20
+                                                          :upper-limit-b 30
                                                           :twinkle-step 0.1
                                                           :lower-limit-h 200
-                                                          :upper-limit-h 360
+                                                          :upper-limit-h 300
                                                           :gradient true
                                                           :shift true}]]}}
 
@@ -323,8 +327,46 @@
                    {:id :be1
                     :display-name "beacon"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[beacon {:color [:hsb 330 50 30] :interval 1000 :stroke-width 15 :size-step 50}]
-                                                [beacon {:color [:hsb 350 50 30] :interval 1000 :stroke-width 15 :offset 200 :size-step 50}]]}}
+                    :layer-map {:global-bottom [[beacon {:color [:hsb 360 50 30] :interval 2000 :stroke-width 15 :size-step 50}]
+                                                [beacon {:color [:hsb 360 50 30] :interval 2000 :stroke-width 15 :offset 400 :size-step 50}]]}}
+
+
+                   {:id :be2
+                    :display-name "beacon"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[beacon-odroid {:color [:hsb 360 50 30]
+                                                                :interval 10
+                                                                :stroke-width 15
+                                                                :size-step 10
+                                                                :center-x 100
+                                                                :center-y 100
+                                                                :max-diameter 1300}]]}}
+                                                ;[beacon {:color [:hsb 360 50 30] :interval 2000 :stroke-width 15 :offset 400 :size-step 50}]]}}
+
+                   {:id :rain
+                    :display-name "beacon"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[raindrops {:color [:hsb 360 50 30]
+                                                            :interval 40
+                                                            :stroke-width 15
+                                                            :size-step 10
+                                                            :center-x 100
+                                                            :center-y 100
+                                                            :max-diameter 1300}]
+                                                [raindrops {:color [:hsb 360 50 30]
+                                                            :interval 45
+                                                            :stroke-width 15
+                                                            :size-step 10
+                                                            :center-x 500
+                                                            :center-y 500
+                                                            :max-diameter 1000}]
+                                                [raindrops {:color [:hsb 360 50 30]
+                                                            :interval 42
+                                                            :stroke-width 15
+                                                            :size-step 10
+                                                            :center-x 500
+                                                            :center-y 50
+                                                            :max-diameter 800}]]}}
 
 
                    {:id :be
@@ -431,7 +473,7 @@
                                                 [bounce {:interval 650 :color [:hsb 60 70 50]}]
                                                 [bounce {:interval 600 :color [:hsb 230 70 50]}]]}}]
 
-          :init-scene :twra}
+          :init-scene :rain}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

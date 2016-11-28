@@ -216,6 +216,20 @@
            (= direction :horizontal) (q/rect 0 (* h y-interval) width y-interval)
            (= direction :vertical) (q/rect (* h x-interval) 0 x-interval height)))))}))
 
+(defn image-background
+  "for LED configuration"
+  [[x y width height]]
+  {:setup
+   (fn [_]
+     {:backgr (q/load-image "fragments2small.jpg")})
+
+   :draw
+   (fn [state]
+     (q/background-image (:backgr state))
+     (stroke-and-fill [:hsb 70 0 30])
+     (q/stroke-weight 3)
+     (q/text (str (q/mouse-x) " " (q/mouse-y)) 10 400))})
+
 (defn beacon
   "Low light beacon visualization centered around center-x and center-y. The beacon expands from 0 to max-diameter over the specified interval. You can specify the color and stroke-width of the beacon."
   [[x y width height] {:keys [center-x center-y interval offset max-diameter color stroke-width]}]
@@ -274,6 +288,49 @@
        (q/stroke-weight stroke-width)
        (if restrict-size (q/ellipse center-x center-y (:diameter state) (:diameter state))
                          (cond (< (:diameter state) width) (q/ellipse center-x center-y (:diameter state) (:diameter state)))))}))
+
+(defn raindrops
+  "droplets"
+  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter restrict-size color stroke-width]}]
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
+        interval (or interval 200)
+        size-step (or size-step 40)
+        offset (or offset 0)
+        max-diameter (or max-diameter (max width height))
+        color (or color [:hsb 115 50 50])
+        stroke-width (or stroke-width 20)]
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :diameter 0
+        :center-x center-x
+        :center-y center-y
+        :interval interval
+        :max-diameter max-diameter})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
+       (if (< time (+ last-step-time interval offset))
+         state
+         (if (> (+ size-step (:diameter state)) (:max-diameter state))
+           {:last-step-time time
+            :diameter 0
+            :center-x (rand width)
+            :center-y (rand height)
+            :max-diameter (+ 400 (rand 600))}
+           {:last-step-time time
+            :diameter (+ size-step (:diameter state))
+            :center-x (:center-x state)
+            :center-y (:center-y state)
+            :max-diameter (:max-diameter state)})))
+
+     :draw
+     (fn [state]
+       (q/no-fill)
+       (stroke color)
+       (q/stroke-weight stroke-width)(q/ellipse (:center-x state) (:center-y state) (:diameter state) (:diameter state)))}))
 
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."
@@ -620,7 +677,7 @@
        (q/translate center-x center-y)
        (q/rotate (:angle state))
        (cond
-         (= shape :star) (draw-star 0 0 size-1 size-2 5)
+         (= shape :star) (draw-star 0 0 size-1 size-2 7)
          (= shape :rect) (q/rect 0 0 size-1 size-2)
          (= shape :heart) (draw-heart 0 0 50))
        (q/pop-matrix))}))
