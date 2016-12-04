@@ -291,14 +291,15 @@
 
 (defn raindrops
   "droplets"
-  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter restrict-size color stroke-width]}]
+  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter restrict-size color1 color2 stroke-width]}]
   (let [center-x (or center-x (/ width 2))
         center-y (or center-y (/ height 2))
         interval (or interval 200)
         size-step (or size-step 40)
         offset (or offset 0)
         max-diameter (or max-diameter (max width height))
-        color (or color [:hsb 115 50 50])
+        color1 (or color1 [:hsb 115 50 50])
+        color2 (or color2 [:hsb 115 50 30])
         stroke-width (or stroke-width 20)]
 
     {:setup
@@ -307,7 +308,6 @@
         :diameter 0
         :center-x center-x
         :center-y center-y
-        :interval interval
         :max-diameter max-diameter})
 
      :update
@@ -329,8 +329,11 @@
      :draw
      (fn [state]
        (q/no-fill)
-       (stroke color)
-       (q/stroke-weight stroke-width)(q/ellipse (:center-x state) (:center-y state) (:diameter state) (:diameter state)))}))
+       (stroke color1)
+       (q/stroke-weight stroke-width)
+       (q/ellipse (:center-x state) (:center-y state) (:diameter state) (:diameter state)))}))
+       ;(stroke color2)
+       ;(q/ellipse (:center-x state) (:center-y state) (- (:diameter state) 25) (- (:diameter state) 25)))}))
 
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."

@@ -9,7 +9,7 @@
 
 (def system nil)
 
-(def config-path (atom "configs/dev.edn"))
+(def config-path (atom "configs/fragments2.edn"))
 
 (defn init []
   (alter-var-root #'system
