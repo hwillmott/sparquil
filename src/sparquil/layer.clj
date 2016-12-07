@@ -291,7 +291,7 @@
 
 (defn raindrops
   "droplets"
-  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter restrict-size color1 color2 stroke-width]}]
+  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter restrict-size color1 color2 stroke-width spacing]}]
   (let [center-x (or center-x (/ width 2))
         center-y (or center-y (/ height 2))
         interval (or interval 200)
@@ -299,8 +299,8 @@
         offset (or offset 0)
         max-diameter (or max-diameter (max width height))
         color1 (or color1 [:hsb 115 50 50])
-        color2 (or color2 [:hsb 115 50 30])
-        stroke-width (or stroke-width 20)]
+        stroke-width (or stroke-width 20)
+        spacing (or spacing 70)]
 
     {:setup
      (fn [{:keys [:env/time]}]
@@ -317,8 +317,8 @@
          (if (> (+ size-step (:diameter state)) (:max-diameter state))
            {:last-step-time time
             :diameter 0
-            :center-x (rand width)
-            :center-y (rand height)
+            :center-x (+ (rand (/ width 3)) (/ width 3))
+            :center-y (+ (rand (/ height 3)) (/ height 3))
             :max-diameter (+ 400 (rand 600))}
            {:last-step-time time
             :diameter (+ size-step (:diameter state))
@@ -331,9 +331,10 @@
        (q/no-fill)
        (stroke color1)
        (q/stroke-weight stroke-width)
-       (q/ellipse (:center-x state) (:center-y state) (:diameter state) (:diameter state)))}))
-       ;(stroke color2)
-       ;(q/ellipse (:center-x state) (:center-y state) (- (:diameter state) 25) (- (:diameter state) 25)))}))
+       (q/ellipse (:center-x state) (:center-y state) (:diameter state) (:diameter state))
+       (when (and color2 (> (:diameter state) spacing))
+         (stroke color2)
+         (q/ellipse (:center-x state) (:center-y state) (- (:diameter state) spacing) (- (:diameter state) spacing))))}))
 
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."

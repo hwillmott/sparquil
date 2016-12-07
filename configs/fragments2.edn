@@ -205,17 +205,29 @@
                                                                  :upper-limit-b 25
                                                                  :twinkle-step 0.1}]]}}
 
-                   {:id :beaconred
+                   {:id :beaconyellow
                     :display-name "beacon"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[beacon {:color [:hsb 28 70 30] :interval 2000 :stroke-width 15 :size-step 50}]
-                                                [beacon {:color [:hsb 30 70 30] :interval 2000 :stroke-width 15 :offset 400 :size-step 50}]]}}
+                    :layer-map {:global-bottom [[beacon {:color [:hsb 30 70 30] :interval 2000 :stroke-width 15 :size-step 50}]
+                                                [beacon {:color [:hsb 30 65 30] :interval 2000 :stroke-width 15 :offset 300 :size-step 50}]]}}
 
                    {:id :beaconblue
                     :display-name "beacon"
                     :led-layout :normal
                     :layer-map {:global-bottom [[beacon {:color [:hsb 175 50 40] :interval 1300 :stroke-width 15 :size-step 50}]
                                                 [beacon {:color [:hsb 200 50 40] :interval 1300 :stroke-width 15 :offset 200 :size-step 50}]]}}
+
+                   {:id :droplet
+                    :display-name "rain"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[raindrops {:color1 [:hsb 30 70 30]
+                                                            :color2 [:hsb 30 65 30]
+                                                            :interval 50
+                                                            :stroke-width 15
+                                                            :size-step 10
+                                                            :center-x 100
+                                                            :center-y 100
+                                                            :max-diameter 1300}]]}}
 
                    {:id :rain
                     :display-name "rain"
@@ -277,7 +289,7 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[pinwheel {:center-x 200 :center-y 200 :radius 400 :interval 5000}]]}}]
 
-          :init-scene :beaconred}
+          :init-scene :droplet}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
