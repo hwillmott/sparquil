@@ -225,8 +225,8 @@
                                                             :interval 50
                                                             :stroke-width 15
                                                             :size-step 10
-                                                            :center-x 100
-                                                            :center-y 100
+                                                            :min-d 400
+                                                            :range-d 300
                                                             :max-diameter 1300}]]}}
 
                    {:id :rain
@@ -237,24 +237,24 @@
                                                             :interval 50
                                                             :stroke-width 15
                                                             :size-step 8
-                                                            :center-x 100
-                                                            :center-y 100
+                                                            :min-d 400
+                                                            :range-d 600
                                                             :max-diameter 1300}]
                                                 [raindrops {:color1 [:hsb 360 50 30]
                                                             :color2 [:hsb 360 50 15]
                                                             :interval 47
                                                             :stroke-width 15
                                                             :size-step 8
-                                                            :center-x 500
-                                                            :center-y 500
+                                                            :min-d 400
+                                                            :range-d 600
                                                             :max-diameter 1000}]
                                                 [raindrops {:color1 [:hsb 360 50 30]
                                                             :color2 [:hsb 360 50 15]
                                                             :interval 45
                                                             :stroke-width 15
                                                             :size-step 8
-                                                            :center-x 500
-                                                            :center-y 50
+                                                            :min-d 400
+                                                            :range-d 600
                                                             :max-diameter 800}]]}}
 
 

@@ -291,13 +291,16 @@
 
 (defn raindrops
   "droplets"
-  [[x y width height] {:keys [center-x center-y interval size-step offset max-diameter restrict-size color1 color2 stroke-width spacing]}]
-  (let [center-x (or center-x (/ width 2))
-        center-y (or center-y (/ height 2))
+  [[x y width height] {:keys [min-x range-x min-y range-y min-d range-d interval size-step offset color1 color2 stroke-width spacing]}]
+  (let [min-x (or min-x (/ width 3))
+        range-x (or range-x (/ width 3))
+        min-y (or min-y (/ height 3))
+        range-y (or range-y (/ height 3))
+        min-d (or min-d (/ width 2))
+        range-d (or range-d (/ width 2))
         interval (or interval 200)
         size-step (or size-step 40)
         offset (or offset 0)
-        max-diameter (or max-diameter (max width height))
         color1 (or color1 [:hsb 115 50 50])
         stroke-width (or stroke-width 20)
         spacing (or spacing 70)]
@@ -306,9 +309,9 @@
      (fn [{:keys [:env/time]}]
        {:last-step-time time
         :diameter 0
-        :center-x center-x
-        :center-y center-y
-        :max-diameter max-diameter})
+        :center-x (+ min-x (rand range-x))
+        :center-y (+ min-y (rand range-y))
+        :max-diameter (+ min-d (rand range-d))})
 
      :update
      (fn [{:keys [:env/time]} {:keys [last-step-time grid] :as state}]
@@ -317,9 +320,9 @@
          (if (> (+ size-step (:diameter state)) (:max-diameter state))
            {:last-step-time time
             :diameter 0
-            :center-x (+ (rand (/ width 3)) (/ width 3))
-            :center-y (+ (rand (/ height 3)) (/ height 3))
-            :max-diameter (+ 400 (rand 600))}
+            :center-x (+ min-x (rand range-x))
+            :center-y (+ min-y (rand range-y))
+            :max-diameter (+ min-d (rand range-d))}
            {:last-step-time time
             :diameter (+ size-step (:diameter state))
             :center-x (:center-x state)
