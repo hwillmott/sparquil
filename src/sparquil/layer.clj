@@ -230,6 +230,15 @@
      (q/stroke-weight 3)
      (q/text (str (q/mouse-x) " " (q/mouse-y)) 10 400))})
 
+(defn mouse-coordinates
+  "for LED configuration"
+  [[x y width height]]
+  {:draw
+   (fn [_]
+     (stroke-and-fill [:hsb 70 0 30])
+     (q/stroke-weight 3)
+     (q/text (str (q/mouse-x) " " (q/mouse-y)) 10 400))})
+
 (defn beacon
   "Low light beacon visualization centered around center-x and center-y. The beacon expands from 0 to max-diameter over the specified interval. You can specify the color and stroke-width of the beacon."
   [[x y width height] {:keys [center-x center-y interval offset max-diameter color stroke-width]}]
@@ -373,6 +382,21 @@
        (doseq [i (range count)]
          (q/vertex (+ center-x (* length (q/cos (+ (:angle state) (q/radians (* i spoke-angle))))))
                    (+ center-y (* length (q/sin (+ (:angle state) (q/radians (* i spoke-angle))))))))
+       (q/end-shape :close))}))
+
+(defn shape
+  "color an irregular shape, given coordinates"
+  [[x y width height] {:keys [coordinates color]}]
+  (let [color (or color [:hsb 30 65 30])]
+
+    {:draw
+     (fn [state]
+       (q/begin-shape)
+       (stroke color)
+       (q/stroke-weight 10)
+       (q/fill 0)
+       (doseq [[x y] coordinates]
+         (q/vertex x y))
        (q/end-shape :close))}))
 
 (defn inverted-beacon
