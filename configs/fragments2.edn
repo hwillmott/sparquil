@@ -274,6 +274,21 @@
                                                 [shape {:coordinates [[225 216] [207 320] [152 367] [127 353] [132 281]]}]
                                                 [shape {:coordinates [[248 265] [360 439] [241 355]]}]]}}
 
+                   {:id :shimmer-shapes
+                    :display-name "shimmer-shapes"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[mouse-coordinates]
+                                                [shimmer-shape {:coordinates [[368 270] [376 316] [331 342] [314 315]]}]
+                                                [shimmer-shape {:coordinates [[403 284] [497 281] [499 383]]}]
+                                                [shimmer-shape {:coordinates [[383 180] [443 171] [538 252] [395 256]]}]
+                                                [shimmer-shape {:coordinates [[379 153] [425 148] [363 82]]}]
+                                                [shimmer-shape {:coordinates [[355 230] [305 274] [257 225] [330 96]]}]
+                                                [shimmer-shape {:coordinates [[119 115] [242 91] [183 10]]}]
+                                                [shimmer-shape {:coordinates [[98 157] [231 187] [285 118]]}]
+                                                [shimmer-shape {:coordinates [[130 188] [177 210] [131 250] [90 225]]}]
+                                                [shimmer-shape {:coordinates [[225 216] [207 320] [152 367] [127 353] [132 281]]}]
+                                                [shimmer-shape {:coordinates [[248 265] [360 439] [241 355]]}]]}}
+
                    {:id :spokes
                     :display-name "spokes"
                     :led-layout :normal
@@ -284,7 +299,7 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[pinwheel {:center-x 200 :center-y 200 :radius 400 :interval 5000}]]}}]
 
-          :init-scene :shapes}
+          :init-scene :shimmer-shapes}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

@@ -399,6 +399,40 @@
          (q/vertex x y))
        (q/end-shape :close))}))
 
+(defn shimmer-shape
+  "color an irregular shape, given coordinates"
+  [[x y width height] {:keys [coordinates hue-range brightness-range perlin-step interval]}]
+  (let [hue-range (or hue-range [150 360])
+        brightness-range (or brightness-range [10 30])
+        perlin-step (or perlin-step 0.05)
+        interval (or interval 40)]
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:h-offset (rand 10)
+        :b-offset (rand 10)
+        :last-step-time time})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [h-offset b-offset last-step-time] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:h-offset (+ h-offset perlin-step)
+          :b-offset (+ b-offset perlin-step)
+          :last-step-time time}))
+
+     :draw
+     (fn [{:keys [h-offset b-offset last-step-time] :as state}]
+       (let [h (q/map-range (q/noise h-offset) 0 1 (get hue-range 0) (get hue-range 1))
+             b (q/map-range (q/noise b-offset) 0 1 (get brightness-range 0) (get brightness-range 1))]
+         (q/begin-shape)
+         (stroke [:hsb h 55 b])
+         (q/stroke-weight 10)
+         (q/fill 0)
+         (doseq [[x y] coordinates]
+           (q/vertex x y))
+         (q/end-shape :close)))}))
+
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."
   [[x y width height] {:keys [center-x center-y interval offset max-diameter stroke-width]}]
