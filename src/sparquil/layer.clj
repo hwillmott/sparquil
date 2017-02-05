@@ -339,6 +339,42 @@
          (stroke color2)
          (q/ellipse (:center-x state) (:center-y state) (- (:diameter state) spacing) (- (:diameter state) spacing))))}))
 
+(defn spokes
+  "like the spokes of a bicycle wheel"
+  [[x y width height] {:keys [center-x center-y color interval step-size count length stroke-width]}]
+  (let [center-x (or center-x (/ width 2))
+        center-y (or center-y (/ height 2))
+        color (or color [:hsb 30 65 30])
+        interval (or interval 50)
+        step-size (or step-size 8)
+        count (or count 15)
+        spoke-angle (/ 360 count)
+        length (or length (max width height))
+        stroke-width (or stroke-width 10)]
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:angle 0
+        :last-step-time time})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [angle last-step-time] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:angle (+ angle step-size)
+          :last-step-time time}))
+
+     :draw
+     (fn [state]
+       (q/begin-shape :triangle-fan)
+       (stroke color)
+       (q/stroke-weight stroke-width)
+       (q/fill 0)
+       (q/vertex center-x center-y)
+       (doseq [i (range count)]
+         (q/vertex (+ center-x (* length (q/cos (+ (:angle state) (q/radians (* i spoke-angle))))))
+                   (+ center-y (* length (q/sin (+ (:angle state) (q/radians (* i spoke-angle))))))))
+       (q/end-shape :close))}))
+
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."
   [[x y width height] {:keys [center-x center-y interval offset max-diameter stroke-width]}]

@@ -214,8 +214,8 @@
                    {:id :beaconblue
                     :display-name "beacon"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[beacon {:color [:hsb 175 50 40] :interval 1300 :stroke-width 15 :size-step 50}]
-                                                [beacon {:color [:hsb 200 50 40] :interval 1300 :stroke-width 15 :offset 200 :size-step 50}]]}}
+                    :layer-map {:global-bottom [[beacon {:color [:hsb 185 45 25] :interval 1300 :stroke-width 15 :size-step 50}]
+                                                [beacon {:color [:hsb 200 45 25] :interval 1300 :stroke-width 15 :offset 200 :size-step 50}]]}}
 
                    {:id :droplet
                     :display-name "rain"
@@ -225,7 +225,7 @@
                                                             :interval 50
                                                             :stroke-width 15
                                                             :size-step 10
-                                                            :min-d 400
+                                                            :min-d 500
                                                             :range-d 300
                                                             :max-diameter 1300}]]}}
 
@@ -233,7 +233,6 @@
                     :display-name "rain"
                     :led-layout :normal
                     :layer-map {:global-bottom [[raindrops {:color1 [:hsb 360 50 30]
-                                                            :color2 [:hsb 360 50 15]
                                                             :interval 50
                                                             :stroke-width 15
                                                             :size-step 8
@@ -241,7 +240,6 @@
                                                             :range-d 600
                                                             :max-diameter 1300}]
                                                 [raindrops {:color1 [:hsb 360 50 30]
-                                                            :color2 [:hsb 360 50 15]
                                                             :interval 47
                                                             :stroke-width 15
                                                             :size-step 8
@@ -249,7 +247,6 @@
                                                             :range-d 600
                                                             :max-diameter 1000}]
                                                 [raindrops {:color1 [:hsb 360 50 30]
-                                                            :color2 [:hsb 360 50 15]
                                                             :interval 45
                                                             :stroke-width 15
                                                             :size-step 8
@@ -258,38 +255,17 @@
                                                             :max-diameter 800}]]}}
 
 
-                   {:id :rost
-                    :display-name "rotating star"
+                   {:id :spokes
+                    :display-name "spokes"
                     :led-layout :normal
-                    :layer-map {:global-bottom [[rotate-shape-odroid {:interval 50
-                                                                      :angle-step 0.1
-                                                                      :size-1 80
-                                                                      :size-2 160
-                                                                      :stroke-width 8
-                                                                      :color [:hsb 30 50 30]
-                                                                      :shape :star}]
-                                                [rotate-shape-odroid {:interval 50
-                                                                      :angle-step 0.1
-                                                                      :size-1 60
-                                                                      :size-2 120
-                                                                      :stroke-width 8
-                                                                      :color [:hsb 50 50 30]
-                                                                      :shape :star}]
-                                                [rotate-shape-odroid {:interval 50
-                                                                      :angle-step 0.1
-                                                                      :size-1 40
-                                                                      :size-2 80
-                                                                      :stroke-width 8
-                                                                      :color [:hsb 80 50 30]
-                                                                      :shape :star}]]}}
-
+                    :layer-map {:global-bottom [[spokes {:center-x 280 :center-y 50}]]}}
 
                    {:id :pinwheel
                     :display-name "pinwheel"
                     :led-layout :normal
                     :layer-map {:global-bottom [[pinwheel {:center-x 200 :center-y 200 :radius 400 :interval 5000}]]}}]
 
-          :init-scene :droplet}
+          :init-scene :spokes}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
