@@ -299,7 +299,7 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[pinwheel {:center-x 200 :center-y 200 :radius 400 :interval 5000}]]}}]
 
-          :init-scene :shimmer-shapes}
+          :init-scene :rain}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}

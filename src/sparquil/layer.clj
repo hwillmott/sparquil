@@ -400,10 +400,10 @@
        (q/end-shape :close))}))
 
 (defn shimmer-shape
-  "color an irregular shape, given coordinates"
+  "color an irregular shape, given coordinates, using perlin noise to change the hue and brightness"
   [[x y width height] {:keys [coordinates hue-range brightness-range perlin-step interval]}]
-  (let [hue-range (or hue-range [150 360])
-        brightness-range (or brightness-range [10 30])
+  (let [hue-range (or hue-range [150 320])
+        brightness-range (or brightness-range [5 30])
         perlin-step (or perlin-step 0.05)
         interval (or interval 40)]
 
@@ -426,7 +426,7 @@
        (let [h (q/map-range (q/noise h-offset) 0 1 (get hue-range 0) (get hue-range 1))
              b (q/map-range (q/noise b-offset) 0 1 (get brightness-range 0) (get brightness-range 1))]
          (q/begin-shape)
-         (stroke [:hsb h 55 b])
+         (stroke [:hsb h 50 b])
          (q/stroke-weight 10)
          (q/fill 0)
          (doseq [[x y] coordinates]
