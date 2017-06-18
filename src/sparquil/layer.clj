@@ -448,9 +448,36 @@
      :destination-vertex destination-vertex
      :destination-pos destination-pos}))
 
+(defn calculate-next-pos
+  "calculate next position if not arriving at a vertex"
+  [magnitude speed diff curr]
+  (let [normalized [(/ (get diff 0) magnitude)
+                    (/ (get diff 1) magnitude)]
+        scaled [(* speed (get normalized 0))
+                (* speed (get normalized 1))]
+        added [(+ (get curr 0) (get scaled 0))
+               (+ (get curr 1) (get scaled 1))]]
+    added))
+
 (defn update-agent
   "update an agent"
-  [agents])
+  [agent graph speed]
+  (let [dest-v (if (= (:current-pos agent) (:destination-pos agent))
+                 (rand-nth (seq (:edges (get graph (:destination-vertex agent)))))
+                 (:destination-vertex agent))
+        dest-p (if (= (:current-pos agent) (:destination-pos agent))
+                 (:coordinates (get graph dest-v))
+                 (:destination-pos agent))
+        diff (mapv - dest-p (:current-pos agent))
+        mag-diff (q/sqrt (+ (* (get diff 0) (get diff 0)) (* (get diff 1) (get diff 1))))
+        next-pos (if (>= mag-diff speed)
+                   (calculate-next-pos mag-diff speed diff (:current-pos agent))
+                   dest-p)]
+
+    {:current-pos next-pos
+     :destination-vertex dest-v
+     :destination-pos dest-p}))
+
 
 
 (defn wandering-agents
@@ -469,7 +496,7 @@
        (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
-          :agents agents}))
+          :agents (mapv #(update-agent % graph 5) agents)}))
 
      :draw
      (fn [{:keys [last-step-time agents] :as state}]
