@@ -402,8 +402,8 @@
 (defn shimmer-shape
   "color an irregular shape, given coordinates, using perlin noise to change the hue and brightness"
   [[x y width height] {:keys [coordinates hue-range brightness-range perlin-step interval]}]
-  (let [hue-range (or hue-range [150 320])
-        brightness-range (or brightness-range [5 30])
+  (let [hue-range (or hue-range [-18 40])
+        brightness-range (or brightness-range [12 30])
         perlin-step (or perlin-step 0.05)
         interval (or interval 40)]
 
@@ -423,15 +423,43 @@
 
      :draw
      (fn [{:keys [h-offset b-offset last-step-time] :as state}]
-       (let [h (q/map-range (q/noise h-offset) 0 1 (get hue-range 0) (get hue-range 1))
-             b (q/map-range (q/noise b-offset) 0 1 (get brightness-range 0) (get brightness-range 1))]
+       (let [h (mod (q/map-range (q/noise h-offset) 0 1 (get hue-range 0) (get hue-range 1)) 360)
+             b (let [brightness (q/map-range (q/noise b-offset) 0 1 (get brightness-range 0) (get brightness-range 1))]
+                 (if (< brightness 7)
+                   0
+                   brightness))]
+
          (q/begin-shape)
-         (stroke [:hsb h 50 b])
+         (stroke [:hsb h 80 b])
          (q/stroke-weight 10)
          (q/fill 0)
          (doseq [[x y] coordinates]
            (q/vertex x y))
          (q/end-shape :close)))}))
+
+(defn wandering-agents
+  "light agents bouncing around shapes"
+  [[x y width height] {:keys [graph hue interval]}]
+  (let [hue (or hue 60)
+        interval (or interval 50)]
+
+    {:setup
+     (fn [{:keys [:env/time]}]
+       {:last-step-time time
+        :agents []})
+
+     :update
+     (fn [{:keys [:env/time]} {:keys [last-step-time] :as state}]
+       (if (< time (+ last-step-time interval))
+         state
+         {:last-step-time time}))
+
+     :draw
+     (fn [{:keys [last-step-time] :as state}]
+       (doseq [[key value] graph]
+         (let [[x y] (:coordinates value)]
+           (stroke-and-fill [:hsb hue 50 30])
+           (q/ellipse x y 15 15))))}))
 
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."

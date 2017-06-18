@@ -289,6 +289,46 @@
                                                 [shimmer-shape {:coordinates [[225 216] [207 320] [152 367] [127 353] [132 281]]}]
                                                 [shimmer-shape {:coordinates [[248 265] [360 439] [241 355]]}]]}}
 
+                   {:id :wandering-agents
+                    :display-name "wandering agents"
+                    :led-layout :normal
+                    :layer-map {:global-bottom [[mouse-coordinates]
+                                                [wandering-agents {:graph {:a1 {:coordinates [368 270] :edges [:a2 :a4] :jumps [:e2 :e1 :b1 :c4]}
+                                                                           :a2 {:coordinates [371 312] :edges [:a1 :a3]}
+                                                                           :a3 {:coordinates [331 341] :edges [:a2 :a4]}
+                                                                           :a4 {:coordinates [314 315] :edges [:a1 :a3] :jumps [:e2]}
+                                                                           :b1 {:coordinates [403 284] :edges [:b2 :b3] :jumps [:a1 :e1 :c4]}
+                                                                           :b2 {:coordinates [497 281] :edges [:b1 :b3] :jumps [:c3]}
+                                                                           :b3 {:coordinates [493 370] :edges [:b1 :b2]}
+                                                                           :c1 {:coordinates [383 180] :edges [:c2 :c4] :jumps [:d1]}
+                                                                           :c2 {:coordinates [443 171] :edges [:c1 :c3] :jumps [:d2]}
+                                                                           :c3 {:coordinates [526 245] :edges [:c2 :c4] :jumps [:b2]}
+                                                                           :c4 {:coordinates [395 256] :edges [:c1 :c3] :jumps [:a1 :b1 :e1]}
+                                                                           :d1 {:coordinates [379 153] :edges [:d2 :d3] :jumps [:c1]}
+                                                                           :d2 {:coordinates [415 144] :edges [:d1 :d3] :jumps [:c2]}
+                                                                           :d3 {:coordinates [363 89] :edges [:d1 :d2] :jumps [:e4]}
+                                                                           :e1 {:coordinates [355 230] :edges [:e2 :e4] :jumps [:a1 :b1 :c4]}
+                                                                           :e2 {:coordinates [305 274] :edges [:e1 :e3] :jumps [:a4]}
+                                                                           :e3 {:coordinates [261 223] :edges [:e2 :e4] :jumps [:g2 :i1 :j1]}
+                                                                           :e4 {:coordinates [326 106] :edges [:e1 :e3] :jumps [:d3 :g3]}
+                                                                           :f1 {:coordinates [119 115] :edges [:f2 :f3] :jumps [:g1]}
+                                                                           :f2 {:coordinates [242 91] :edges [:f1 :f3] :jumps [:g3]}
+                                                                           :f3 {:coordinates [182 16] :edges [:f1 :f2]}
+                                                                           :g1 {:coordinates [98 157] :edges [:g2 :g3] :jumps [:f1 :h1]}
+                                                                           :g2 {:coordinates [231 187] :edges [:g1 :g3] :jumps [:e1 :h1 :i1]}
+                                                                           :g3 {:coordinates [279 121] :edges [:g1 :g2] :jumps [:e4 :f2]}
+                                                                           :h1 {:coordinates [130 188] :edges [:h2 :h4] :jumps [:g1]}
+                                                                           :h2 {:coordinates [177 210] :edges [:h1 :h3] :jumps [:g2 :i1]}
+                                                                           :h3 {:coordinates [131 250] :edges [:h2 :h4] :jumps [:i5]}
+                                                                           :h4 {:coordinates [90 225] :edges [:h1 :h3]}
+                                                                           :i1 {:coordinates [225 216] :edges [:i2 :i5] :jumps [:e3 :g2 :h2]}
+                                                                           :i2 {:coordinates [207 320] :edges [:i1 :i3] :jumps [:j1]}
+                                                                           :i3 {:coordinates [152 367] :edges [:i2 :i4] :jumps [:j3]}
+                                                                           :i4 {:coordinates [127 353] :edges [:i3 :i5]}
+                                                                           :i5 {:coordinates [132 281] :edges [:i1 :i4] :jumps [:h3]}
+                                                                           :j1 {:coordinates [249 270] :edges [:j2 :j3] :jumps [:e3 :i2]}
+                                                                           :j2 {:coordinates [344 424] :edges [:j1 :j3]}
+                                                                           :j3 {:coordinates [241 355] :edges [:j1 :j2] :jumps [:i3]}}}]]}}
                    {:id :spokes
                     :display-name "spokes"
                     :led-layout :normal
@@ -299,7 +339,7 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[pinwheel {:center-x 200 :center-y 200 :radius 400 :interval 5000}]]}}]
 
-          :init-scene :rain}
+          :init-scene :wandering-agents}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
