@@ -437,6 +437,22 @@
            (q/vertex x y))
          (q/end-shape :close)))}))
 
+(defn new-agent
+  "create a new agent to bounce around"
+  [graph]
+  (let [vertex (rand-nth (seq graph))
+        current-pos (:coordinates (val vertex))
+        destination-vertex (rand-nth (seq (:edges (val vertex))))
+        destination-pos (:coordinates (get graph destination-vertex))]
+    {:current-pos current-pos
+     :destination-vertex destination-vertex
+     :destination-pos destination-pos}))
+
+(defn update-agent
+  "update an agent"
+  [agents])
+
+
 (defn wandering-agents
   "light agents bouncing around shapes"
   [[x y width height] {:keys [graph hue interval]}]
@@ -446,18 +462,19 @@
     {:setup
      (fn [{:keys [:env/time]}]
        {:last-step-time time
-        :agents []})
+        :agents [(new-agent graph)]})
 
      :update
-     (fn [{:keys [:env/time]} {:keys [last-step-time] :as state}]
+     (fn [{:keys [:env/time]} {:keys [last-step-time agents] :as state}]
        (if (< time (+ last-step-time interval))
          state
-         {:last-step-time time}))
+         {:last-step-time time
+          :agents agents}))
 
      :draw
-     (fn [{:keys [last-step-time] :as state}]
-       (doseq [[key value] graph]
-         (let [[x y] (:coordinates value)]
+     (fn [{:keys [last-step-time agents] :as state}]
+       (doseq [agent agents]
+         (let [[x y] (:current-pos agent)]
            (stroke-and-fill [:hsb hue 50 30])
            (q/ellipse x y 15 15))))}))
 
