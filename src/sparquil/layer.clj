@@ -444,7 +444,8 @@
         current-pos (:coordinates (val vertex))
         destination-vertex (rand-nth (seq (:edges (val vertex))))
         destination-pos (:coordinates (get graph destination-vertex))]
-    {:current-pos current-pos
+    {:source-vertex (key vertex)
+     :current-pos current-pos
      :destination-vertex destination-vertex
      :destination-pos destination-pos}))
 
@@ -462,19 +463,24 @@
 (defn update-agent
   "update an agent"
   [agent graph speed]
-  (let [dest-v (if (= (:current-pos agent) (:destination-pos agent))
+  (let [update-target (= (:current-pos agent) (:destination-pos agent))
+        dest-v (if update-target
                  (rand-nth (seq (:edges (get graph (:destination-vertex agent)))))
                  (:destination-vertex agent))
-        dest-p (if (= (:current-pos agent) (:destination-pos agent))
+        dest-p (if update-target
                  (:coordinates (get graph dest-v))
                  (:destination-pos agent))
+        source-v (if update-target
+                   (:destination-vertex agent)
+                   (:source-vertex agent))
         diff (mapv - dest-p (:current-pos agent))
         mag-diff (q/sqrt (+ (* (get diff 0) (get diff 0)) (* (get diff 1) (get diff 1))))
         next-pos (if (>= mag-diff speed)
                    (calculate-next-pos mag-diff speed diff (:current-pos agent))
                    dest-p)]
 
-    {:current-pos next-pos
+    {:source-vertex source-v
+     :current-pos next-pos
      :destination-vertex dest-v
      :destination-pos dest-p}))
 
