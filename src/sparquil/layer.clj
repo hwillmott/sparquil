@@ -465,7 +465,9 @@
   [agent graph speed]
   (let [update-target (= (:current-pos agent) (:destination-pos agent))
         dest-v (if update-target
-                 (rand-nth (seq (:edges (get graph (:destination-vertex agent)))))
+                 (let [edges (:edges (get graph (:destination-vertex agent)))
+                       edges-excluded (seq (remove #{(:source-vertex agent)} edges))]
+                   (rand-nth edges-excluded))
                  (:destination-vertex agent))
         dest-p (if update-target
                  (:coordinates (get graph dest-v))
