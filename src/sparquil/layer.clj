@@ -445,7 +445,7 @@
         destination-vertex (rand-nth (seq (:edges (val vertex))))
         destination-pos (:coordinates (get graph destination-vertex))]
     {:source-vertex (key vertex)
-     :current-pos current-pos
+     :positions [current-pos]
      :destination-vertex destination-vertex
      :destination-pos destination-pos}))
 
@@ -463,7 +463,7 @@
 (defn update-agent
   "update an agent"
   [agent graph speed]
-  (let [update-target (= (:current-pos agent) (:destination-pos agent))
+  (let [update-target (= (get (:positions agent) 0) (:destination-pos agent))
         dest-v (if update-target
                  (rand-nth (seq (remove
                                   #{(:source-vertex agent)}
@@ -475,14 +475,19 @@
         source-v (if update-target
                    (:destination-vertex agent)
                    (:source-vertex agent))
-        diff (mapv - dest-p (:current-pos agent))
-        mag-diff (q/sqrt (+ (* (get diff 0) (get diff 0)) (* (get diff 1) (get diff 1))))
-        next-pos (if (>= mag-diff speed)
-                   (calculate-next-pos mag-diff speed diff (:current-pos agent))
+        diff (mapv - dest-p (get (:positions agent) 0))
+        magnitude (q/sqrt (+
+                           (* (get diff 0) (get diff 0))
+                           (* (get diff 1) (get diff 1))))
+        next-p (if (>= magnitude speed)
+                   (calculate-next-pos magnitude speed diff (get (:positions agent) 0))
                    dest-p)]
 
     {:source-vertex source-v
-     :current-pos next-pos
+     :positions [next-p
+                 (get (:positions agent) 0)
+                 (get (:positions agent) 1)
+                 (get (:positions agent) 2)]
      :destination-vertex dest-v
      :destination-pos dest-p}))
 
@@ -504,14 +509,15 @@
        (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
-          :agents (mapv #(update-agent % graph 5) agents)}))
+          :agents (mapv #(update-agent % graph 10) agents)}))
 
      :draw
      (fn [{:keys [last-step-time agents] :as state}]
        (doseq [agent agents]
-         (let [[x y] (:current-pos agent)]
-           (stroke-and-fill [:hsb hue 50 30])
-           (q/ellipse x y 15 15))))}))
+         (doseq [[x y] (:positions agent)]
+           (when-not (nil? x)
+             (stroke-and-fill [:hsb hue 50 30])
+             (q/ellipse x y 15 15)))))}))
 
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."
