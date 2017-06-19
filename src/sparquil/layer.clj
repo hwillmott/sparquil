@@ -463,10 +463,10 @@
 
 (defn update-agent
   "update an agent"
-  [agent graph speed]
+  [agent graph speed max-length]
   (if (= 0 (:life agent))
     nil
-    (let [update-target (= (get (:positions agent) 0) (:destination-pos agent))
+    (let [update-target (= (last (:positions agent)) (:destination-pos agent))
           dest-v (if update-target
                    (rand-nth (seq (remove
                                     #{(:source-vertex agent)}
@@ -478,19 +478,19 @@
           source-v (if update-target
                      (:destination-vertex agent)
                      (:source-vertex agent))
-          diff (mapv - dest-p (get (:positions agent) 0))
+          diff (mapv - dest-p (last (:positions agent)))
           magnitude (q/sqrt (+
                              (* (get diff 0) (get diff 0))
                              (* (get diff 1) (get diff 1))))
           next-p (if (>= magnitude speed)
-                     (calculate-next-pos magnitude speed diff (get (:positions agent) 0))
-                     dest-p)]
+                     (calculate-next-pos magnitude speed diff (last (:positions agent)))
+                     dest-p)
+          positions (if (= max-length (count (:positions agent)))
+                      (vec (drop 1 (conj (:positions agent) next-p)))
+                      (conj (:positions agent) next-p))]
 
         {:source-vertex source-v
-         :positions [next-p
-                     (get (:positions agent) 0)
-                     (get (:positions agent) 1)
-                     (get (:positions agent) 2)]
+         :positions positions
          :destination-vertex dest-v
          :destination-pos dest-p
          :life (- (:life agent) 1)})))
@@ -499,9 +499,11 @@
 
 (defn wandering-agents
   "light agents bouncing around shapes"
-  [[x y width height] {:keys [graph hue interval]}]
+  [[x y width height] {:keys [graph hue max-length interval]}]
   (let [hue (or hue 60)
-        interval (or interval 50)]
+        interval (or interval 50)
+        max-length (or max-length 10)
+        fade-step (/ 30 max-length)]
 
     {:setup
      (fn [{:keys [:env/time]}]
@@ -513,7 +515,7 @@
        (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
-          :agents (let [agents (remove nil? (mapv #(update-agent % graph 10) agents))]
+          :agents (let [agents (remove nil? (mapv #(update-agent % graph 10 max-length) agents))]
                     (if (< (rand 100) 5)
                       (conj agents (new-agent graph))
                       agents))}))
@@ -521,10 +523,12 @@
      :draw
      (fn [{:keys [last-step-time agents] :as state}]
        (doseq [agent agents]
-         (doseq [[x y] (:positions agent)]
-           (when-not (nil? x)
-             (stroke-and-fill [:hsb hue 50 30])
-             (q/ellipse x y 15 15)))))}))
+         (let [positions (rseq (:positions agent))]
+           (doseq [idx (range (count positions))]
+             (let [[x y] (nth positions idx)]
+               (when-not (nil? x)
+                 (stroke-and-fill [:hsb hue 50 (- 30 (* idx fade-step))])
+                 (q/ellipse x y 15 15)))))))}))
 
 (defn inverted-beacon
   "Makes the whole visualization dark except for a beacon expanding from center-x and center-y, exposing the layer underneath."
