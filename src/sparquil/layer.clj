@@ -447,7 +447,8 @@
     {:source-vertex (key vertex)
      :positions [current-pos]
      :destination-vertex destination-vertex
-     :destination-pos destination-pos}))
+     :destination-pos destination-pos
+     :life 100}))
 
 (defn calculate-next-pos
   "calculate next position if not arriving at a vertex"
@@ -463,33 +464,36 @@
 (defn update-agent
   "update an agent"
   [agent graph speed]
-  (let [update-target (= (get (:positions agent) 0) (:destination-pos agent))
-        dest-v (if update-target
-                 (rand-nth (seq (remove
-                                  #{(:source-vertex agent)}
-                                  (:edges (get graph (:destination-vertex agent))))))
-                 (:destination-vertex agent))
-        dest-p (if update-target
-                 (:coordinates (get graph dest-v))
-                 (:destination-pos agent))
-        source-v (if update-target
-                   (:destination-vertex agent)
-                   (:source-vertex agent))
-        diff (mapv - dest-p (get (:positions agent) 0))
-        magnitude (q/sqrt (+
-                           (* (get diff 0) (get diff 0))
-                           (* (get diff 1) (get diff 1))))
-        next-p (if (>= magnitude speed)
-                   (calculate-next-pos magnitude speed diff (get (:positions agent) 0))
-                   dest-p)]
+  (if (= 0 (:life agent))
+    nil
+    (let [update-target (= (get (:positions agent) 0) (:destination-pos agent))
+          dest-v (if update-target
+                   (rand-nth (seq (remove
+                                    #{(:source-vertex agent)}
+                                    (:edges (get graph (:destination-vertex agent))))))
+                   (:destination-vertex agent))
+          dest-p (if update-target
+                   (:coordinates (get graph dest-v))
+                   (:destination-pos agent))
+          source-v (if update-target
+                     (:destination-vertex agent)
+                     (:source-vertex agent))
+          diff (mapv - dest-p (get (:positions agent) 0))
+          magnitude (q/sqrt (+
+                             (* (get diff 0) (get diff 0))
+                             (* (get diff 1) (get diff 1))))
+          next-p (if (>= magnitude speed)
+                     (calculate-next-pos magnitude speed diff (get (:positions agent) 0))
+                     dest-p)]
 
-    {:source-vertex source-v
-     :positions [next-p
-                 (get (:positions agent) 0)
-                 (get (:positions agent) 1)
-                 (get (:positions agent) 2)]
-     :destination-vertex dest-v
-     :destination-pos dest-p}))
+        {:source-vertex source-v
+         :positions [next-p
+                     (get (:positions agent) 0)
+                     (get (:positions agent) 1)
+                     (get (:positions agent) 2)]
+         :destination-vertex dest-v
+         :destination-pos dest-p
+         :life (- (:life agent) 1)})))
 
 
 
@@ -509,7 +513,7 @@
        (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
-          :agents (mapv #(update-agent % graph 10) agents)}))
+          :agents (remove nil? (mapv #(update-agent % graph 10) agents))}))
 
      :draw
      (fn [{:keys [last-step-time agents] :as state}]
