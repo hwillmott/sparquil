@@ -448,7 +448,7 @@
      :positions [current-pos]
      :destination-vertex destination-vertex
      :destination-pos destination-pos
-     :life 100}))
+     :life 50}))
 
 (defn calculate-next-pos
   "calculate next position if not arriving at a vertex"
@@ -513,7 +513,10 @@
        (if (< time (+ last-step-time interval))
          state
          {:last-step-time time
-          :agents (remove nil? (mapv #(update-agent % graph 10) agents))}))
+          :agents (let [agents (remove nil? (mapv #(update-agent % graph 10) agents))]
+                    (if (< (rand 100) 5)
+                      (conj agents (new-agent graph))
+                      agents))}))
 
      :draw
      (fn [{:keys [last-step-time agents] :as state}]
