@@ -197,7 +197,7 @@
 
 
           :scenes [{:id :twinkle
-                    :display-name "Twinkle star"
+                    :display-name "twinkle"
                     :led-layout :normal
                     :layer-map {:global-bottom [[twinkle-odroid {:hue 160
                                                                  :interval 50
@@ -206,19 +206,19 @@
                                                                  :twinkle-step 0.1}]]}}
 
                    {:id :beaconyellow
-                    :display-name "beacon"
+                    :display-name "beacon yellow"
                     :led-layout :normal
                     :layer-map {:global-bottom [[beacon {:color [:hsb 30 70 30] :interval 2000 :stroke-width 15 :size-step 50}]
                                                 [beacon {:color [:hsb 30 65 30] :interval 2000 :stroke-width 15 :offset 300 :size-step 50}]]}}
 
                    {:id :beaconblue
-                    :display-name "beacon"
+                    :display-name "beacon blue"
                     :led-layout :normal
                     :layer-map {:global-bottom [[beacon {:color [:hsb 185 45 25] :interval 1300 :stroke-width 15 :size-step 50}]
                                                 [beacon {:color [:hsb 200 45 25] :interval 1300 :stroke-width 15 :offset 200 :size-step 50}]]}}
 
                    {:id :droplet
-                    :display-name "rain"
+                    :display-name "droplet"
                     :led-layout :normal
                     :layer-map {:global-bottom [[raindrops {:color1 [:hsb 30 70 30]
                                                             :color2 [:hsb 30 65 30]
@@ -339,7 +339,7 @@
                     :led-layout :normal
                     :layer-map {:global-bottom [[pinwheel {:center-x 200 :center-y 200 :radius 400 :interval 5000}]]}}]
 
-          :init-scene :wandering-agents}
+          :init-scene :droplet}
 
  :redis {:host "127.0.0.1" :port 6379}
  :fadecandy {:host "127.0.0.1" :port 7890}
